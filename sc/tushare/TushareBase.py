@@ -1,0 +1,1025 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+from __future__ import division
+import sys
+import os
+import time
+import datetime
+import json
+from sqlalchemy import create_engine
+import tushare as ts
+sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../common'))
+from ConfigReader import ConfigReader
+from LightMysql import LightMysql
+
+
+class TushareBase:
+    table_name = ""
+    pause = 1
+    # 股票涨停幅度值
+    limit_up_value = 9.95
+    inside_dish = "卖盘"
+    outside_dish = "买盘"
+    midside_dish = "中性盘"
+    bidside_dish = "竞价盘"
+    t_sunso_stock_basic = "t_sunso_stock_basic"
+    t_sunso_stock_newly_quotes_data = "t_sunso_stock_newly_quotes_data"
+    t_sunso_stock_all_quotes_data = "t_sunso_stock_all_quotes_data"
+    t_sunso_stock_day_trade_statistic_data = "t_sunso_stock_day_trade_statistic_data"
+    t_tushare_stock_today_tick_trade_data = "t_tushare_stock_today_tick_trade_data"
+    t_tushare_stock_hist_tick_trade_data = "t_tushare_stock_hist_tick_trade_data"
+    t_tushare_stock_newly_quotes_data = "t_tushare_stock_newly_quotes_data"
+    t_tushare_stock_newly_quotes_data_hist = "t_tushare_stock_newly_quotes_data_hist"
+    t_tushare_stock_basic = "t_tushare_stock_basic"
+    # 小单(手)
+    min_volume = " < 200 "
+    # 中单(手)
+    mid_volume = " between 200 and 1000 "
+    # 大单(手)
+    max_volume = " between 1001 and 5000 "
+    # 超大单(手)
+    super_volume = " > 5000 "
+    # 早盘前部分时间
+    time_early_before = " between '09:30:00' and '10:00:00' "
+    # 早盘后部分时间
+    time_early_after = " between '10:00:01' and '11:31:00' "
+    # 午盘前部分时间
+    time_noon_before = " between '13:00:00' and '14:30:00' "
+    # 午盘后部分时间
+    time_noon_after = " between '14:30:01' and '14:59:00' "
+    # 降序
+    desc = "desc"
+    # 升序
+    asc = "asc"
+    func_max = "max"
+    func_min = "min"
+    func_count = "count"
+    func_sum = "sum"
+    yyyy_mm_dd_date_format = "%Y-%m-%d"
+    db_engine = None
+    db_execute = None
+
+    def __init__(self):
+        self.configReader = ConfigReader().get_conf("main")
+        TushareBase.db_engine = create_engine(self.configReader.mysql_url)
+
+        dbconfig = {
+            'host': '127.0.0.1',
+            'port': 3307,
+            'user': 'root',
+            'passwd': 'root',
+            'db': 'tushare',
+            'charset': 'utf8'}
+
+        TushareBase.db_execute = LightMysql(dbconfig)
+
+        print("基类构造函数--" + self.configReader.mysql_url)
+
+    def get_db_engine(self):
+        print("get db engine~~~" + self.configReader.mysql_url)
+        return create_engine(self.configReader.mysql_url)
+
+    def get_one_stock_basic(self, stock_code):
+        sql = "select * from " + self.t_tushare_stock_basic + " where code='" + stock_code + "'"
+        data = self.select_sql(sql)[0]
+        self.convert_dict_unicode_to_str(data)
+        return data
+
+    def get_stock_basics(self):
+        data = ts.get_stock_basics()
+        data["date"] = self.get_latest_work_day()
+        return data
+
+    def get_stock_basics_to_db(self):
+        table_name = "t_tushare_stock_basic"
+        sql = "delete from " + table_name
+        self.delete_sql(sql)
+        self.data_to_db_append(self.get_stock_basics(), table_name)
+
+    def get_stock_basics_to_hist_db(self):
+        table_name = "t_tushare_stock_basic_hist"
+        sql = "delete from " + table_name + " where date='" + self.get_latest_work_day() + "'"
+        self.delete_sql(sql)
+        self.data_to_db_append(self.get_stock_basics(), table_name)
+
+    def get_tushare_stock_newly_quotes_data_date(self):
+        sql = "select max(date) as c from " + self.t_tushare_stock_newly_quotes_data
+        return self.count_sql(sql)
+
+    # 从历史交易行情中获取某日涨停板的股票列表
+    def get_limit_up_stock(self, date):
+        sql = "select code from t_tushare_stock_hist_quotes_data where p_change>9 and date='" + date + "'"
+        data_list = self.select_sql(sql)
+        for data in data_list:
+            data["code"] = data["code"].encode('utf-8')
+        return data_list
+
+    # 从当日交易日中获取涨停股票数据
+    def get_limit_up_stock_from_newly(self):
+        sql = " select * from t_tushare_stock_newly_quotes_data where changepercent >" + str(self.limit_up_value)
+        data_list = self.select_sql(sql)
+        for data in data_list:
+            self.convert_dict_unicode_to_str(data)
+        return data_list
+
+    # 获取sunso中最近交易日的股票行情数据
+    def get_sunso_stock_newly_quotes_data(self):
+        sql = "select * from " + self.t_sunso_stock_newly_quotes_data
+        data_list = self.select_sql(sql)
+        for data in data_list:
+            self.convert_dict_unicode_to_str(data)
+        return data_list
+
+    # 获取sunso_stock_all_quotes_data指定日的股票行情数据
+    def get_sunso_stock_all_quotes_data_by_date(self, date):
+        sql = "select * from " + self.t_sunso_stock_all_quotes_data + " where trade_date='" + date + "'"
+        data_list = self.select_sql(sql)
+        self.convert_dict_list_unicode_to_str(data_list)
+        return data_list
+
+    # 把字典列表中的unicode值转换成字符串
+    def convert_dict_list_unicode_to_str(self, data_list):
+        if data_list is None:
+            return  data_list
+        for data in data_list:
+            self.convert_dict_unicode_to_str(data)
+        return data_list
+
+    # 把字典中的unicode值转换成字符串
+    def convert_dict_unicode_to_str(self, data):
+        if data is None:
+            return data
+
+        for key in data:
+            value = data[key]
+            if isinstance(value, unicode):
+                data[key] = self.encode(value)
+
+        return data
+
+    # 把unicode值转化成字符串
+    def encode(self, value):
+        return value.encode('utf-8')
+
+    # 获取当日股票的涨停价
+    def get_stock_limit_up_value(self, stock_code):
+        return round(self.get_stock_pre_close_amt(stock_code) * 1.1, 2)
+
+    # 获取当日股票的跌停价
+    def get_stock_limit_down_value(self, stock_code):
+        return round(self.get_stock_pre_close_amt(stock_code) * 0.9, 2)
+
+    # 获取股票当前第一次涨停时间
+    def get_stock_first_limit_up_time(self, stock_code):
+        limit_up_value = self.get_stock_limit_up_value(stock_code)
+        return self.get_stock_time_by_price(stock_code, limit_up_value, self.asc)
+
+    # 获取股票当前最近一次涨停时间
+    def get_stock_newly_limit_up_time(self, stock_code):
+        limit_up_value = self.get_stock_limit_up_value(stock_code)
+        return self.get_stock_time_by_price(stock_code, limit_up_value, self.desc)
+
+    # 获取股票当前第一次跌停时间
+    def get_stock_first_limit_down_time(self, stock_code):
+        limit_down_value = self.get_stock_limit_down_value(stock_code)
+        return self.get_stock_time_by_price(stock_code, limit_down_value, self.asc)
+
+    # 获取股票当前最近一次跌停时间
+    def get_stock_newly_limit_down_time(self, stock_code):
+        limit_down_value = self.get_stock_limit_down_value(stock_code)
+        return self.get_stock_time_by_price(stock_code, limit_down_value, self.desc)
+
+    # 根据股价价格，获取出现该价格的时间点
+    def get_stock_time_by_price(self, stock_code, price, time_sort):
+        sql = "select time as c from " + self.t_tushare_stock_today_tick_trade_data + " where code='" + stock_code + \
+              "' and price=" + str(price) + " order by time " + time_sort + " limit 1"
+        time_value = self.count_sql(sql)
+        if time_value is None:
+            time_value = ""
+        self.log_info("time-->" + time_value)
+        time_value = self.encode(time_value)
+        return time_value
+
+    # 获取股票昨日收盘价
+    def get_stock_pre_close_amt(self, stock_code):
+        sql = "select settlement as c from " + self.t_tushare_stock_newly_quotes_data + \
+              " where code='" + stock_code + "' "
+        return self.count_sql(sql)
+
+    def get_time_to_market_ymd(self, stock_basics_data):
+        # print("value-->" + stock_basics_data["timeToMarket"])
+        if stock_basics_data is None:
+            print("stock_basics_data parameter is emtpy")
+            return self.get_now_ymd()
+        return time.strftime('%Y-%m-%d', time.strptime(str(stock_basics_data["timeToMarket"]), '%Y%m%d'))
+
+    def get_avg_trade_volume_from_tushare_quotes(self, stock_code, days):
+        sql = "select sum(volume)/" + str(days) + " as c from ( " \
+                  "select volume from t_tushare_stock_newly_quotes_data where code='" + stock_code + "' union " \
+                  "(select volume from t_tushare_stock_hist_quotes_data where code='" + stock_code + \
+                  "' order by date desc limit " + str((days-1)) + ") "\
+              " ) as t "
+        return self.count_sql_default_zero(sql)
+
+    def get_avg_trade_amt_from_sunso_quotes(self, stock_code, days):
+        str_days = str(days)
+        sql = "select sum(trade_amt)/" + str_days + " as c from t_sunso_stock_newly_quotes_data_hist where code='" \
+              + stock_code + "' order by trade_date desc limit " + str_days
+        return self.count_sql_default_zero(sql)
+
+    # 从sunso_all_quotes 获取某股票N日内平均的交易数量
+    def get_avg_trade_volume_from_sunso_all_quotes(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_all_quotes(stock_code, date, "trade_volume", days)
+
+    # 从sunso_all_quotes 获取某股票N日内平均的交易金额
+    def get_avg_trade_amt_from_sunso_all_quotes(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_all_quotes(stock_code, date, "trade_amt", days)
+
+    # 从sunso_all_quotes 获取某股票N日内平均的交易价格
+    def get_avg_trade_price_from_sunso_all_quotes(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_all_quotes(stock_code, date, "close_amt", days)
+
+    # 从sunso_all_quotes， 获取某个股票，某字段，N日内的平均值
+    def get_avg_colum_value_from_sunso_all_quotes(self, stock_code, date, column, days):
+        str_days = str(days)
+        sql = "select sum(" + column + ")/count(*)  as c from " + self.t_sunso_stock_all_quotes_data + " " \
+              "where code='" + stock_code + "' and trade_date <='" + date + "' " \
+              "order by trade_date desc limit " + str_days
+        return self.count_sql_default_zero(sql)
+
+
+    # 判断某个股票的交易日期数是否达到足够的天数
+    def is_enough_trade_date_from_sunso_stock_all_quotes_data(self, stock_code, days):
+        count_value = self.count_stock_from_sunso_stock_all_quotes_data(stock_code)
+        if count_value >= days:
+            return True
+        return False
+
+    # 统计某个股票的交易日数量
+    def count_stock_from_sunso_stock_all_quotes_data(self, stock_code):
+        sql = "select count(*) as c from " + self.t_sunso_stock_all_quotes_data + " where code='" + stock_code + "' "
+        return self.count_sql(sql)
+
+    # 获取sunso_stock_quotes_data的列字段
+    def get_sunso_stock_quotes_data_column(self):
+        sql = "code,name,open_amt,close_amt,low_amt,high_amt,avg_amt,pre_close_amt,turnover_rate,price_change_percent," \
+              "price_wave_amt,price_wave_percent,trade_volume,trade_amt,avg5_trade_volume,avg10_trade_volume," \
+              "avg20_trade_volume,avg5_trade_amt,avg10_trade_amt,avg20_trade_amt,inside_dish_volume," \
+              "outside_dish_volume,oi_dish_diff_volume,oi_dish_volume_percent,inside_dish_amt,outside_dish_amt," \
+              "oi_dish_diff_amt,oi_dish_amt_percent,min_trade_volume,mid_trade_volume,max_trade_volume,min_trade_amt," \
+              "mid_trade_amt,max_trade_amt,first_limit_up_date,first_limit_down_date,per,pb,market_cap_amt," \
+              "circulation_amt,trade_date"
+        return sql
+
+    # 获取某个股票的最小交易日期
+    def get_min_trade_date_from_sunso_stock_all_quotes_data(self, stock_code):
+        sql = "select min(date) as c from " + self.t_sunso_stock_all_quotes_data + " where code='" + stock_code + "' "
+        return self.count_sql(sql)
+
+    # 获取股票当日总交易量
+    def get_stock_today_sum_volume(self, stock_code):
+        sql = "select sum(volume) as c from " + self.t_tushare_stock_today_tick_trade_data + " where " \
+              "code='" + stock_code + "' and date='" + self.get_latest_work_day() + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日总交易金额
+    def get_stock_today_sum_amt(self, stock_code):
+        sql = "select sum(amount) as c from " + self.t_tushare_stock_today_tick_trade_data + " where " \
+              "code='" + stock_code + "' and date='" + self.get_latest_work_day() + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的内盘交易量
+    def get_inside_dish_volume(self, stock_code):
+        return self.get_stock_dish_volume_by_type(stock_code, self.inside_dish)
+
+    # 获取股票当日的外盘交易量
+    def get_outside_dish_volume(self, stock_code):
+        return self.get_stock_dish_volume_by_type(stock_code, self.outside_dish)
+
+    # 获取股票当日的中间盘交易量
+    def get_midside_dish_volume(self, stock_code):
+        return self.get_stock_dish_volume_by_type(stock_code, self.midside_dish)
+
+    # 获取股票当日的竞价盘交易量
+    def get_bidside_dish_volume(self, stock_code):
+        return self.get_stock_dish_volume_by_type(stock_code, self.bidside_dish)
+
+    # 获取股票当日的所有交易量
+    def get_sum_dish_volume(self, stock_code):
+        return self.get_stock_dish_volume_by_type(stock_code, None)
+
+    def get_stock_dish_volume_by_type(self, stock_code, trade_type):
+        return self.get_stock_dish_volume_by_table_and_type(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, trade_type)
+
+    # 获取股票指定日的内盘交易量
+    def get_inside_dish_volume_date(self, stock_code, date):
+        return self.get_stock_dish_volume_by_type_and_date(stock_code, self.inside_dish, date)
+
+    # 获取股票指定日的外盘交易量
+    def get_outside_dish_volume_date(self, stock_code, date):
+        return self.get_stock_dish_volume_by_type_and_date(stock_code, self.outside_dish, date)
+
+    # 获取股票指定日的中间盘交易量
+    def get_midside_dish_volume_date(self, stock_code, date):
+        return self.get_stock_dish_volume_by_type_and_date(stock_code, self.midside_dish, date)
+
+    # 获取股票指定日的竞价盘交易量
+    def get_bidside_dish_volume_date(self, stock_code, date):
+        return self.get_stock_dish_volume_by_type_and_date(stock_code, self.bidside_dish, date)
+
+    def get_stock_dish_volume_by_type_and_date(self, stock_code, trade_type, date):
+        return self.get_stock_dish_volume_by_table_and_type(
+            stock_code, self.t_tushare_stock_hist_tick_trade_data, trade_type, date)
+
+    def get_stock_dish_volume_by_table_and_type(self, stock_code, table_name, trade_type, date=None):
+        sql = "select sum(volume) as c from " + table_name + " where code='" + stock_code + \
+              "' "
+
+        if trade_type is not None:
+            sql = sql + " and type='" + trade_type + "'"
+
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的内盘交易金额
+    def get_inside_dish_amt(self, stock_code):
+        return self.get_stock_dish_amt_by_type(stock_code, self.inside_dish)
+
+    # 获取股票当日的外盘交易金额
+    def get_outside_dish_amt(self, stock_code):
+        return self.get_stock_dish_amt_by_type(stock_code, self.outside_dish)
+
+    # 获取股票当日的中间盘交易金额
+    def get_midside_dish_amt(self, stock_code):
+        return self.get_stock_dish_amt_by_type(stock_code, self.midside_dish)
+
+    # 获取股票当日的竞价盘交易金额
+    def get_bidside_dish_amt(self, stock_code):
+        return self.get_stock_dish_amt_by_type(stock_code, self.bidside_dish)
+
+    # 获取股票当日的所有交易金额
+    def get_sum_dish_amt(self, stock_code):
+        return self.get_stock_dish_amt_by_type(stock_code, None)
+
+    def get_stock_dish_amt_by_type(self, stock_code, trade_type):
+        return self.get_stock_dish_amt_by_table_and_type(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, trade_type, None)
+
+    # 获取股票指定日的内盘交易金额
+    def get_inside_dish_amt_date(self, stock_code, date):
+        return self.get_stock_dish_amt_by_type_and_date(stock_code, self.inside_dish, date)
+
+    # 获取股票指定日的外盘交易金额
+    def get_outside_dish_amt_date(self, stock_code, date):
+        return self.get_stock_dish_amt_by_type_and_date(stock_code, self.outside_dish, date)
+
+    # 获取股票指定日的中间盘交易金额
+    def get_midside_dish_amt_date(self, stock_code, date):
+        return self.get_stock_dish_amt_by_type_and_date(stock_code, self.midside_dish, date)
+
+    # 获取股票指定日的竞价盘交易金额
+    def get_bidside_dish_amt_date(self, stock_code, date):
+        return self.get_stock_dish_amt_by_type_and_date(stock_code, self.bidside_dish, date)
+
+    def get_stock_dish_amt_by_type_and_date(self, stock_code, trade_type, date):
+        return self.get_stock_dish_amt_by_table_and_type(
+            stock_code, self.t_tushare_stock_hist_tick_trade_data, trade_type, date)
+
+    def get_stock_dish_amt_by_table_and_type(self, stock_code, table_name, trade_type, date):
+        sql = "select sum(amount) as c from " + table_name + " where code='" + stock_code + \
+              "' "
+        if trade_type is not None:
+            sql = sql + " and type='" + trade_type + "'"
+
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的内盘交易次数
+    def get_inside_dish_count(self, stock_code):
+        return self.get_stock_dish_count_by_type(stock_code, self.inside_dish)
+
+    # 获取股票当日的外盘交易次数
+    def get_outside_dish_count(self, stock_code):
+        return self.get_stock_dish_count_by_type(stock_code, self.outside_dish)
+
+    # 获取股票当日的中间盘交易次数
+    def get_midside_dish_count(self, stock_code):
+        return self.get_stock_dish_count_by_type(stock_code, self.midside_dish)
+
+    # 获取股票当日的竞价盘交易次数
+    def get_bidside_dish_count(self, stock_code):
+        return self.get_stock_dish_count_by_type(stock_code, self.bidside_dish)
+
+    # 获取股票当日的所有交易次数
+    def get_sum_dish_count(self, stock_code):
+        return self.get_stock_dish_count_by_type(stock_code, None)
+
+    # 获取指定日期、交易类型股票的交易次数
+    def get_stock_dish_count_by_type(self, stock_code, trade_type):
+        return self.get_stock_dish_count_by_table_and_type(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, trade_type, self.get_latest_work_day())
+
+    # 获取指定日期、交易类型股票的交易次数
+    def get_stock_dish_count_by_table_and_type(self, stock_code, table_name, trade_type, date):
+        sql = "select count(*) as c from " + table_name + " where code='" + stock_code + \
+              "' "
+        if trade_type is not None:
+            sql = sql + " and type='" + trade_type + "'"
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的小单交易次数
+    def get_min_count(self, stock_code):
+        return self.get_stock_count_by_size(stock_code, self.min_volume)
+
+    # 获取股票当日的中单交易次数
+    def get_mid_count(self, stock_code):
+        return self.get_stock_count_by_size(stock_code, self.mid_volume)
+
+    # 获取股票当日的大单交易次数
+    def get_max_count(self, stock_code):
+        return self.get_stock_count_by_size(stock_code, self.max_volume)
+
+    # 获取股票当日的超级大单交易次数
+    def get_super_count(self, stock_code):
+        return self.get_stock_count_by_size(stock_code, self.super_volume)
+
+    # 根据交易量大小类型，获取股票对应的交易次数
+    def get_stock_count_by_size(self, stock_code, volume_condition):
+        return self.get_stock_count_by_table_and_size(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, volume_condition)
+
+    # 根据对应数据表、交易量大小类型、交易日期， 获取股票对应交易次数
+    def get_stock_count_by_table_and_size(self, stock_code, table_name, volume_condition, date=None):
+        sql = "select count(*) as c from " + table_name + \
+              " where code='" + stock_code + "' and volume " + volume_condition
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的小单交易量
+    def get_min_volume(self, stock_code):
+        return self.get_stock_volume_by_size(stock_code, self.min_volume)
+
+    # 获取股票当日的中单交易量
+    def get_mid_volume(self, stock_code):
+        return self.get_stock_volume_by_size(stock_code, self.mid_volume)
+
+    # 获取股票当日的大单交易量
+    def get_max_volume(self, stock_code):
+        return self.get_stock_volume_by_size(stock_code, self.max_volume)
+
+    # 获取股票当日的超级大单交易量
+    def get_super_volume(self, stock_code):
+        return self.get_stock_volume_by_size(stock_code, self.super_volume)
+
+    def get_stock_volume_by_size(self, stock_code, volume_condition):
+        return self.get_stock_volume_by_table_and_size(stock_code, self.t_tushare_stock_today_tick_trade_data,
+                                                       volume_condition)
+
+    # 获取股票指定日的小单交易量
+    def get_min_volume_date(self, stock_code, date):
+        return self.get_stock_volume_by_size_and_date(stock_code, self.min_volume, date)
+
+    # 获取股票指定日的中单交易量
+    def get_mid_volume_date(self, stock_code, date):
+        return self.get_stock_volume_by_size_and_date(stock_code, self.mid_volume, date)
+
+    # 获取股票指定日的大单交易量
+    def get_max_volume_date(self, stock_code, date):
+        return self.get_stock_volume_by_size_and_date(stock_code, self.max_volume, date)
+
+    # 获取股票指定日的超级大单交易量
+    def get_super_volume_date(self, stock_code, date):
+        return self.get_stock_volume_by_size_and_date(stock_code, self.super_volume, date)
+
+    # 根据交易量大小类型及交易日期， 获取股票对应交易量数据
+    def get_stock_volume_by_size_and_date(self, stock_code, volume_condition, date):
+        return self.get_stock_volume_by_table_and_size(stock_code, self.t_tushare_stock_hist_tick_trade_data,
+                                                       volume_condition, date)
+
+    # 根据对应数据表、交易量大小类型、交易日期， 获取股票对应交易量数据
+    def get_stock_volume_by_table_and_size(self, stock_code, table_name, volume_condition, date=None):
+        sql = "select sum(volume) as c from " + table_name + \
+              " where code='" + stock_code + "' and volume " + volume_condition
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票当日的小单交易金额
+    def get_min_amt(self, stock_code):
+        return self.get_stock_amt_by_size(stock_code, self.min_volume)
+
+    # 获取股票当日的中单交易金额
+    def get_mid_amt(self, stock_code):
+        return self.get_stock_amt_by_size(stock_code, self.mid_volume)
+
+    # 获取股票当日的大单交易金额
+    def get_max_amt(self, stock_code):
+        return self.get_stock_amt_by_size(stock_code, self.max_volume)
+
+    # 获取股票当日的超级大单交易金额
+    def get_super_amt(self, stock_code):
+        return self.get_stock_amt_by_size(stock_code, self.super_volume)
+
+    # 根据交易量大小类型， 获取股票当日对应交易金额数据
+    def get_stock_amt_by_size(self, stock_code, volume_condition):
+        return self.get_stock_amt_by_table_and_size(stock_code, self.t_tushare_stock_today_tick_trade_data,
+                                                    volume_condition)
+
+    # 获取股票指定日的小单交易金额
+    def get_min_amt_date(self, stock_code, date):
+        return self.get_stock_amt_by_size_and_date(stock_code, self.min_volume, date)
+
+    # 获取股票指定日的中单交易金额
+    def get_mid_amt_date(self, stock_code, date):
+        return self.get_stock_amt_by_size_and_date(stock_code, self.mid_volume, date)
+
+    # 获取股票指定日的大单交易金额
+    def get_max_amt_date(self, stock_code, date):
+        return self.get_stock_amt_by_size_and_date(stock_code, self.max_volume, date)
+
+    # 获取股票指定日的超级大单交易金额
+    def get_super_amt_date(self, stock_code, date):
+        return self.get_stock_amt_by_size_and_date(stock_code, self.super_volume, date)
+
+    # 根据交易量大小类型及交易日期， 获取股票对应交易金额数据
+    def get_stock_amt_by_size_and_date(self, stock_code, volume_condition, date):
+        return self.get_stock_amt_by_table_and_size(stock_code, self.t_tushare_stock_hist_tick_trade_data,
+                                                    volume_condition, date)
+
+    # 根据对应数据表、交易量大小类型、交易日期， 获取股票对应交易金额数据
+    def get_stock_amt_by_table_and_size(self, stock_code, table_name, volume_condition, date=None):
+        sql = "select sum(amount) as c from " + table_name + \
+              " where code='" + stock_code + "' and volume " + volume_condition
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票涨停价的交易金额
+    def get_stock_amt_by_limit_up_price(self, stock_code):
+        limit_up_value = self.get_stock_limit_up_value(stock_code)
+        return self.get_stock_amt_by_price(stock_code, limit_up_value)
+
+    # 获取股票跌停价的交易金额
+    def get_stock_amt_by_limit_down_price(self, stock_code):
+        limit_down_value = self.get_stock_limit_down_value(stock_code)
+        return self.get_stock_amt_by_price(stock_code, limit_down_value)
+
+    # 根据对应数据表、价格， 获取股票对应交易金额数据
+    def get_stock_amt_by_price(self, stock_code, price):
+        return self.get_stock_column_sum_by_table_and_price(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, "amount", price, self.get_latest_work_day())
+
+    # 获取股票涨停价的交易数量
+    def get_stock_volume_by_limit_up_price(self, stock_code):
+        limit_up_value = self.get_stock_limit_up_value(stock_code)
+        return self.get_stock_volume_by_price(stock_code, limit_up_value)
+
+    # 获取股票跌停价的交易数量
+    def get_stock_volume_by_limit_down_price(self, stock_code):
+        limit_down_value = self.get_stock_limit_down_value(stock_code)
+        return self.get_stock_volume_by_price(stock_code, limit_down_value)
+
+    # 根据对应数据表、价格， 获取股票对应交易数量数据
+    def get_stock_volume_by_price(self, stock_code, price):
+        return self.get_stock_column_sum_by_table_and_price(
+            stock_code, self.t_tushare_stock_today_tick_trade_data, "volume", price, self.get_latest_work_day())
+
+    # 根据对应数据表、价格、交易日期， 获取股票对应字段的统计数
+    def get_stock_column_sum_by_table_and_price(self, stock_code, table_name, column_name, price, date=None):
+        sql = "select sum(" + column_name + ") as c from " + table_name + \
+              " where code='" + stock_code + "' and price= " + str(price)
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取股票开盘集合竞价的交易数量
+    def get_stock_volume_by_open_bid(self, stock_code):
+        return self.get_stock_volume_by_order_time_and_limt(stock_code, self.asc, 1)
+
+    # 获取股票闭盘集合竞价的交易数量
+    def get_stock_volume_by_close_bid(self, stock_code):
+        return self.get_stock_volume_by_order_time_and_limt(stock_code, self.desc, 1)
+
+    def get_stock_volume_by_order_time_and_limt(self, stock_code, order, limit):
+        date = self.get_latest_work_day()
+        return self.get_stock_column_sum_by_order_time_and_limt(stock_code, "volume", order, limit, date)
+
+    # 获取股票开盘集合竞价的交易金额
+    def get_stock_amt_by_open_bid(self, stock_code):
+        return self.get_stock_amt_by_order_time_and_limt(stock_code, self.asc, 1)
+
+    # 获取股票闭盘集合竞价的交易金额
+    def get_stock_amt_by_close_bid(self, stock_code):
+        return self.get_stock_amt_by_order_time_and_limt(stock_code, self.desc, 1)
+
+    def get_stock_amt_by_order_time_and_limt(self, stock_code, order, limit):
+        date = self.get_latest_work_day()
+        return self.get_stock_column_sum_by_order_time_and_limt(stock_code, "amount", order, limit, date)
+
+    # 根据对应交易日期，根据时间排序，及指定条数， 获取股票对应字段的统计数
+    def get_stock_column_sum_by_order_time_and_limt(self, stock_code, column_name, order, limit, date=None):
+        sql = "select sum(" + column_name + ") as c from (" \
+              "select * from " + self.t_tushare_stock_today_tick_trade_data + \
+              " where code='" + stock_code + "' and volume > 0 "
+        if date is not None:
+            sql = sql + " and date='" + date + "'"
+        sql = sql + "order by time " + order + " limit " + str(limit)
+        sql = sql + ") as t "
+        return self.count_sql_default_zero(sql)
+
+    # 获取单笔最大买单交易数量
+    def get_stock_single_max_buy_trade_volume(self, stock_code, date):
+        return self.get_stock_column_func_value_by_date_and_type(
+            stock_code, self.func_max, "volume", date, self.outside_dish)
+
+    # 获取单笔最大买单交易金额
+    def get_stock_single_max_buy_trade_amt(self, stock_code, date):
+        return self.get_stock_column_func_value_by_date_and_type(
+            stock_code, self.func_max, "amount", date, self.outside_dish)
+
+    # 获取单笔最大买单交易时间
+    def get_stock_single_max_buy_trade_time(self, stock_code, date):
+        return self.get_stock_column_func_value_by_date_and_type(
+            stock_code, self.func_max, "time", date, self.outside_dish)
+
+    # 根据对应交易日期和交易类型，获取某个股票某个字段的函数计算值，如(max,min,avg)
+    def get_stock_column_func_value_by_date_and_type(self, stock_code, func, column_name, date, trade_type):
+        sql = "select " + func + "(" + column_name + ") as c from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' and type='" + trade_type + "'"
+        return self.count_sql_default_zero(sql)
+
+    # 获取交易日，某个股票，买票的最大交易金额记录
+    def get_stock_buy_max_amt_trade_data_by_date(self, stock_code, date):
+        return self.get_stock_max_amt_trade_data_by_date_and_type(stock_code, date, self.outside_dish)
+
+    # 获取交易日，某个股票，卖盘的最大交易金额记录
+    def get_stock_sell_max_amt_trade_data_by_date(self, stock_code, date):
+        return self.get_stock_max_amt_trade_data_by_date_and_type(stock_code, date, self.inside_dish)
+
+    # 获取交易日，某个股票，卖盘或买票的最大交易金额记录
+    def get_stock_max_amt_trade_data_by_date_and_type(self, stock_code, date, trade_type):
+        default_data = {"time": '', "volume": 0, "amount": 0}
+        sql = "select time,volume,amount from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' and type='" + trade_type + "' " \
+              "order by amount desc limit 1"
+        data_list = self.select_sql(sql)
+        if data_list is None:
+            return default_data
+        return data_list[0]
+
+    # 获取早盘前部分的成交量统计
+    def get_early_before_trade_volume(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, self.time_early_before, trade_type)
+
+    # 获取早盘前部分的成交金额统计
+    def get_early_before_trade_amt(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "amount", date, volume_condition, self.time_early_before, trade_type)
+
+    # 获取早盘前部分相关函数的成交价格统计
+    def get_early_before_trade_price(self, stock_code, date, func):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, func, "price", date, None, self.time_early_before, None)
+
+    # 获取早盘前部分的成交次数统计
+    def get_early_before_trade_count(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, self.time_early_before, trade_type)
+
+    # 获取早盘后部分的成交量统计
+    def get_early_after_trade_volume(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, self.time_early_after, trade_type)
+
+    # 获取早盘后部分的成交金额统计
+    def get_early_after_trade_amt(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "amount", date, volume_condition, self.time_early_after, trade_type)
+
+    # 获取早盘后部分相关函数的成交价格统计
+    def get_early_after_trade_price(self, stock_code, date, func):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, func, "price", date, None, self.time_early_after, None)
+
+    # 获取早盘后部分的成交次数统计
+    def get_early_after_trade_count(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, self.time_early_after, trade_type)
+
+    # 获取午盘前部分的成交量统计
+    def get_noon_before_trade_volume(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, self.time_noon_before, trade_type)
+
+    # 获取午盘前部分的成交金额统计
+    def get_noon_before_trade_amt(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "amount", date, volume_condition, self.time_noon_before, trade_type)
+
+    # 获取午盘前部分相关函数的成交价格统计
+    def get_noon_before_trade_price(self, stock_code, date, func):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, func, "price", date, None, self.time_noon_before, None)
+
+    # 获取午盘前部分的成交次数统计
+    def get_noon_before_trade_count(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, self.time_noon_before, trade_type)
+
+    # 获取午盘后部分的成交量统计
+    def get_noon_after_trade_volume(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, self.time_noon_after, trade_type)
+
+    # 获取午盘后部分的成交金额统计
+    def get_noon_after_trade_amt(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "amount", date, volume_condition, self.time_noon_after, trade_type)
+
+    # 获取午盘后部分相关函数的成交价格统计
+    def get_noon_after_trade_price(self, stock_code, date, func):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, func, "price", date, None, self.time_noon_after, None)
+
+    # 获取午盘后部分的成交次数统计
+    def get_noon_after_trade_count(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, self.time_noon_after, trade_type)
+
+    # 根据交易日、交易量大小类型、交易类型、时间点，获取某个列对应函数计算值
+    def get_stock_column_func_value_by_date_time_and_volume_and_type(
+            self, stock_code, func, column_name, date, volume_condition, time_condition, trade_type):
+        sql = "select " + func + "(" + column_name + ") as c from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' "
+        if volume_condition is not None:
+            sql = sql + " and volume " + volume_condition + " "
+        if trade_type is not None:
+            sql = sql + " and type='" + trade_type + "'"
+        if time_condition is not None:
+            sql = sql + " and time " + time_condition + " "
+        return self.count_sql_default_zero(sql)
+
+    # 获取早盘前部分股票的平均价格
+    def get_early_before_avg_trade_price(self, stock_code, date):
+        return self.get_stock_avg_trade_price_by_amount_divison_volume(stock_code, date, self.time_early_before)
+
+    # 获取早盘后部分股票的平均价格
+    def get_early_after_avg_trade_price(self, stock_code, date):
+        return self.get_stock_avg_trade_price_by_amount_divison_volume(stock_code, date, self.time_early_after)
+
+    # 获取午盘前部分股票的平均价格
+    def get_noon_before_avg_trade_price(self, stock_code, date):
+        return self.get_stock_avg_trade_price_by_amount_divison_volume(stock_code, date, self.time_noon_before)
+
+    # 获取午盘后部分股票的平均价格
+    def get_noon_after_avg_trade_price(self, stock_code, date):
+        return self.get_stock_avg_trade_price_by_amount_divison_volume(stock_code, date, self.time_noon_after)
+
+    # 交易金额/交易数量，获取平均价格
+    def get_stock_avg_trade_price_by_amount_divison_volume(self, stock_code, date, time_condition):
+        sql ="select round(sum(amount)/sum(volume*100),2) as c from " + self.t_tushare_stock_today_tick_trade_data + " " \
+             "where code='" + stock_code + "' and date='" + date + "' "
+        if time_condition is not None:
+            sql = sql + " and time " + time_condition + " "
+        return self.count_sql_default_zero(sql)
+
+    # 获取大单交易类型时间分布
+    def get_max_trade_distribution_time(self, stock_code, date):
+        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.max_volume)
+
+    # 获取超级大单交易类型时间分布
+    def get_super_trade_distribution_time(self, stock_code, date):
+        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.super_volume)
+
+    # 获取某种交易类型的交易时间分布情况
+    def get_stock_trade_distribution_time_by_trade_type(self, stock_code, date, volume_condition):
+        sql = "select group_concat(time) as c from (" + " " \
+              "select * from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' and volume " + volume_condition + " " \
+              " order by time asc ) as t"
+        distribution_time = self.count_sql(sql)
+        if distribution_time is None:
+            distribution_time = ""
+        return self.encode(distribution_time)
+
+    # 获取股票连续涨跌相关数据
+    def get_stock_continue_up_down_data(self, stock_code, date):
+        result_data = {"continue_up_down_days": 0, "contiune_up_down_percent": 0}
+        newly_quotes_data = self.get_stock_newly_quotes_data(stock_code, date)
+        if newly_quotes_data is None:
+            return result_data
+
+        change_percent = newly_quotes_data["changepercent"]
+        if change_percent == 0:
+            return result_data
+
+        if change_percent > 0:
+            up_data = self.get_stock_continue_up_down_data_by_up_down_type(stock_code, date, "<")
+            return self.get_stock_continue_up_down_data_by_data(newly_quotes_data, up_data)
+
+        if change_percent < 0:
+            down_date =  self.get_stock_continue_up_down_data_by_up_down_type(stock_code, date, ">")
+            return self.get_stock_continue_up_down_data_by_data(newly_quotes_data, down_date)
+
+        return result_data
+
+    def get_stock_continue_up_down_data_by_data(self, newly_quotes_data, up_down_data):
+        change_percent = newly_quotes_data["changepercent"]
+        result_data = {"continue_up_down_days": 1, "contiune_up_down_percent": change_percent}
+        if up_down_data is None:
+            return result_data
+
+        stock_code = newly_quotes_data["code"]
+        date = newly_quotes_data["date"]
+        newly_close_amt = newly_quotes_data["trade"]
+
+        trade_date = up_down_data["trade_date"]
+        close_amt = up_down_data["close_amt"]
+        result_data["continue_up_down_days"] = self.get_stock_continue_up_down_count_by_trade_date(stock_code, trade_date, date)
+        result_data["contiune_up_down_percent"] = self.cal_percent_round_2(newly_close_amt - close_amt, close_amt)
+        return result_data
+
+    def get_stock_continue_up_down_data_by_up_down_type(self, stock_code, date, up_down_type):
+        sql = "select * from " + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where  code='" + stock_code + "' and trade_date<' " + date + "' and trade_date>"  \
+              "(select trade_date from " + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where  code='" + stock_code + "' and trade_date<'" + date + "' and price_change_percent " \
+              "" + up_down_type + " 0 order by trade_date desc limit 1) " \
+              " order by trade_date asc limit 1 "
+        return self.select_one_sql(sql)
+
+    # 根据交易日获取股票连续涨跌的次数
+    def get_stock_continue_up_down_count_by_trade_date(self, stock_code, begin_date, end_date):
+        sql = "select count(*) as c from " + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where  code='" + stock_code + "' and trade_date between '" + begin_date + "' and '" + end_date + "' "
+        return self.count_sql_default_zero(sql)
+
+    def get_stock_newly_quotes_data(self, stock_code, date):
+        sql = "select * from " + self.t_tushare_stock_newly_quotes_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "'"
+        return self.select_one_sql(sql)
+
+    def get_now_ymd(self):
+        return time.strftime("%Y-%m-%d", time.localtime())
+
+    def data_to_db_append(self, data, table_name):
+        print(data)
+        self.data_to_db(data, table_name, "append")
+
+    def data_to_db(self, data, table_name, append_type):
+        if data is None:
+            print("data_to_db input data parameter is empty")
+            return
+        data.to_sql(table_name, TushareBase.db_engine, if_exists=append_type)
+
+    def delete_sql(self, sql):
+        TushareBase.db_execute.dml(sql)
+
+    def insert_sql(self, sql):
+        TushareBase.db_execute.dml(sql)
+
+    def update_sql(self, sql):
+        TushareBase.db_execute.dml(sql)
+
+    def select_sql(self, sql):
+        data_list = TushareBase.db_execute.select(sql)
+        if len(data_list) < 1:
+            return None
+        self.convert_dict_list_unicode_to_str(data_list)
+        return data_list
+
+    def select_one_sql(self, sql):
+        data_list =self.select_sql(sql)
+        if data_list is None:
+            return data_list
+        return data_list[0]
+
+    def count_sql(self, sql):
+        data = TushareBase.db_execute.select(sql)
+        if len(data) < 1:
+            return None
+        count = data[0]["c"]
+        self.log_info("count result-->" + str(count))
+        return count
+
+    def count_sql_default_zero(self, sql):
+        value = self.count_sql(sql)
+        if value is None:
+            value = 0
+        return value
+
+    def is_exist_data_sql(self, sql):
+        count_value = self.count_sql(sql)
+        if count_value > 0:
+            return True
+
+        return False
+
+    def sleep_five_second(self):
+        time.sleep(5)
+
+    def sleep_one_second(self):
+        time.sleep(1)
+
+    def sleep_second(self, second):
+        time.sleep(second)
+
+    def get_latest_work_day(self):
+        return "2018-10-19"
+
+    def get_before_two_month(self):
+        before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)
+        return before_two_month.strftime("%Y-%m-%d")
+
+    def compare_two_date_str(self, first_date, two_date):
+        if first_date is None:
+            return False
+        if two_date is None:
+            return False
+        if datetime.datetime.strptime(first_date, "%Y-%m-%d") >= datetime.datetime.strptime(two_date, "%Y-%m-%d"):
+            return True
+        return False
+
+    def log_info(self, message):
+        print("message-->" + message)
+
+    def is_none(self, data):
+        if data is None:
+            return True
+        return False
+
+    # 计算百分比，并进行四舍五入保留2为小数
+    def cal_percent_round_2(self, first_value, second_value):
+        if first_value == 0 or second_value == 0:
+            return 0
+
+        return round((first_value/second_value)*100, 2)
+
+    # 两个数相除并保留两个小数点
+    def cal_division_round_2(self, first_value, second_value):
+        if first_value == 0 or second_value == 0:
+            return 0
+        return round((first_value / second_value), 2)
+
+    def get_next_date_str(self, date):
+        if date is None:
+            return date
+        next_date = datetime.datetime.strptime(date, "%Y-%m-%d") + datetime.timedelta(days=1)
+        return next_date.strftime("%Y-%m-%d")
+
+    def get_pre_date_str(self, date):
+        if date is None:
+            return date
+        next_date = datetime.datetime.strptime(date, "%Y-%m-%d") + datetime.timedelta(days=-1)
+        return next_date.strftime("%Y-%m-%d")
+
+    def get_date_str_list(self, start_date_str, end_date_str):
+        date_list = []
+        start_date = datetime.datetime.strptime(start_date_str, self.yyyy_mm_dd_date_format)
+        end_date = datetime.datetime.strptime(end_date_str, self.yyyy_mm_dd_date_format)
+        while start_date <= end_date:
+            date_list.append(start_date.strftime(self.yyyy_mm_dd_date_format))
+            start_date = start_date + datetime.timedelta(1)
+        return date_list
+
+
+test = TushareBase()
+# value = test.cal_percent_round_2(766, 877)
+# test.get_one_stock_basic("603997")
+# value = test.get_date_str_list("2018-09-28", "2018-10-13")
+# value = test.get_before_two_month()
+# value = test.get_next_date_str("2018-09-30")
+# print(value)
+# value = test.compare_two_date_str("2018-09-27", "2018-09-28")
+# print(value)
+# test.get_inside_dish_volume("002134")
+# test.get_inside_dish_amt("002134")
+# test.get_min_volume("002134")
+# test.get_max_amt("002134")
+# test.get_mid_amt("002134")
+# test.get_stock_limit_up_value("603997")
+# test.get_stock_limit_down_value("603997")
+# test.get_stock_first_limit_up_time("002931")
+# test.get_stock_first_limit_down_time("002931")
+# test.get_sunso_stock_newly_quotes_data()
+# test.get_avg_trade_volume_from_tushare_quotes("600532", 5)
+# test.get_avg_trade_amt_from_sunso_quotes("600532", 5)
+# test.get_stock_basics_to_db()
+# test.get_stock_basics_to_hist_db()
+# test.setproperty("users")
+# test.getproperty()
+
+# data = json.loads('{"timeToMarket":"20180909"}')
+# time_to_market = test.get_time_to_market_ymd(None)
+# print("timeToMarket-->" + time_to_market)
+# test.data_to_db_append(None, 'user')
+
+# test.count_sql("select count(*) as c from t_tushare_stock_basic")
