@@ -34,8 +34,8 @@ class TushareStockHistQuotesData(TushareBase, object):
         self.data_to_db_append(self.get_one_stock_hist_quotes_data(stock_code, start_date, end_date), self.table_name)
 
     # 获取单个股份的所有历史行情数据
-    def get_one_stock_hist_quotes_data_to_db(self, stock_code):
-        self.data_to_db_append(self.get_one_stock_hist_quotes_data(stock_code), self.table_name)
+    def get_one_stock_hist_quotes_data_to_db(self, stock_code, start_date=None, end_date=None):
+        self.data_to_db_append(self.get_one_stock_hist_quotes_data(stock_code, start_date, end_date), self.table_name)
 
     # 获取所有股票的历史行情数据, 开始时间为该股票已存在行情的最大日期+1
     def get_all_stock_quotes_data_to_db(self):
@@ -150,13 +150,54 @@ class TushareStockHistQuotesData(TushareBase, object):
         print(sql)
         self.insert_sql(sql)
 
+    def delete_tushare_one_stock_hist_quotes_data(self, stock_code):
+        sql = "delete from " + self.table_name + " where code='" + stock_code + "'"
+        self.delete_sql(sql)
+
+    def get_one_stock_list_not_in_sunso_stock_day_trade_statistic_data(self, stock_code):
+        sql = "select " + self.get_stock_hist_quotes_data_serach_column() + "" \
+              " from " + self.table_name + " " \
+              "where concat(code,date) not in (select concat(code,trade_date) from " \
+               "" + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where code='" + stock_code + "')  " \
+              " and code='" + stock_code + "' order by date asc "
+        return self.select_sql(sql)
+
+    def get_date_stock_list_not_in_sunso_stock_day_trade_statistic_data(self, date):
+        sql = "select * " \
+              " from " + self.t_sunso_stock_basic + " " \
+              "where concat(code,trade_date) not in (select concat(code,trade_date) from " \
+              "" + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where trade_date='" + date + "')  " \
+              " and trade_date='" + date + "' " \
+              " and code='600518' " \
+              "order by trade_date asc "
+        return self.select_sql(sql)
+
+    def get_one_stock_hist_quotes_data_by_date(self, stock_code, date):
+        sql = "select " + self.get_stock_hist_quotes_data_serach_column() + "" \
+              " from " + self.table_name + " " \
+              " where code='" + stock_code + "' and date='" + date + "'"
+        return self.select_one_sql(sql)
+
+    def is_exist_stock_hist_quotes_data_by_date(self, stock_code, date):
+        sql = "select count(*) as c from " + self.table_name + " where code='" + stock_code + "' and date='" + date + "'"
+        count_value = self.count_sql_default_zero(sql)
+        if count_value > 0:
+            return True
+        return False
+
+    def get_stock_hist_quotes_data_serach_column(self):
+        return "code,date,open,high,close as trade,low,volume,p_change as changepercent,ma5,ma10,ma20,v_ma5,v_ma10,v_ma20"
+
 
 newly = TushareStockHistQuotesData()
-data_list = newly.get_stock_hist_quotes_data_list_by_less_trade_date_limit("603895", "2018-10-12", 30)
-newly.save_data_list_to_sunso_stock_all_quotes_data(data_list)
+# newly.get_one_stock_hist_quotes_data("603895")
+# data_list = newly.get_stock_hist_quotes_data_list_by_less_trade_date_limit("603895", "2018-10-12", 30)
+# newly.save_data_list_to_sunso_stock_all_quotes_data(data_list)
 # newly.get_one_stock_hist_quotes_data_to_db_before_exist_min_trade_date("603895", "2018-08-14")
 # newly.get_all_stock_quotes_data_to_db()
-# newly.get_one_stock_hist_quotes_data_to_db("600687")
+# newly.get_one_stock_hist_quotes_data_to_db("600518")
 # newly.get_all_stock_date_quotes_data_to_db("2018-09-28","2018-10-07")
 # newly.get_loss_stock_date_quotes_data_to_db("2018-09-28", "2018-10-07")
 # 】newly.get_limit_up_stock_date_quotes_data_to_db("2018-09-28", "2018-09-20", "2018-09-27")

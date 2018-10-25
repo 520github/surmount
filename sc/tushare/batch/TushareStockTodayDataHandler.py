@@ -15,6 +15,7 @@ class TushareStockTodayDataHandler(object):
     tushare_stock_newly_quotes_data = None
     tushare_stock_today_tick_trade_data = None
     latest_work_day = None
+    title = "run_tushare_stock_today_data_handle"
 
     def __init__(self):
         self.tushare_stock_newly_quotes_data = TushareStockNewlyQuotesData()
@@ -30,34 +31,39 @@ class TushareStockTodayDataHandler(object):
         self.tushare_stock_newly_quotes_data.get_all_stock_newly_quotes_data_to_db()
 
     def handle_tushare_stock_today_tick_trade_data(self):
-        data_list = self.tushare_stock_today_tick_trade_data.get_stocks_not_in_sunso_stock_day_trade_statistic_data()
+        data_list = self.get_handle_stock_data_list()
         if data_list is None or len(data_list) < 1:
-            print("date " + self.latest_work_day + " not found today_tick_trade handle to day_trade_statistic_data")
+            print("date " + self.latest_work_day + " not found newly_quotes_data handle to day_trade_statistic_data")
             time.sleep(60)
             return
 
         for data in data_list:
             stock_code = data["code"]
-            if not self.tushare_stock_today_tick_trade_data.is_exist_today_tick_trade_data(stock_code):
-                self.tushare_stock_today_tick_trade_data.get_one_stock_today_tick_trade_data_replace_to_db(stock_code)
+            date = data["date"].strftime("%Y-%m-%d")
+            if not self.tushare_stock_today_tick_trade_data.is_exist_today_tick_trade_data(stock_code, date):
+                # self.tushare_stock_today_tick_trade_data.get_one_stock_today_tick_trade_data_replace_to_db(stock_code)
+                self.tushare_stock_today_tick_trade_data.get_one_stock_date_tick_trade_data_to_db(stock_code, date)
             self.tushare_stock_today_tick_trade_data.insert_to_sunso_stock_day_trade_statistic_data(data)
-            self.tushare_stock_today_tick_trade_data.delete_today_tick_trade_data(stock_code)
+            self.tushare_stock_today_tick_trade_data.delete_today_tick_trade_data(stock_code, date)
+
+    def get_handle_stock_data_list(self):
+        return self.tushare_stock_today_tick_trade_data.get_stocks_not_in_sunso_stock_day_trade_statistic_data()
 
     def run_tushare_stock_today_data_handle(self):
         while True:
             try:
                 start_time = time.time()
                 print("       ")
-                print("start run_tushare_stock_today_data_handle run  " + self.get_now_date_time_all_str())
+                print("start " + self.title + " run  " + self.get_now_date_time_all_str())
                 print("       ")
                 self.handle_tushare_stock_today_quotes_data()
                 self.handle_tushare_stock_today_tick_trade_data()
                 consume_time = str(time.time() - start_time)
                 print("      ")
-                print("end run_tushare_stock_today_data_handle run " + self.get_now_date_time_all_str() + ", counsume time:" + consume_time)
+                print("end " + self.title + " run " + self.get_now_date_time_all_str() + ", counsume time:" + consume_time)
                 print("      ")
             except Exception, e:
-                print("exception run_tushare_stock_today_data_handle run  " + self.get_now_date_time_all_str())
+                print("exception " + self.title + " run  " + self.get_now_date_time_all_str())
                 print e
                 print(traceback.format_exc())
                 time.sleep(30)

@@ -16,12 +16,13 @@ class TushareStockHistTickTradeData(TushareBase, object):
         if date is None:
             date = self.get_latest_work_day()
 
-        data = ts.get_tick_data(stock_code, date, src="tt")
+        data = ts.get_tick_data(stock_code, date, src="nt") #
         if data is None:
             return data
 
         data["date"] = date
         data["code"] = stock_code
+        data.insert(2, "pchange", 0)
         return data
 
     def get_one_stock_hist_tick_trade_data_to_db(self, stock_code=None, date=None):
@@ -49,5 +50,5 @@ class TushareStockHistTickTradeData(TushareBase, object):
 
 
 hist_tick = TushareStockHistTickTradeData()
-hist_tick.get_all_stock_hist_tick_trade_data_to_db()
-# hist_tick.get_one_stock_hist_tick_trade_data_to_db("002113", "2018-09-28")
+# hist_tick.get_all_stock_hist_tick_trade_data_to_db()
+hist_tick.get_one_stock_hist_tick_trade_data_to_db("600518", "2018-10-16")

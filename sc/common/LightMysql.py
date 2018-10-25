@@ -61,6 +61,8 @@ class LightMysql:
 
     def select(self, sql, params=(), ret_type='all', ret_format='array'):
         '''select or show'''
+        if len(params) < 1:
+            params = None
         self._cursor.execute(sql, params)
         if ret_type == 'all':
             if (self._dbconfig.has_key('cursorType') and self._dbconfig['cursorType'] == 'list') or ret_format == 'row':
@@ -75,6 +77,8 @@ class LightMysql:
 
     def dml(self, sql, params=()):
         '''update or delete or insert'''
+        if len(params) < 1:
+            params = None
         self._cursor.execute(sql, params)
         self._connect.commit()
         type = self.dml_type(sql)
