@@ -1,3 +1,125 @@
+CREATE TABLE `t_sunso_stock_plate` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `key` varchar(64) NOT NULL DEFAULT '' COMMENT '板块key',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '板块说明',
+  `start_date` date  NOT NULL COMMENT '板块开始日期',
+  `end_date` date  NOT NULL COMMENT '板块结束日期',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块基本信息';
+create unique index unique_name_startDate on t_sunso_stock_plate(name, start_date);
+
+insert into t_sunso_stock_plate(`key`, name, remark, start_date, end_date)
+value('stock_repurchase', '股份回购', '国家重新修改的股份回购政策方案后，出现的股份回购潮流', '2018-10-29', '2018-10-29');
+
+CREATE TABLE `t_sunso_stock_plate_day_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
+  `avg_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下所有股票的平均涨幅',
+  `tap_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下的龙头涨幅',
+  `mid_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下的中军涨幅',
+  `up_limit_count` bigint NOT NULL DEFAULT -1  COMMENT '当日涨停数',
+  `down_limit_count` bigint NOT NULL DEFAULT -1  COMMENT '当日跌停数(一旦出现跌停情况，整个板块就需要关注方向的转变)',
+  `up_count` bigint NOT NULL DEFAULT -1  COMMENT '上当日涨个数',
+  `down_count` bigint NOT NULL DEFAULT -1  COMMENT '当日下跌个数',
+  `net_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '当日板块资金净流入情况',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日板块说明',
+  `trade_date` date  NOT NULL COMMENT '交易日期',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块每日数据';
+create unique index unique_name_startDate on t_sunso_stock_plate_day_data(name, trade_date);
+
+CREATE TABLE `t_sunso_stock_plate_stock` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '股票加入说明',
+  `advise` varchar(512) NOT NULL DEFAULT '' COMMENT '预判建议',
+  `join_date` date  NOT NULL COMMENT '股票加入板块日期',
+  `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块下的股票信息';
+create unique index unique_plateName_plateStartDate_code on t_sunso_stock_plate_stock(plate_name, plate_start_date, code);
+
+insert into t_sunso_stock_plate_stock(`plate_name`, `plate_start_date`, `code`, `name`, `remark`, `join_date`)
+values
+('股份回购', '2018-10-29', '600346', '恒力股份', '发布回购预案,用于股权激励,拟10亿～20亿回购股份，集中竞价交易方式回购股份，每股回购价格不超过18元', '2018-10-29'),
+('股份回购', '2018-10-29', '002261', '拓维信息', '发布回购预案,用于股权激励,拟0.5亿～1亿回购股份，每股回购价格不超过5元', '2018-10-29'),
+('股份回购', '2018-10-29', '300440', '运达科技', '发布回购预案,用于股权激励,拟0.4亿～0.8亿回购股份，每股回购价格不超过7元', '2018-10-29'),
+('股份回购', '2018-10-29', '600373', '中文传媒', '发布回购预案', '2018-10-29'),
+('股份回购', '2018-10-29', '603501', '韦尔股份', '发布回购预案,用于股权激励', '2018-10-29'),
+('股份回购', '2018-10-29', '000671', '阳光城', '发布回购预案,用于股权激励', '2018-10-29'),
+('股份回购', '2018-10-29', '603018', '中设集团', '发布回购预案,用于股权激励', '2018-10-29'),
+('股份回购', '2018-10-29', '600438', '通威股份', '发布回购预案', '2018-10-29'),
+('股份回购', '2018-10-29', '603167', '渤海轮渡', '发布回购预案,用于股权激励', '2018-10-29'),
+('股份回购', '2018-10-29', '600867', '通化东宝', '发布回购预案', '2018-10-29'),
+('股份回购', '2018-10-29', '300041', '回天新材', '发布回购预案,用于股权激励', '2018-10-29'),
+('股份回购', '2018-10-29', '601555', '东吴证券', '发布回购预案', '2018-10-29'),
+('股份回购', '2018-10-29', '300279', '和晶科技', '用于股权激励,股份回购消息刺激一字板，最后勉强回封', '2018-10-29'),
+('股份回购', '2018-10-29', '002845', '同兴达', '', '2018-10-29'),
+('股份回购', '2018-10-29', '002699', '美盛文化', '发布回购预案,股份回购消息刺激一字板，但炸板没有回封', '2018-10-29'),
+('股份回购', '2018-10-29', '300690', '双一科技', '发布回购预案,用于股权激励，股份回购消息刺激一字板，但炸板没有回封', '2018-10-29'),
+('股份回购', '2018-10-29', '002556', '辉隆股份', '发布回购预案,用于股权激励，股份回购消息刺激一字板，但炸板没有回封', '2018-10-29'),
+('股份回购', '2018-10-29', '300582', '英飞特', '发布首次回购公司股份公告', '2018-10-29'),
+('股份回购', '2018-10-29', '002570', '*ST因美', '发布首次回购公司股份公告', '2018-10-29'),
+('股份回购', '2018-10-29', '600208', '新湖中宝', '调高公司回购规模，提高回购股份价格', '2018-10-29'),
+('股份回购', '2018-10-29', '601218', '吉鑫科技', '上市控股股东提议公司回购股份', '2018-10-29'),
+('股份回购', '2018-10-29', '600079', '人福医药', '上市控股股东提议公司回购股份', '2018-10-29'),
+('股份回购', '2018-10-29', '600496', '精工钢构', '上市控股股东提议公司回购股份', '2018-10-29'),
+('股份回购', '2018-10-29', '603011', '合锻智能', '上市控股股东提议公司回购股份', '2018-10-29'),
+('股份回购', '2018-10-29', '600052', '浙江广厦', '上市控股股东提议公司回购股份', '2018-10-29'),
+('股份回购', '2018-10-29', '600318', '新力金融', '回购预案获股东大会审议通过', '2018-10-29'),
+('股份回购', '2018-10-29', '300469', '信息发展', '回购预案获股东大会审议通过', '2018-10-29'),
+('股份回购', '2018-10-29', '600699', '均胜电子', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600804', '鹏博士', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600400', '红豆股份', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600297', '广汇汽车', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600337', '美克家居', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600155', '华创阳安', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600633', '浙数文化', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600535', '天士力', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600300', '维维股份', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '603001', '奥康国际', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '603979', '金诚信', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600986', '科达股份', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '600280', '中央商场', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '601388', '怡球资源', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '603808', '歌力思', '上市公司发布回购最新进展', '2018-10-29')
+;
+
+
+CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '股票当日涨幅幅',
+  `net_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(万)',
+  `continue_up_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续涨停次数',
+  `continue_down_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续跌停次数',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日股票说明',
+  `trade_date` date  NOT NULL COMMENT '股票交易日期',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块下股票的每日数据';
+create unique index unique_plateName_plateStartDate_code_tradeDate on t_sunso_stock_plate_stock_day_data(plate_name, plate_start_date, code, trade_date);
+
+
+
+
+
+
 CREATE TABLE `t_sunso_stock_day_up_limit_data` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
@@ -285,6 +407,170 @@ CREATE TABLE `t_sunso_stock_basic` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 create unique index unique_code_tradeDate on t_sunso_stock_basic(code, trade_date);
+
+drop table `t_sunso_stock_day_trade_statistic_core_data`;
+CREATE TABLE `t_sunso_stock_day_trade_statistic_core_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `open_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '开盘价(元)',
+  `close_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '收盘价(元)',
+  `low_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '最低价(元)',
+  `high_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '最高价(元)',
+  `avg_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '平均价(元)',
+  `pre_close_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '昨日收盘价(元)',
+
+  `close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日最低价-昨天收盘价)/昨日收盘价%',
+  `high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日最高价-昨天收盘价)/昨日收盘价%',
+  `low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `turnover_rate` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '换手率',
+  `trade_volume` bigint NOT NULL DEFAULT -1  COMMENT '成交量(股),直接从当前行情获取数据',
+  `trade_amt` decimal(18,0) NOT NULL DEFAULT -1 COMMENT '成交金额(元)，,直接从当前行情获取数据' ,
+  `trade_count` bigint NOT NULL DEFAULT -1  COMMENT '交易次数',
+  `trade_per_avg_volume` bigint NOT NULL DEFAULT -1  COMMENT '当天每次平均交易量(笔均量),trade_volume/trade_count',
+  `trade_net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '净流入交易资金(万)，今日收盘市值-昨日收盘市值',
+  `market_cap_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '总市值(万)',
+  `circulation_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '流通市值(万)',
+
+  `pre_avg1_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前1日平均成交价)/前1日平均成交价%' ,
+  `pre_avg1_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '(当日成交金额-前1日平均成交金额)/前1日平均成交金额%',
+  `pre_avg1_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '(当日净流入金额-前1日平均净流入金额)/前1日平均净流入金额%',
+  `pre_avg1_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前1日平均成交量)/前1日平均成交量%',
+  `pre_avg1_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前1日平均成交次数)/前1日平均成交次数%',
+  `pre_avg1_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前1日平均每日平均成交量)/前1日平均每日平均成交量%',
+
+  `inside_dish_sum_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '当日内盘累计交易金额/总交易金额%',
+  `outside_dish_sum_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '当日外盘累计交易金额/总交易金额%',
+  `midside_dish_sum_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '当日中间盘累计交易金额/总交易金额%',
+  `small_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单累计交易资金/总交易金额%',
+  `small_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买票累计交易资金/总交易金额%',
+  `small_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖盘累计交易资金/总交易金额%',
+  `large_above_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上累计交易资金%',
+  `large_above_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买票累计交易资金%',
+  `large_above_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘累计交易资金%',
+  `large_above_bs_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买票累计交易资金/当日大单及以上卖盘累计交易资金',
+
+  `dragon_tiger_today_reason` varchar(512) NOT NULL DEFAULT '' COMMENT '今日龙虎榜的原因',
+  `dragon_tiger_all_today_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '今日龙虎榜买入和卖出的总计金额/今日总交易金额%',
+  `dragon_tiger_total_reason` varchar(512) NOT NULL DEFAULT '' COMMENT '累计上龙虎榜的原因',
+  `dragon_tiger_all_total_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '累计龙虎榜买入和卖出的总计金额/近3日总交易金额%',
+  `dragon_tiger_all_5day_count` bigint NOT NULL DEFAULT -1  COMMENT '5日内上龙虎榜次数',
+  `dragon_tiger_all_5day_bs_amt_percent` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '5日内机构或营业部买入金额/5日内机构或营业部卖出金额%',
+
+  `pre_avg3_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前3日平均成交价)/前3日平均成交价%' ,
+  `pre_avg3_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '(当日成交金额-前3日平均成交金额)/前3日平均成交金额%',
+  `pre_avg3_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '(当日净流入金额-前3日平均净流入金额)/前3日平均净流入金额%',
+  `pre_avg3_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前3日平均成交量)/前3日平均成交量%',
+  `pre_avg3_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前3日平均成交次数)/前3日平均成交次数%',
+  `pre_avg3_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前3日平均每日平均成交量)/前3日平均每日平均成交量%',
+
+  `pre_avg5_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前5日平均成交价)/前5日平均成交价%' ,
+  `pre_avg10_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前10日平均成交价)/前10日平均成交价%' ,
+  `pre_avg20_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前20日平均成交价)/前20日平均成交价%' ,
+  `pre_avg30_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前30日平均成交价)/前30日平均成交价%' ,
+  `pre_avg60_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前60日平均成交价)/前60日平均成交价%' ,
+  `pre_avg90_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前90日平均成交价)/前90日平均成交价%' ,
+  `pre_avg120_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前120日平均成交价)/前120日平均成交价%' ,
+  `pre_avg250_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前250日平均成交价)/前250日平均成交价%',
+  `pre_avg365_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交价-前365日平均成交价)/前365日平均成交价%',
+
+  `pre_avg5_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前5日平均成交金额)/前5日平均成交金额%' ,
+  `pre_avg10_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前10日平均成交金额)/前10日平均成交金额%' ,
+  `pre_avg20_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前20日平均成交金额)/前20日平均成交金额%' ,
+  `pre_avg30_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前30日平均成交金额)/前30日平均成交金额%' ,
+  `pre_avg60_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前60日平均成交金额)/前60日平均成交金额%' ,
+  `pre_avg90_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前90日平均成交金额)/前90日平均成交金额%' ,
+  `pre_avg120_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前120日平均成交金额)/前120日平均成交金额%' ,
+  `pre_avg250_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前250日平均成交金额)/前250日平均成交金额%' ,
+  `pre_avg365_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交金额-前365日平均成交金额)/前365日平均成交金额%' ,
+
+  `pre_avg5_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前5日平均净流入金额)/前5日平均净流入金额%' ,
+  `pre_avg10_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前10日平均净流入金额)/前10日平均净流入金额%' ,
+  `pre_avg20_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前20日平均净流入金额)/前20日平均净流入金额%' ,
+  `pre_avg30_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前30日平均净流入金额)/前30日平均净流入金额%' ,
+  `pre_avg60_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前60日平均净流入金额)/前60日平均净流入金额%' ,
+  `pre_avg90_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前90日平均净流入金额)/前90日平均净流入金额%' ,
+  `pre_avg120_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前120日平均净流入金额)/前120日平均净流入金额%' ,
+  `pre_avg250_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前250日平均净流入金额)/前250日平均净流入金额%' ,
+  `pre_avg365_trade_net_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日净流入金额-前365日平均净流入金额)/前365日平均净流入金额%' ,
+
+  `pre_avg5_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前5日平均成交量)/前5日平均成交量%',
+  `pre_avg10_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前10日平均成交量)/前10日平均成交量%',
+  `pre_avg20_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前20日平均成交量)/前20日平均成交量%',
+  `pre_avg30_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前30日平均成交量)/前30日平均成交量%',
+  `pre_avg60_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前60日平均成交量)/前60日平均成交量%',
+  `pre_avg90_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前90日平均成交量)/前90日平均成交量%',
+  `pre_avg120_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前120日平均成交量)/前120日平均成交量%',
+  `pre_avg250_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前250日平均成交量)/前250日平均成交量%',
+  `pre_avg365_trade_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交量-前365日平均成交量)/前365日平均成交量%',
+
+  `pre_avg5_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前5日平均成交次数)/前5日平均成交次数%',
+  `pre_avg10_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前10日平均成交次数)/前10日平均成交次数%',
+  `pre_avg20_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前20日平均成交次数)/前20日平均成交次数%',
+  `pre_avg30_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前30日平均成交次数)/前30日平均成交次数%',
+  `pre_avg60_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前60日平均成交次数)/前60日平均成交次数%',
+  `pre_avg90_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前90日平均成交次数)/前90日平均成交次数%',
+  `pre_avg120_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前120日平均成交次数)/前120日平均成交次数%',
+  `pre_avg250_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前250日平均成交次数)/前250日平均成交次数%',
+  `pre_avg365_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日成交次数-前365日平均成交次数)/前365日平均成交次数%',
+
+  `pre_avg5_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前5日平均每日平均成交量)/前5日平均每日平均成交量%',
+  `pre_avg10_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前10日平均每日平均成交量)/前10日平均每日平均成交量%',
+  `pre_avg20_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前20日平均每日平均成交量)/前20日平均每日平均成交量%',
+  `pre_avg30_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前30日平均每日平均成交量)/前30日平均每日平均成交量%',
+  `pre_avg60_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前60日平均每日平均成交量)/前60日平均每日平均成交量%',
+  `pre_avg90_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前90日平均每日平均成交量)/前90日平均每日平均成交量%',
+  `pre_avg120_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前120日平均每日平均成交量)/前120日平均每日平均成交量%',
+  `pre_avg250_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前250日平均每日平均成交量)/前250日平均每日平均成交量%',
+  `pre_avg365_trade_per_avg_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日平均成交量-前365日平均每日平均成交量)/前365日平均每日平均成交量%',
+
+  `dragon_tiger_today_is` tinyint NOT NULL DEFAULT -1 COMMENT '今日是否上龙虎榜',
+  `dragon_tiger_all_today_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '今日龙虎榜买入和卖出的总计金额',
+  `dragon_tiger_all_today_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜总买入金额/今日总交易额%',
+  `dragon_tiger_all_today_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜总卖出金额/今日总交易额%',
+  `dragon_tiger_organ_today_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜机构买入金额/今日总交易额%',
+  `dragon_tiger_organ_today_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜机构卖出金额/今日总交易额%',
+  `dragon_tiger_sale_today_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜营业部买入金额/今日总交易额%',
+  `dragon_tiger_sale_today_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '今日龙虎榜营业部卖出金额/今日总交易额%',
+
+  `dragon_tiger_total_is` tinyint NOT NULL DEFAULT -1 COMMENT '累计是否上龙虎榜',
+  `dragon_tiger_all_total_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '累计龙虎榜买入和卖出的总计金额',
+  `dragon_tiger_all_total_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '龙累计虎榜总买入金额/近3日总交易额%',
+  `dragon_tiger_all_total_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '累计龙虎榜总卖出金额/近3日总交易额%',
+  `dragon_tiger_organ_total_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '累计龙虎榜机构买入金额/近3日总交易额%',
+  `dragon_tiger_organ_total_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '累计龙虎榜机构卖出金额/近3日总交易额%',
+  `dragon_tiger_sale_total_buy_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '累计龙虎榜营业部买入金额/近3日总交易额%',
+  `dragon_tiger_sale_total_sell_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '累计龙虎榜营业部卖出金额/近3日总交易额%',
+
+  `dragon_tiger_all_5day_bs_count_percent` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '5日内机构或营业部买入次数/5日内机构或营业部卖出次数%',
+  `dragon_tiger_all_5day_bs_diff_amt` decimal(12,2) NOT NULL DEFAULT -1  COMMENT '5日内机构或营业部净额金额(万)',
+  `dragon_tiger_organ_5day_bs_amt_percent` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '5日内机构买入金额/5日内机构卖出金额%',
+  `dragon_tiger_organ_5day_bs_count_percent` decimal(8,2) NOT NULL DEFAULT -1  COMMENT '5日内机构买入次数/5日内机构卖出次数%',
+  `dragon_tiger_organ_5day_bs_diff_amt` decimal(12,2) NOT NULL DEFAULT -1  COMMENT '5日内机构净额金额(万)',
+  `dragon_tiger_sale_5day_name` varchar(2048) NOT NULL DEFAULT '' COMMENT '5日内进行买卖的营业部名称',
+
+  `medium_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单累计交易资金/总交易金额%',
+  `large_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单累计交易资金/总交易金额%',
+  `super_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超大单累计交易资金/总交易金额%',
+
+  `small_inside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日内盘小单累计交易资金/当日小单累计金额',
+  `small_outside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日外盘小单累计交易资金/当日小单累计金额%',
+  `medium_inside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日内盘中单累计交易资金/当日中单累计金额%',
+  `medium_outside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日外盘中单累计交易资金/当日中单累计金额%',
+  `large_inside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日内盘大单累计交易资金/当日大单累计金额%',
+  `large_outside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日外盘大单累计交易资金/当日大单累计金额%',
+  `super_inside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日内盘超大单累计交易资金/当日超级大单累计金额%',
+  `super_outside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日外盘超大单累计交易资金/当日超级大单累计金额%',
+
+  `trade_date` date NOT NULL COMMENT '交易日期',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_core_data(code, trade_date);
 
 
 drop table t_sunso_stock_day_trade_statistic_data;

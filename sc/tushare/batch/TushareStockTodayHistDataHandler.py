@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+# 指定某个交易时间，计算该交易时间相关股票的数据
+
 import sys
 import os
 import time
@@ -9,7 +11,7 @@ from TushareStockTodayDataHandler import TushareStockTodayDataHandler
 
 
 class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
-    date = "2018-10-24"
+    date = "2018-10-21"
 
     def __init__(self):
         super(TushareStockTodayHistDataHandler,self).__init__()
@@ -22,8 +24,12 @@ class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
         print("not thing doing")
 
     def get_handle_stock_data_list(self):
+        TushareStockTodayHistDataHandler.date = self.get_next_date_str(TushareStockTodayHistDataHandler.date)
         return self.tushare_stock_today_tick_trade_data.get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(
             TushareStockTodayHistDataHandler.date)
+
+    def get_next_date_str(self, date):
+        return self.tushare_stock_today_tick_trade_data.get_next_date_str(date)
 
 
 if __name__ == '__main__':

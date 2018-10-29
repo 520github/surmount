@@ -116,7 +116,7 @@ class TushareStockTodayTickTradeData(TushareBase, object):
         if settlement_key in data.keys():
             pre_close_amt = data[settlement_key]
         else:
-            pre_close_amt = Decimal(round(close_amt / (1 + change_percent / 100), 2))
+            pre_close_amt = Decimal(self.cal_division_round_2(close_amt, (1 + change_percent / 100)))
 
         sum_trade_volume = self.get_stock_today_sum_volume(stock_code, date)
         sum_trade_amt = self.get_stock_today_sum_amt(stock_code, date)
@@ -129,7 +129,7 @@ class TushareStockTodayTickTradeData(TushareBase, object):
             trade_amt = sum_trade_amt
 
         trade_count = self.get_all_count(stock_code, date)
-        trade_per_count_avg_volume = trade_volume / trade_count
+        trade_per_count_avg_volume = self.cal_division_round_2(trade_volume, trade_count)
 
         sunso_stock_baise = self.get_one_sunso_stock_basic(stock_code, date)
         name_key = "name"
@@ -497,7 +497,7 @@ class TushareStockTodayTickTradeData(TushareBase, object):
         dragon_tiger_sale_today_buy_amt = dragon_tiger_all_today_buy_amt - dragon_tiger_organ_today_buy_amt
         dragon_tiger_sale_today_sell_amt = dragon_tiger_all_today_sell_amt - dragon_tiger_organ_today_sell_amt
 
-        today_sum_amt = trade_amt/10000
+        today_sum_amt = self.cal_division_round_2(trade_amt, 10000)
         dragon_tiger_all_today_buy_amt_percent = str(dragon_tiger_today["buy_percent"]*100)
         dragon_tiger_all_today_sell_amt_percent = str(dragon_tiger_today["sell_percent"]*100)
         dragon_tiger_organ_today_buy_amt_percent = str(self.cal_percent_round_2(dragon_tiger_organ_today_buy_amt, today_sum_amt))
@@ -637,26 +637,26 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(close_amt) + "," + \
                      "" + str(low_amt) + "," + \
                      "" + str(high_amt) + "," + \
-                     "" + avg_amt + "," + \
+                     "" + str(avg_amt) + "," + \
                      "" + str(pre_close_amt) + "," + \
                      "" + str(close_low_diff_amt) + "," + \
                      "" + str(high_close_diff_amt) + "," + \
-                     "" + close_low_diff_amt_percent + "," + \
-                     "" + high_close_diff_amt_percent + "," + \
+                     "" + str(close_low_diff_amt_percent) + "," + \
+                     "" + str(high_close_diff_amt_percent) + "," + \
                      "" + str(open_pre_close_diff_amt) + "," + \
-                     "" + open_pre_close_diff_amt_percent + "," + \
+                     "" + str(open_pre_close_diff_amt_percent) + "," + \
                      "" + str(low_pre_close_diff_amt) + "," + \
-                     "" + low_pre_close_diff_amt_percent + "," + \
+                     "" + str(low_pre_close_diff_amt_percent) + "," + \
                      "" + str(high_pre_close_diff_amt) + "," + \
-                     "" + high_pre_close_diff_amt_percent + "," + \
+                     "" + str(high_pre_close_diff_amt_percent) + "," + \
                      "" + str(trade_volume) + "," + \
                      "" + str(trade_amt) + "," + \
                      "" + str(trade_count) + "," + \
                      "" + str(trade_per_count_avg_volume) + "," + \
                      "" + str(turnover_ratio) + "," + \
-                     "" + price_change_percent + "," + \
+                     "" + str(price_change_percent) + "," + \
                      "" + str(price_wave_amt) + "," + \
-                     "" + price_wave_percent + "," + \
+                     "" + str(price_wave_percent) + "," + \
                      "" + str(pre1_close_price) + "," + \
                      "" + str(pre5_close_price) + "," + \
                      "" + str(pre10_close_price) + "," + \
@@ -761,58 +761,58 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(midside_dish_volume) + "," + \
                      "" + str(sum_dish_volume) + "," + \
                      "" + str(oi_dish_diff_volume) + "," + \
-                     "" + oi_dish_volume_percent + "," + \
+                     "" + str(oi_dish_volume_percent) + "," + \
                      "" + str(inside_dish_amt) + "," + \
                      "" + str(outside_dish_amt) + "," + \
                      "" + str(midside_dish_amt) + "," + \
                      "" + str(sum_dish_amt) + "," + \
                      "" + str(oi_dish_diff_amt) + "," + \
-                     "" + oi_dish_amt_percent + "," + \
+                     "" + str(oi_dish_amt_percent) + "," + \
                      "" + str(inside_dish_count) + "," + \
                      "" + str(outside_dish_count) + "," + \
                      "" + str(midside_dish_count) + "," + \
                      "" + str(sum_dish_count) + "," + \
                      "" + str(oi_dish_diff_count) + "," + \
-                     "" + oi_dish_count_percent + "," + \
+                     "" + str(oi_dish_count_percent) + "," + \
                      "" + str(min_trade_volume) + "," + \
                      "" + str(mid_trade_volume) + "," + \
                      "" + str(max_trade_volume) + "," + \
                      "" + str(super_trade_volume) + "," + \
                      "" + str(sum_trade_volume) + "," + \
-                     "" + min_trade_volume_percent + "," + \
-                     "" + mid_trade_volume_percent + "," + \
-                     "" + max_trade_volume_percent + "," + \
-                     "" + super_trade_volume_percent + "," + \
+                     "" + str(min_trade_volume_percent) + "," + \
+                     "" + str(mid_trade_volume_percent) + "," + \
+                     "" + str(max_trade_volume_percent) + "," + \
+                     "" + str(super_trade_volume_percent) + "," + \
                      "" + str(min_trade_amt) + "," + \
                      "" + str(mid_trade_amt) + "," + \
                      "" + str(max_trade_amt) + "," + \
                      "" + str(super_trade_amt) + "," + \
                      "" + str(sum_trade_amt) + "," + \
-                     "" + min_trade_amt_percent + "," + \
-                     "" + mid_trade_amt_percent + "," + \
-                     "" + max_trade_amt_percent + "," + \
-                     "" + super_trade_amt_percent + "," + \
+                     "" + str(min_trade_amt_percent) + "," + \
+                     "" + str(mid_trade_amt_percent) + "," + \
+                     "" + str(max_trade_amt_percent) + "," + \
+                     "" + str(super_trade_amt_percent) + "," + \
                      "" + str(min_trade_count) + "," + \
                      "" + str(mid_trade_count) + "," + \
                      "" + str(max_trade_count) + "," + \
                      "" + str(super_trade_count) + "," + \
                      "" + str(sum_trade_count) + "," + \
-                     "" + min_trade_count_percent + "," + \
-                     "" + mid_trade_count_percent + "," + \
-                     "" + max_trade_count_percent + "," + \
-                     "" + super_trade_count_percent + "," + \
-                     "'" + max_trade_distribution_time + "'," + \
-                     "'" + super_trade_distribution_time + "'," + \
+                     "" + str(min_trade_count_percent) + "," + \
+                     "" + str(mid_trade_count_percent) + "," + \
+                     "" + str(max_trade_count_percent) + "," + \
+                     "" + str(super_trade_count_percent) + "," + \
+                     "'" + str(max_trade_distribution_time) + "'," + \
+                     "'" + str(super_trade_distribution_time) + "'," + \
                      "" + str(single_max_buy_trade_volume) + "," + \
                      "" + str(single_max_buy_trade_amt) + "," + \
-                     "'" + single_max_buy_trade_time + "'," + \
+                     "'" + str(single_max_buy_trade_time) + "'," + \
                      "" + str(single_max_sell_trade_volume) + "," + \
                      "" + str(single_max_sell_trade_amt) + "," + \
-                     "'" + single_max_sell_trade_time + "'," + \
-                     "" + single_max_buy_trade_volume_percent + "," + \
-                     "" + single_max_buy_trade_amt_percent + "," + \
-                     "" + single_max_sell_trade_volume_percent + "," + \
-                     "" + single_max_sell_trade_amt_percent + "," + \
+                     "'" +str( single_max_sell_trade_time) + "'," + \
+                     "" + str(single_max_buy_trade_volume_percent) + "," + \
+                     "" + str(single_max_buy_trade_amt_percent) + "," + \
+                     "" + str(single_max_sell_trade_volume_percent) + "," + \
+                     "" + str(single_max_sell_trade_amt_percent) + "," + \
                      "" + str(early_before_min_trade_price) + "," + \
                      "" + str(early_before_max_trade_price) + "," + \
                      "" + str(early_before_avg_trade_price) + "," + \
@@ -862,9 +862,9 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(early_before_sell_max_trade_volume) + "," + \
                      "" + str(early_before_sell_max_trade_amt) + "," + \
                      "" + str(early_before_sell_max_trade_count) + "," + \
-                     "" + early_before_bs_max_trade_volume_percent + "," + \
-                     "" + early_before_bs_max_trade_amt_percent + "," + \
-                     "" + early_before_bs_max_trade_count_percent + "," + \
+                     "" + str(early_before_bs_max_trade_volume_percent) + "," + \
+                     "" + str(early_before_bs_max_trade_amt_percent) + "," + \
+                     "" + str(early_before_bs_max_trade_count_percent) + "," + \
                      "" + str(early_before_super_trade_volume) + "," + \
                      "" + str(early_before_super_trade_amt) + "," + \
                      "" + str(early_before_super_trade_count) + "," + \
@@ -874,31 +874,31 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(early_before_sell_super_trade_volume) + "," + \
                      "" + str(early_before_sell_super_trade_amt) + "," + \
                      "" + str(early_before_sell_super_trade_count) + "," + \
-                     "" + early_before_bs_super_trade_volume_percent + "," + \
-                     "" + early_before_bs_super_trade_amt_percent + "," + \
-                     "" + early_before_bs_super_trade_count_percent + "," + \
+                     "" + str(early_before_bs_super_trade_volume_percent) + "," + \
+                     "" + str(early_before_bs_super_trade_amt_percent) + "," + \
+                     "" + str(early_before_bs_super_trade_count_percent) + "," + \
                      "" + str(open_bid_trade_volume) + "," + \
                      "" + str(open_bid_trade_amt) + "," + \
-                     "'" + open_bid_trade_type + "'," + \
-                     "" + open_bid_trade_amt_percent + "," + \
+                     "'" + str(open_bid_trade_type) + "'," + \
+                     "" + str(open_bid_trade_amt_percent) + "," + \
                      "" + str(close_bid_trade_volume) + "," + \
                      "" + str(close_bid_trade_amt) + "," + \
-                     "'" + close_bid_trade_type + "'," + \
-                     "" + close_bid_trade_amt_percent + "," + \
+                     "'" + str(close_bid_trade_type) + "'," + \
+                     "" + str(close_bid_trade_amt_percent) + "," + \
                      "" + str(limit_up_volume) + "," + \
                      "" + str(limit_up_amt) + "," + \
-                     "" + limit_up_amt_percent + "," + \
+                     "" + str(limit_up_amt_percent) + "," + \
                      "" + str(limit_down_volume) + "," + \
                      "" + str(limit_down_amt) + "," + \
-                     "" + limit_down_amt_percent + "," + \
-                     "'" + first_limit_up_time + "'," + \
-                     "'" + first_limit_down_time + "', " + \
-                     "'" + last_limit_up_time + "'," + \
-                     "'" + last_limit_down_time + "', " \
+                     "" + str(limit_down_amt_percent) + "," + \
+                     "'" + str(first_limit_up_time) + "'," + \
+                     "'" + str(first_limit_down_time) + "', " + \
+                     "'" + str(last_limit_up_time) + "'," + \
+                     "'" + str(last_limit_down_time) + "', " \
                      "" + str(continue_up_down_days) + "," \
-                     "" + contiune_up_down_percent + "," \
+                     "" + str(contiune_up_down_percent) + "," \
                      "" + str(dragon_tiger_today_is) + "," \
-                     "'" + dragon_tiger_today_reason + "'," \
+                     "'" + str(dragon_tiger_today_reason) + "'," \
                      "" + str(dragon_tiger_all_today_buy_amt) + "," \
                      "" + str(dragon_tiger_all_today_sell_amt) + "," \
                      "" + str(dragon_tiger_organ_today_buy_amt) + "," \
@@ -907,30 +907,30 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(dragon_tiger_sale_today_sell_amt) + "," \
                      "" + str(dragon_tiger_all_today_buy_amt_percent) + "," \
                      "" + str(dragon_tiger_all_today_sell_amt_percent) + "," \
-                     "" + dragon_tiger_organ_today_buy_amt_percent + "," \
-                     "" + dragon_tiger_organ_today_sell_amt_percent + "," \
-                     "" + dragon_tiger_sale_today_buy_amt_percent + "," \
-                     "" + dragon_tiger_sale_today_sell_amt_percent + "," \
+                     "" + str(dragon_tiger_organ_today_buy_amt_percent) + "," \
+                     "" + str(dragon_tiger_organ_today_sell_amt_percent) + "," \
+                     "" + str(dragon_tiger_sale_today_buy_amt_percent) + "," \
+                     "" + str(dragon_tiger_sale_today_sell_amt_percent) + "," \
                      "" + str(dragon_tiger_total_is) + "," \
-                     "'" + dragon_tiger_total_reason + "'," \
+                     "'" + str(dragon_tiger_total_reason) + "'," \
                      "" + str(dragon_tiger_all_total_buy_amt) + "," \
                      "" + str(dragon_tiger_all_total_sell_amt) + "," \
                      "" + str(dragon_tiger_organ_total_buy_amt) + "," \
                      "" + str(dragon_tiger_organ_total_sell_amt) + "," \
                      "" + str(dragon_tiger_sale_total_buy_amt) + "," \
                      "" + str(dragon_tiger_sale_total_sell_amt) + "," \
-                     "" + dragon_tiger_organ_total_buy_amt_percent + "," \
-                     "" + dragon_tiger_organ_total_sell_amt_percent + "," \
-                     "" + dragon_tiger_sale_total_buy_amt_percent + "," \
-                     "" + dragon_tiger_sale_total_sell_amt_percent + "," \
+                     "" + str(dragon_tiger_organ_total_buy_amt_percent) + "," \
+                     "" + str(dragon_tiger_organ_total_sell_amt_percent) + "," \
+                     "" + str(dragon_tiger_sale_total_buy_amt_percent) + "," \
+                     "" + str(dragon_tiger_sale_total_sell_amt_percent) + "," \
                      "" + str(dragon_tiger_all_5day_count) + "," \
                      "" + str(dragon_tiger_all_5day_buy_count) + "," \
                      "" + str(dragon_tiger_all_5day_sell_count) + "," \
-                     "" + dragon_tiger_all_5day_bs_count_percent + "," \
+                     "" + str(dragon_tiger_all_5day_bs_count_percent) + "," \
                      "" + str(dragon_tiger_all_5day_buy_amt) + "," \
                      "" + str(dragon_tiger_all_5day_sell_amt) + "," \
                      "" + str(dragon_tiger_all_5day_diff_amt) + "," \
-                     "" + dragon_tiger_all_5day_bs_amt_percent + "," \
+                     "" + str(dragon_tiger_all_5day_bs_amt_percent) + "," \
                      "" + str(dragon_tiger_organ_5day_buy_count) + "," \
                      "" + str(dragon_tiger_organ_5day_sell_count) + "," \
                      "" + str(dragon_tiger_organ_5day_buy_amt) + "," \
@@ -938,11 +938,12 @@ class TushareStockTodayTickTradeData(TushareBase, object):
                      "" + str(dragon_tiger_organ_5day_diff_amt) + "," \
                      "" + str(dragon_tiger_sale_5day_buy_amt) + "," \
                      "" + str(dragon_tiger_sale_5day_sell_amt) + "," \
-                     "'" + dragon_tiger_sale_5day_name + "'," \
-                     "'" + date + "')"
+                     "'" + str(dragon_tiger_sale_5day_name) + "'," \
+                     "'" + str(date) + "')"
 
-        print(insert_sql)
-        self.insert_sql(insert_sql)
+        # print(insert_sql)
+        # self.insert_sql(insert_sql)
+        self.insert_into_about_sunso_stock_day_trade_statistic_data(data)
 
     # 从当日行情表中获取需要处理的股票数据
     def get_stocks_not_in_sunso_stock_day_trade_statistic_data(self):
@@ -956,9 +957,9 @@ class TushareStockTodayTickTradeData(TushareBase, object):
     # 从当日行情历史表中获取需要处理的股票数据
     def get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(self, date):
         sql = "select * from " + self.t_tushare_stock_newly_quotes_data_hist + " " \
-              "where code not in (select code from " + self.t_sunso_stock_day_trade_statistic_data + " " \
+              "where code not in (select code from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
               "where trade_date='" + date + "') and date='" + date + "' " \
-              " and code in ('600518','300736')"
+              # " and code in ('300508')"
         return self.select_sql(sql)
 
     # t_tushare_stock_newly_quotes_data 获取某股票N日内平均的交易数量
