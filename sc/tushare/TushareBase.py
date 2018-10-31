@@ -50,6 +50,8 @@ class TushareBase:
     max_volume = " between 1001 and 5000 "
     # 超大单(手)
     super_volume = " > 5000 "
+    # 大单及超大单
+    large_above = " > 1001 "
     # 早盘前部分时间
     time_early_before = " between '09:30:00' and '10:00:00' "
     # 早盘后部分时间
@@ -193,6 +195,14 @@ class TushareBase:
     # 获取当日股票的跌停价
     def get_stock_limit_down_value(self, stock_code):
         return round(self.get_stock_pre_close_amt(stock_code) * 0.9, 2)
+
+    # 获取当日股票的涨停价
+    def get_stock_limit_up_value_by_pre_close_amt(self, pre_close_amt):
+        return round(pre_close_amt * Decimal(1.1), 2)
+
+    # 获取当日股票的跌停价
+    def get_stock_limit_down_value_by_pre_close_amt(self, pre_close_amt):
+        return round(pre_close_amt * Decimal(0.9), 2)
 
     # 获取股票当前第一次涨停时间
     def get_stock_first_limit_up_time(self, stock_code, date, limit_up_value):
@@ -741,6 +751,17 @@ class TushareBase:
         return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
             stock_code, self.func_sum, "amount", date, volume_condition, None, trade_type)
 
+    # 根据相关条件获取全体的成交量统计
+    def get_all_day_trade_volume(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, None, trade_type)
+
+    # 根据相关条件获取全体的交易平均价
+    def get_all_day_avg_trade_price(self, stock_code, date, volume_condition, trade_type):
+        amt = self.get_all_day_trade_amt(stock_code, date, volume_condition, trade_type)
+        volume = self.get_all_day_trade_volume(stock_code, date, volume_condition, trade_type)
+        return Decimal(self.cal_division_round_2(amt, volume*100))
+
     # 获取早盘前部分的成交量统计
     def get_early_before_trade_volume(self, stock_code, date, volume_condition, trade_type):
         return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
@@ -917,22 +938,28 @@ class TushareBase:
 
         trade_date = self.get_date_str(up_down_data["trade_date"])
         close_amt = up_down_data["close_amt"]
-        result_data["continue_up_down_days"] = self.get_stock_continue_up_down_count_by_trade_date(stock_code, trade_date, date)
+        result_data["continue_up_down_days"] = self.get_stock_continue_up_down_count_by_trade_date(stock_code, trade_date, date) + 1
         result_data["contiune_up_down_percent"] = self.cal_percent_round_2(newly_close_amt - close_amt, close_amt)
         return result_data
 
     def get_stock_continue_up_down_data_by_up_down_type(self, stock_code, date, up_down_type):
-        sql = "select * from " + self.t_sunso_stock_day_trade_statistic_data + " " \
-              "where  code='" + stock_code + "' and trade_date<' " + date + "' and trade_date>"  \
-              "(select trade_date from " + self.t_sunso_stock_day_trade_statistic_data + " " \
-              "where  code='" + stock_code + "' and trade_date<'" + date + "' and price_change_percent " \
+        sql = "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+              "where  code='" + stock_code + "' and trade_date<'" + date + "' and trade_date>"  \
+              "(select trade_date from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+              "where  code='" + stock_code + "' and trade_date<'" + date + "' and close_pre_close_diff_amt_ratio " \
               "" + up_down_type + " 0 order by trade_date desc limit 1) " \
               " order by trade_date asc limit 1 "
-        return self.select_one_sql(sql)
+        data = self.select_one_sql(sql)
+        if data is None:
+            sql = "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+                  "where code='" + stock_code + "' and trade_date<'" + date + "' " \
+                  "order by trade_date asc limit 1 "
+            data = self.select_one_sql(sql)
+        return data
 
     # 根据交易日获取股票连续涨跌的次数
     def get_stock_continue_up_down_count_by_trade_date(self, stock_code, begin_date, end_date):
-        sql = "select count(*) as c from " + self.t_sunso_stock_day_trade_statistic_data + " " \
+        sql = "select count(*) as c from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
               "where  code='" + stock_code + "' and trade_date between '" + begin_date + "' and '" + end_date + "' "
         return self.count_sql_default_zero(sql)
 
@@ -1028,9 +1055,9 @@ class TushareBase:
         data["column"] = "sum(amount)"
         return self.select_column_from_newly_quotes_data_hist_by_pre_date(data)
 
-    def get_market_cap_amt_from_newly_quotes_data_hist_by_pre_one_date(self, data):
+    def get_circulation_amt_from_newly_quotes_data_hist_by_pre_one_date(self, data):
         data["limit"] = 1
-        data["column"] = "mktcap"
+        data["column"] = "nmc"
         return self.select_column_from_newly_quotes_data_hist_by_pre_date(data)
 
     def select_column_from_newly_quotes_data_hist_by_pre_date(self, data):
@@ -1061,6 +1088,18 @@ class TushareBase:
     def get_avg_trade_per_avg_volume_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, days):
         return self.get_avg_colum_value_from_sunso_stock_day_trade_statistic_core(stock_code, date, "trade_per_avg_volume", days)
 
+    # t_sunso_stock_day_trade_statistic_core_data 获取某股票N日内平均的换手率
+    def get_avg_turnover_rate_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_stock_day_trade_statistic_core(stock_code, date, "turnover_rate", days)
+
+    # t_sunso_stock_day_trade_statistic_core_data 获取某股票N日内平均的大额以上买盘交易金额比例
+    def get_avg_large_above_buy_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_stock_day_trade_statistic_core(stock_code, date, "large_above_buy_trade_amt_ratio", days)
+
+    # t_sunso_stock_day_trade_statistic_core_data 获取某股票N日内平均的大额以上卖盘交易金额比例
+    def get_avg_large_above_sell_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, days):
+        return self.get_avg_colum_value_from_sunso_stock_day_trade_statistic_core(stock_code, date,  "large_above_sell_trade_amt_ratio", days)
+
     # t_sunso_stock_day_trade_statistic_core_data， 获取某个股票，某字段，N日内的平均值
     def get_avg_colum_value_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, column, days):
         str_days = str(days)
@@ -1069,6 +1108,146 @@ class TushareBase:
                "where code='" + stock_code + "' and trade_date <'" + date + "' " \
                "order by trade_date desc limit " + str_days + ") as t"
         return self.count_sql_default_zero(sql)
+
+    # 获取前一天的股票数据
+    def get_pre_date_data_from_sunso_stock_day_trade_statistic_core(self, stock_code, date):
+        sql = "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+              "where code='" + stock_code + "' and trade_date <'" + date + "' order by trade_date desc limit 1"
+        data = self.select_one_sql(sql)
+        if data is None:
+            return {"large_above_day1_bs_diff_trade_amt":0,"large_above_day3_bs_diff_trade_amt":0,"large_above_day5_bs_diff_trade_amt":0, "continue_down_limit_days":0, "continue_up_limit_days":0}
+        return data
+
+    # 获取前N天，当日大单及以上买盘和卖盘之间的差额的汇总值
+    def get_pre_n_days_sum_large_above_bs_diff_trade_amt(self, stock_code, date, days):
+        return self.get_pre_n_days_sum_value_from_sunso_stock_day_trade_statistic_core(stock_code, date, "sum(large_above_day1_bs_diff_trade_amt)", days)
+
+    # 获取前N天的统计值
+    def get_pre_n_days_sum_value_from_sunso_stock_day_trade_statistic_core(self, stock_code, date, column, days):
+        sql = "select " + column + " as c from ("\
+              "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+              "where code='" + stock_code + "' and trade_date <'" + date + "' " \
+              "order by trade_date desc limit " + str(days) + ") " \
+              " as t "
+        return self.count_sql_default_zero(sql)
+
+    # 获取某个股票指定日期N天前的收盘价
+    def get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(self, stock_code, date, days):
+        str_days = str(days)
+        sql_count = "select count(*) as c from (" \
+                    "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+                    "where code='" + stock_code + "' and trade_date <'" + date + "' " \
+                    "limit  " + str_days + ") as t "
+        count_value = self.count_sql_default_zero(sql_count)
+        if not count_value == days:
+            return 0
+
+        sql = "select close_amt as c from (" \
+              "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+              "where code='" + stock_code + "' and trade_date <'" + date + "' " \
+              "order by trade_date desc limit  " + str_days + ") as t order by trade_date asc limit 1"
+        close_amt = self.count_sql_default_zero(sql)
+        # return float(close_amt)
+        return close_amt
+
+    # 获取股票10点的交易数据
+    def get_stock_ten_time_data_from_today_tick_trade_data(self, stock_code, date):
+        sql = "select * from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' and time like '10:%' order by time asc limit 1"
+        return self.select_one_sql(sql)
+
+    # 获取10点的交易价格
+    def get_stock_ten_time_price_from_today_tick_trade_data(self, stock_coe, date):
+        data = self.get_stock_ten_time_data_from_today_tick_trade_data(stock_coe, date)
+        if data is None:
+            return 0
+        return data["price"]
+
+    # 是否涨停
+    def is_up_limit(self, pre_close_amt, close_amt):
+        up_limit_amt = self.get_stock_limit_up_value_by_pre_close_amt(pre_close_amt)
+        if str(up_limit_amt) == str(round(close_amt, 2)):
+            return True
+        return False
+
+    # 是否跌停
+    def is_down_limit(self, pre_close_amt, close_amt):
+        down_limit_amt = self.get_stock_limit_down_value_by_pre_close_amt(pre_close_amt)
+        if str(down_limit_amt) == str(round(close_amt, 2)):
+            return True
+        return False
+
+    # 获取涨停类型
+    def get_up_limit_type(self, stock_code, date, pre_close_amt, close_amt, low_high_diff_amt):
+        up_limit_type = 0
+        if close_amt <= 0:
+            return up_limit_type
+        if not self.is_up_limit(pre_close_amt, close_amt):
+            return up_limit_type
+
+        up_limit_type = 10
+        if low_high_diff_amt == 0:
+            up_limit_type = 30
+            return up_limit_type
+
+        up_limit_amt = self.get_stock_limit_up_value_by_pre_close_amt(pre_close_amt)
+        if self.is_continue_price_by_after_time(stock_code, date, up_limit_amt):
+            up_limit_type = 20
+
+        return up_limit_type
+
+    # 获取跌停类型
+    def get_down_limit_type(self, stock_code, date, pre_close_amt, close_amt, low_high_diff_amt):
+        down_limit_type = 0
+        if close_amt <= 0:
+            return down_limit_type
+
+        if not self.is_down_limit(pre_close_amt, close_amt):
+            return down_limit_type
+
+        down_limit_type = 10
+        if low_high_diff_amt == 0:
+            down_limit_type = 30
+            return down_limit_type
+
+        down_limit_amt = self.get_stock_limit_down_value_by_pre_close_amt(pre_close_amt)
+        if self.is_continue_price_by_after_time(stock_code, date, down_limit_amt):
+            down_limit_type = 20
+
+        return down_limit_type
+
+    # 某个时间点之后是否是只出现某个价格交易
+    def is_continue_price_by_after_time(self, stock_code, date, price):
+        sql = "select count(*) as c from " + self.t_tushare_stock_today_tick_trade_data + " " \
+              "where code='" + stock_code + "' and date='" + date + "' and time>'10:30:00' and price<>" + str(price)
+        count_value = self.count_sql_default_zero(sql)
+        if count_value > 0:
+            return False
+        return True
+
+    # 获取连续涨停天数
+    def get_continue_up_limit_days(self, stock_code, date, up_limit_type):
+        if up_limit_type < 1:
+            return 0
+        pre_up_limit_days = 0
+        data = self.get_pre_date_data_from_sunso_stock_day_trade_statistic_core(stock_code, date)
+        if data is not None:
+            pre_up_limit_days = data["continue_up_limit_days"]
+        if pre_up_limit_days < 0:
+            pre_up_limit_days = 0
+        return pre_up_limit_days + 1
+
+    # 获取连续跌停天数
+    def get_continue_down_limit_days(self, stock_code, date, down_limit_type):
+        if down_limit_type < 1:
+            return 0
+        pre_down_limit_days = 0
+        data = self.get_pre_date_data_from_sunso_stock_day_trade_statistic_core(stock_code, date)
+        if data is not None:
+            pre_down_limit_days = data["continue_down_limit_days"]
+        if pre_down_limit_days < 0:
+            pre_down_limit_days = 0
+        return pre_down_limit_days + 1
 
     # 获取某只股票统计的核心数据
     def get_one_stock_statistic_core_data(self, data):
@@ -1123,7 +1302,49 @@ class TushareBase:
         data["open_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(open_amt - pre_close_amt, pre_close_amt)
         data["low_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(low_amt - pre_close_amt, pre_close_amt)
         data["high_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(high_amt - pre_close_amt, pre_close_amt)
+        low_high_diff_amt = high_amt - low_amt
         data["low_high_diff_amt_ratio"] = self.cal_percent_round_2(high_amt - low_amt, pre_close_amt)
+        ten_time_price = Decimal(self.get_stock_ten_time_price_from_today_tick_trade_data(stock_code, date))
+        data["open_ten_time_ratio"] = self.cal_percent_round_2(ten_time_price - open_amt, open_amt)
+        data["ten_tine_close_ratio"] = self.cal_percent_round_2(close_amt - ten_time_price, ten_time_price)
+
+        pre1_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 1)
+        pre3_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 3)
+        pre5_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 5)
+        pre10_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 10)
+        pre20_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 20)
+        pre30_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 30)
+        pre60_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 60)
+        pre90_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 90)
+        pre120_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 120)
+        pre250_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 250)
+        pre365_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 365)
+
+        data["pre1_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre1_close_price, pre1_close_price)
+        data["pre3_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre3_close_price, pre3_close_price)
+        data["pre5_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre5_close_price, pre5_close_price)
+        data["pre10_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre10_close_price, pre10_close_price)
+        data["pre20_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre20_close_price, pre20_close_price)
+        data["pre30_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre30_close_price, pre30_close_price)
+        data["pre60_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre60_close_price, pre60_close_price)
+        data["pre90_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre90_close_price, pre90_close_price)
+        data["pre120_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre120_close_price, pre120_close_price)
+        data["pre250_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre250_close_price, pre250_close_price)
+        data["pre365_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre365_close_price, pre365_close_price)
+
+        up_limit_type = self.get_up_limit_type(stock_code, date, pre_close_amt, close_amt, low_high_diff_amt)
+        down_limit_type = self.get_down_limit_type(stock_code, date, pre_close_amt, close_amt, low_high_diff_amt)
+        data["up_limit_type"] = up_limit_type
+        data["down_limit_type"] = down_limit_type
+        limit_up_price = self.get_stock_limit_up_value_by_pre_close_amt(pre_close_amt)
+        limit_down_price = self.get_stock_limit_down_value_by_pre_close_amt(pre_close_amt)
+        data["first_limit_up_time"] = self.get_stock_first_limit_up_time(stock_code, date, limit_up_price)
+        data["first_limit_down_time"] = self.get_stock_first_limit_down_time(stock_code, date, limit_down_price)
+        data["continue_up_limit_days"] = self.get_continue_up_limit_days(stock_code, date, up_limit_type)
+        data["continue_down_limit_days"] = self.get_continue_down_limit_days(stock_code, date, down_limit_type)
+        continue_up_down_data = self.get_stock_continue_up_down_data(data)
+        data["continue_up_down_days"] = str(continue_up_down_data["continue_up_down_days"])
+        data["contiune_up_down_percent"] = str(round(continue_up_down_data["contiune_up_down_percent"], 2))
 
         turnoverratio_key = "turnoverratio"
         if turnoverratio_key in data.keys():
@@ -1132,6 +1353,15 @@ class TushareBase:
             turnover_rate = str(self.cal_percent_round_2(
                 trade_volume, sunso_stock_baise["circulation_stock_volume"]*self.unit_hundred_million))
         data["turnover_rate"] = turnover_rate
+
+        pre1_avg_turnover_rate = self.get_avg_turnover_rate_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
+        pre3_avg_turnover_rate = self.get_avg_turnover_rate_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
+        pre5_avg_turnover_rate = self.get_avg_turnover_rate_from_sunso_stock_day_trade_statistic_core(stock_code, date, 5)
+
+        data["pre1_avg_turnover_rate_ratio"] = self.cal_division_round_2(turnover_rate, pre1_avg_turnover_rate)
+        data["pre3_avg_turnover_rate_ratio"] = self.cal_division_round_2(turnover_rate, pre3_avg_turnover_rate)
+        data["pre5_avg_turnover_rate_ratio"] = self.cal_division_round_2(turnover_rate, pre5_avg_turnover_rate)
+
         data["trade_volume"] = trade_volume
 
         amount_key = "amount"
@@ -1146,10 +1376,10 @@ class TushareBase:
             #Decimal(trade_volume / trade_count)
         data["trade_count"] = trade_count
         data["trade_per_avg_volume"] = trade_per_avg_volume
-        pre_day_market_cap_amt = self.get_market_cap_amt_from_newly_quotes_data_hist_by_pre_one_date(data)
-        if pre_day_market_cap_amt < 1:
-            pre_day_market_cap_amt = market_cap_amt
-        trade_net_amt = market_cap_amt - pre_day_market_cap_amt
+        pre_day_circulation_amt = self.get_circulation_amt_from_newly_quotes_data_hist_by_pre_one_date(data)
+        if pre_day_circulation_amt < 1:
+            pre_day_circulation_amt = circulation_amt
+        trade_net_amt = circulation_amt - pre_day_circulation_amt
         data["trade_net_amt"] = trade_net_amt
 
         pre_avg1_trade_price = self.get_avg_trade_price_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
@@ -1200,29 +1430,30 @@ class TushareBase:
         data["pre_avg250_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg250_trade_amt, pre_avg250_trade_amt)
         data["pre_avg365_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg365_trade_amt, pre_avg365_trade_amt)
 
-        pre_avg1_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
-        pre_avg3_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
-        pre_avg5_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 5)
-        pre_avg10_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 10)
-        pre_avg20_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 20)
-        pre_avg30_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 30)
-        pre_avg60_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 60)
-        pre_avg90_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 90)
-        pre_avg120_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 120)
-        pre_avg250_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
-        pre_avg365_trade_net_amt = self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
+        pre_avg1_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1))
+        pre_avg3_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3))
+        pre_avg5_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 5))
+        pre_avg10_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 10))
+        pre_avg20_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 20))
+        pre_avg30_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 30))
+        pre_avg60_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 60))
+        pre_avg90_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 90))
+        pre_avg120_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 120))
+        pre_avg250_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250))
+        pre_avg365_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365))
+        abs_trade_net_amt = abs(trade_net_amt)
 
-        data["pre_avg1_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg1_trade_net_amt, pre_avg1_trade_net_amt)
-        data["pre_avg3_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg3_trade_net_amt, pre_avg3_trade_net_amt)
-        data["pre_avg5_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg5_trade_net_amt, pre_avg5_trade_net_amt)
-        data["pre_avg10_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg10_trade_net_amt, pre_avg10_trade_net_amt)
-        data["pre_avg20_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg20_trade_net_amt, pre_avg20_trade_net_amt)
-        data["pre_avg30_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg30_trade_net_amt, pre_avg30_trade_net_amt)
-        data["pre_avg60_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg60_trade_net_amt, pre_avg60_trade_net_amt)
-        data["pre_avg90_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg90_trade_net_amt, pre_avg90_trade_net_amt)
-        data["pre_avg120_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg120_trade_net_amt, pre_avg120_trade_net_amt)
-        data["pre_avg250_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg250_trade_net_amt, pre_avg250_trade_net_amt)
-        data["pre_avg365_trade_net_amt_ratio"] = self.cal_percent_round_2(trade_net_amt - pre_avg365_trade_net_amt, pre_avg365_trade_net_amt)
+        data["pre_avg1_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg1_trade_net_amt, pre_avg1_trade_net_amt)
+        data["pre_avg3_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg3_trade_net_amt, pre_avg3_trade_net_amt)
+        data["pre_avg5_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg5_trade_net_amt, pre_avg5_trade_net_amt)
+        data["pre_avg10_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg10_trade_net_amt, pre_avg10_trade_net_amt)
+        data["pre_avg20_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg20_trade_net_amt, pre_avg20_trade_net_amt)
+        data["pre_avg30_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg30_trade_net_amt, pre_avg30_trade_net_amt)
+        data["pre_avg60_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg60_trade_net_amt, pre_avg60_trade_net_amt)
+        data["pre_avg90_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg90_trade_net_amt, pre_avg90_trade_net_amt)
+        data["pre_avg120_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg120_trade_net_amt, pre_avg120_trade_net_amt)
+        data["pre_avg250_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg250_trade_net_amt, pre_avg250_trade_net_amt)
+        data["pre_avg365_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg365_trade_net_amt, pre_avg365_trade_net_amt)
 
         pre_avg1_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
         pre_avg3_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
@@ -1384,6 +1615,19 @@ class TushareBase:
         data["outside_dish_sum_amt_ratio"] = self.cal_percent_round_2(outside_dish_sum_amt, sum_trade_amt)
         data["midside_dish_sum_amt_ratio"] = self.cal_percent_round_2(midside_dish_sum_amt, sum_trade_amt)
 
+        small_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, None)
+        small_avg_buy_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, self.outside_dish)
+        small_avg_sell_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, self.inside_dish)
+        large_above_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, None)
+        large_above_avg_buy_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, self.outside_dish)
+        large_above_avg_sell_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, self.inside_dish)
+        data["small_avg_trade_price_ratio"] = self.cal_percent_round_2(small_avg_trade_price - close_amt, close_amt)
+        data["small_avg_buy_trade_price_ratio"] = self.cal_percent_round_2(small_avg_buy_trade_price - close_amt, close_amt)
+        data["small_avg_sell_trade_price_ratio"] = self.cal_percent_round_2(small_avg_sell_trade_price - close_amt, close_amt)
+        data["large_above_avg_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_trade_price - close_amt, close_amt)
+        data["large_above_avg_buy_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_buy_trade_price - close_amt, close_amt)
+        data["large_above_avg_sell_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_sell_trade_price - close_amt, close_amt)
+
         small_inside_sum_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, self.inside_dish)
         small_outside_sum_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, self.outside_dish)
         medium_inside_sum_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.mid_volume, self.inside_dish)
@@ -1405,9 +1649,45 @@ class TushareBase:
         large_above_sell_trade_amt = large_inside_sum_trade_amt + super_inside_sum_trade_amt
         data["small_buy_trade_amt_ratio"] = self.cal_percent_round_2(small_outside_sum_trade_amt, sum_trade_amt)
         data["small_sell_trade_amt_ratio"] = self.cal_percent_round_2(small_inside_sum_trade_amt, sum_trade_amt)
-        data["large_above_buy_trade_amt_ratio"] = self.cal_percent_round_2(large_above_buy_trade_amt, sum_trade_amt)
-        data["large_above_sell_trade_amt_ratio"] = self.cal_percent_round_2(large_above_sell_trade_amt, sum_trade_amt)
+        large_above_buy_trade_amt_ratio = Decimal(str(self.cal_percent_round_2(large_above_buy_trade_amt, sum_trade_amt)))
+        data["large_above_buy_trade_amt_ratio"] = large_above_buy_trade_amt_ratio
+        pre1_avg_large_above_buy_trade_amt_ratio = self.get_avg_large_above_buy_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date ,1)
+        pre3_avg_large_above_buy_trade_amt_ratio = self.get_avg_large_above_buy_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
+        pre5_avg_large_above_buy_trade_amt_ratio = self.get_avg_large_above_buy_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date, 5)
+        data["pre1_avg_large_above_buy_trade_amt_ratio"] = self.cal_division_round_2(large_above_buy_trade_amt_ratio, pre1_avg_large_above_buy_trade_amt_ratio)
+        data["pre3_avg_large_above_buy_trade_amt_ratio"] = self.cal_division_round_2(large_above_buy_trade_amt_ratio, pre3_avg_large_above_buy_trade_amt_ratio)
+        data["pre5_avg_large_above_buy_trade_amt_ratio"] = self.cal_division_round_2(large_above_buy_trade_amt_ratio, pre5_avg_large_above_buy_trade_amt_ratio)
+
+        large_above_sell_trade_amt_ratio = Decimal(str(self.cal_percent_round_2(large_above_sell_trade_amt, sum_trade_amt)))
+        data["large_above_sell_trade_amt_ratio"] = large_above_sell_trade_amt_ratio
+        pre1_avg_large_above_sell_trade_amt_ratio = self.get_avg_large_above_sell_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
+        pre3_avg_large_above_sell_trade_amt_ratio = self.get_avg_large_above_sell_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
+        pre5_avg_large_above_sell_trade_amt_ratio = self.get_avg_large_above_sell_trade_amt_ratio_from_sunso_stock_day_trade_statistic_core(stock_code, date, 5)
+        data["pre1_avg_large_above_sell_trade_amt_ratio"] = self.cal_division_round_2(large_above_sell_trade_amt_ratio, pre1_avg_large_above_sell_trade_amt_ratio)
+        data["pre3_avg_large_above_sell_trade_amt_ratio"] = self.cal_division_round_2(large_above_sell_trade_amt_ratio, pre3_avg_large_above_sell_trade_amt_ratio)
+        data["pre5_avg_large_above_sell_trade_amt_ratio"] = self.cal_division_round_2(large_above_sell_trade_amt_ratio, pre5_avg_large_above_sell_trade_amt_ratio)
+
         data["large_above_bs_trade_amt_ratio"] = self.cal_division_round_2(large_above_buy_trade_amt, large_above_sell_trade_amt)
+
+        large_above_bs_diff_trade_amt = large_above_buy_trade_amt - large_above_sell_trade_amt
+        pre_2_days_sum_large_above_bs_diff_trade_amt = self.get_pre_n_days_sum_large_above_bs_diff_trade_amt(stock_code, date, 2)
+        pre_4_days_sum_large_above_bs_diff_trade_amt = self.get_pre_n_days_sum_large_above_bs_diff_trade_amt(stock_code, date, 4)
+        large_above_day3_bs_diff_trade_amt = large_above_bs_diff_trade_amt + pre_2_days_sum_large_above_bs_diff_trade_amt
+        large_above_day5_bs_diff_trade_amt = large_above_bs_diff_trade_amt + pre_4_days_sum_large_above_bs_diff_trade_amt
+        pre_trade_statistic_core_data = self.get_pre_date_data_from_sunso_stock_day_trade_statistic_core(stock_code, date)
+        pre_large_above_bs_diff_trade_amt = abs(pre_trade_statistic_core_data["large_above_day1_bs_diff_trade_amt"])
+        pre_large_above_day3_bs_diff_trade_amt = abs(pre_trade_statistic_core_data["large_above_day3_bs_diff_trade_amt"])
+        pre_large_above_day5_bs_diff_trade_amt = abs(pre_trade_statistic_core_data["large_above_day5_bs_diff_trade_amt"])
+        abs_large_above_bs_diff_trade_amt = abs(large_above_bs_diff_trade_amt)
+        abs_large_above_day3_bs_diff_trade_amt = abs(large_above_day3_bs_diff_trade_amt)
+        abs_large_above_day5_bs_diff_trade_amt = abs(large_above_day5_bs_diff_trade_amt)
+
+        data["large_above_day1_bs_diff_trade_amt"] = large_above_bs_diff_trade_amt
+        data["large_above_day3_bs_diff_trade_amt"] = large_above_day3_bs_diff_trade_amt
+        data["large_above_day5_bs_diff_trade_amt"] = large_above_day5_bs_diff_trade_amt
+        data["large_above_day1_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_bs_diff_trade_amt - pre_large_above_bs_diff_trade_amt, pre_large_above_bs_diff_trade_amt)
+        data["large_above_day3_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_day3_bs_diff_trade_amt - pre_large_above_day3_bs_diff_trade_amt, pre_large_above_day3_bs_diff_trade_amt)
+        data["large_above_day5_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_day5_bs_diff_trade_amt - pre_large_above_day5_bs_diff_trade_amt, pre_large_above_day5_bs_diff_trade_amt)
 
         return data
 
@@ -1481,7 +1761,7 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-10-29"
+        return "2018-10-30"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)

@@ -11,7 +11,7 @@ from TushareStockTodayDataHandler import TushareStockTodayDataHandler
 
 
 class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
-    date = "2018-10-21"
+    date = "2018-10-29"
 
     def __init__(self):
         super(TushareStockTodayHistDataHandler,self).__init__()
