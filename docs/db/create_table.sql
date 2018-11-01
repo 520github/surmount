@@ -1,39 +1,54 @@
+drop table `t_sunso_stock_plate`;
+
 CREATE TABLE `t_sunso_stock_plate` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `key` varchar(64) NOT NULL DEFAULT '' COMMENT '板块key',
-  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '板块说明',
-  `start_date` date  NOT NULL COMMENT '板块开始日期',
-  `end_date` date  NOT NULL COMMENT '板块结束日期',
+  `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
+  `plate_end_date` date  NOT NULL COMMENT '板块结束日期',
+  `total_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '板块总计涨跌幅',
+  `sql_template_key` varchar(1024) NOT NULL default '' COMMENT '获取板块数据的对应sql模版key',
+  `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块基本信息';
-create unique index unique_name_startDate on t_sunso_stock_plate(name, start_date);
+create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate_name, plate_start_date);
+
+insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
+values
+('short_term_3_day_overfall', '短期3天超跌', '短期3天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-29', 'plate_type_short_term_3_day_overfall_sql.sql'),
+('short_term_5_day_overfall', '短期5天超跌', '短期5天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-29', 'plate_type_short_term_5_day_overfall_sql.sql'),
+('day_up_limit', '当日涨停', '当日涨停股票,涨幅达10%', '2018-10-31', '2019-10-29', 'plate_type_day_up_limit_sql.sql'),
+;
 
 insert into t_sunso_stock_plate(`key`, name, remark, start_date, end_date)
 value('stock_repurchase', '股份回购', '国家重新修改的股份回购政策方案后，出现的股份回购潮流', '2018-10-29', '2018-10-29');
 
+drop table t_sunso_stock_plate_day_data;
 CREATE TABLE `t_sunso_stock_plate_day_data` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
+  `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
   `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
   `avg_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下所有股票的平均涨幅',
   `tap_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下的龙头涨幅',
   `mid_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下的中军涨幅',
   `up_limit_count` bigint NOT NULL DEFAULT -1  COMMENT '当日涨停数',
   `down_limit_count` bigint NOT NULL DEFAULT -1  COMMENT '当日跌停数(一旦出现跌停情况，整个板块就需要关注方向的转变)',
-  `up_count` bigint NOT NULL DEFAULT -1  COMMENT '上当日涨个数',
+  `up_count` bigint NOT NULL DEFAULT -1  COMMENT '当日上涨个数',
   `down_count` bigint NOT NULL DEFAULT -1  COMMENT '当日下跌个数',
-  `net_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '当日板块资金净流入情况',
+  `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '当日板块资金净流入情况',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日板块说明',
   `trade_date` date  NOT NULL COMMENT '交易日期',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块每日数据';
-create unique index unique_name_startDate on t_sunso_stock_plate_day_data(name, trade_date);
+create unique index unique_plateName_plateStartDate_tradeDate on t_sunso_stock_plate_day_data(plate_name, plate_start_date, trade_date);
 
+drop table t_sunso_stock_plate_stock;
 CREATE TABLE `t_sunso_stock_plate_stock` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
@@ -43,12 +58,21 @@ CREATE TABLE `t_sunso_stock_plate_stock` (
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '股票加入说明',
   `advise` varchar(512) NOT NULL DEFAULT '' COMMENT '预判建议',
   `join_date` date  NOT NULL COMMENT '股票加入板块日期',
+  `level_type` varchar(64) NOT NULL DEFAULT 'follower' COMMENT '股票级别类型:tap龙头,mid中军,follower跟随者',
+  `total_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '总计涨跌幅',
+  `total_count` int NOT NULL DEFAULT -1 COMMENT '总次数',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票板块下的股票信息';
 create unique index unique_plateName_plateStartDate_code on t_sunso_stock_plate_stock(plate_name, plate_start_date, code);
+
+insert into t_sunso_stock_plate_stock(plate_name,plate_start_date,code,name,join_date)
+select '短期3天超跌','2018-10-31',code,name,'2018-10-31' from t_sunso_stock_day_trade_statistic_core_data
+where trade_date='2018-10-30' and close_amt > 0 and pre3_close_price_ratio <= -15
+;
 
 insert into t_sunso_stock_plate_stock(`plate_name`, `plate_start_date`, `code`, `name`, `remark`, `join_date`)
 values
@@ -96,7 +120,7 @@ values
 ('股份回购', '2018-10-29', '603808', '歌力思', '上市公司发布回购最新进展', '2018-10-29')
 ;
 
-
+drop table t_sunso_stock_plate_stock_day_data;
 CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `plate_name` varchar(128) NOT NULL DEFAULT '' COMMENT '板块名称',
@@ -104,7 +128,7 @@ CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
   `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
   `up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '股票当日涨幅幅',
-  `net_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(万)',
+  `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(万)',
   `continue_up_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续涨停次数',
   `continue_down_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续跌停次数',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日股票说明',
