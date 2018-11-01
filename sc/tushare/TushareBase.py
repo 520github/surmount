@@ -103,7 +103,7 @@ class TushareBase:
                   "order by trade_date desc limit 1"
             data = self.select_one_sql(sql)
         if data is None:
-            return {"name":'', "circulation_stock_volume":0}
+            return {"name":'', "circulation_stock_volume":0, "industry":"", "area":""}
         return data
 
     def get_one_stock_basic(self, stock_code):
@@ -1253,13 +1253,16 @@ class TushareBase:
     def get_one_stock_statistic_core_data(self, data):
         if data is None:
             return data
+        close_amt = data["trade"]
+        # 没有收盘价，停牌的时候，不进行数据的处理
+        if close_amt <= 0:
+            return
         date = data["date"]
         if isinstance(date, datetime.date):
             date = self.get_date_str(date)
         data["trade_date"] = date
         stock_code = data["code"]
         change_percent = data["changepercent"]
-        close_amt = data["trade"]
         open_amt = data["open"]
         low_amt = data["low"]
         high_amt = data["high"]
@@ -1284,6 +1287,8 @@ class TushareBase:
         if name_key not in data.keys():
             data[name_key] = sunso_stock_baise[name_key]
         name = data[name_key]
+        data["industry"] = sunso_stock_baise["industry"]
+        data["area"] = sunso_stock_baise["area"]
         data["open_amt"] = open_amt
         data["close_amt"] = close_amt
         data["low_amt"] = low_amt
@@ -1298,10 +1303,10 @@ class TushareBase:
             # Decimal(round(close_amt / (1 + change_percent / 100), 2))
         data["pre_close_amt"] = pre_close_amt
 
-        data["close_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(close_amt - pre_close_amt, pre_close_amt)
-        data["open_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(open_amt - pre_close_amt, pre_close_amt)
-        data["low_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(low_amt - pre_close_amt, pre_close_amt)
-        data["high_pre_close_diff_amt_ratio"] = self.cal_percent_round_2(high_amt - pre_close_amt, pre_close_amt)
+        data["close_pre_close_diff_amt_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_close_amt)
+        data["open_pre_close_diff_amt_ratio"] = self.cal_percent_round_2_not_zero(open_amt, pre_close_amt)
+        data["low_pre_close_diff_amt_ratio"] = self.cal_percent_round_2_not_zero(low_amt, pre_close_amt)
+        data["high_pre_close_diff_amt_ratio"] = self.cal_percent_round_2_not_zero(high_amt, pre_close_amt)
         low_high_diff_amt = high_amt - low_amt
         data["low_high_diff_amt_ratio"] = self.cal_percent_round_2(high_amt - low_amt, pre_close_amt)
         ten_time_price = Decimal(self.get_stock_ten_time_price_from_today_tick_trade_data(stock_code, date))
@@ -1320,17 +1325,17 @@ class TushareBase:
         pre250_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 250)
         pre365_close_price = self.get_close_price_from_sunso_stock_day_trade_statistic_core_by_date_and_limit(stock_code, date, 365)
 
-        data["pre1_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre1_close_price, pre1_close_price)
-        data["pre3_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre3_close_price, pre3_close_price)
-        data["pre5_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre5_close_price, pre5_close_price)
-        data["pre10_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre10_close_price, pre10_close_price)
-        data["pre20_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre20_close_price, pre20_close_price)
-        data["pre30_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre30_close_price, pre30_close_price)
-        data["pre60_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre60_close_price, pre60_close_price)
-        data["pre90_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre90_close_price, pre90_close_price)
-        data["pre120_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre120_close_price, pre120_close_price)
-        data["pre250_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre250_close_price, pre250_close_price)
-        data["pre365_close_price_ratio"] = self.cal_percent_round_2(close_amt - pre365_close_price, pre365_close_price)
+        data["pre1_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre1_close_price)
+        data["pre3_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre3_close_price)
+        data["pre5_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre5_close_price)
+        data["pre10_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre10_close_price)
+        data["pre20_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre20_close_price)
+        data["pre30_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre30_close_price)
+        data["pre60_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre60_close_price)
+        data["pre90_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre90_close_price)
+        data["pre120_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre120_close_price)
+        data["pre250_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre250_close_price)
+        data["pre365_close_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre365_close_price)
 
         up_limit_type = self.get_up_limit_type(stock_code, date, pre_close_amt, close_amt, low_high_diff_amt)
         down_limit_type = self.get_down_limit_type(stock_code, date, pre_close_amt, close_amt, low_high_diff_amt)
@@ -1394,17 +1399,17 @@ class TushareBase:
         pre_avg250_trade_price = self.get_avg_trade_price_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
         pre_avg365_trade_price = self.get_avg_trade_price_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
 
-        data["pre_avg1_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg1_trade_price, pre_avg1_trade_price)
-        data["pre_avg3_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg3_trade_price, pre_avg3_trade_price)
-        data["pre_avg5_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg5_trade_price, pre_avg5_trade_price)
-        data["pre_avg10_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg10_trade_price, pre_avg10_trade_price)
-        data["pre_avg20_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg20_trade_price, pre_avg20_trade_price)
-        data["pre_avg30_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg30_trade_price, pre_avg30_trade_price)
-        data["pre_avg60_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg60_trade_price, pre_avg60_trade_price)
-        data["pre_avg90_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg90_trade_price, pre_avg90_trade_price)
-        data["pre_avg120_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg120_trade_price, pre_avg120_trade_price)
-        data["pre_avg250_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg250_trade_price, pre_avg250_trade_price)
-        data["pre_avg365_trade_price_ratio"] = self.cal_percent_round_2(close_amt - pre_avg365_trade_price, pre_avg365_trade_price)
+        data["pre_avg1_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg1_trade_price)
+        data["pre_avg3_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg3_trade_price)
+        data["pre_avg5_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg5_trade_price)
+        data["pre_avg10_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg10_trade_price)
+        data["pre_avg20_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg20_trade_price)
+        data["pre_avg30_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg30_trade_price)
+        data["pre_avg60_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg60_trade_price)
+        data["pre_avg90_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg90_trade_price)
+        data["pre_avg120_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg120_trade_price)
+        data["pre_avg250_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg250_trade_price)
+        data["pre_avg365_trade_price_ratio"] = self.cal_percent_round_2_not_zero(close_amt, pre_avg365_trade_price)
 
         pre_avg1_trade_amt = self.get_avg_trade_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
         pre_avg3_trade_amt = self.get_avg_trade_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
@@ -1418,17 +1423,17 @@ class TushareBase:
         pre_avg250_trade_amt = self.get_avg_trade_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
         pre_avg365_trade_amt = self.get_avg_trade_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
 
-        data["pre_avg1_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg1_trade_amt, pre_avg1_trade_amt)
-        data["pre_avg3_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg3_trade_amt, pre_avg3_trade_amt)
-        data["pre_avg5_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg5_trade_amt, pre_avg5_trade_amt)
-        data["pre_avg10_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg10_trade_amt, pre_avg10_trade_amt)
-        data["pre_avg20_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg20_trade_amt, pre_avg20_trade_amt)
-        data["pre_avg30_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg30_trade_amt, pre_avg30_trade_amt)
-        data["pre_avg60_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg60_trade_amt, pre_avg60_trade_amt)
-        data["pre_avg90_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg90_trade_amt, pre_avg90_trade_amt)
-        data["pre_avg120_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg120_trade_amt, pre_avg120_trade_amt)
-        data["pre_avg250_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg250_trade_amt, pre_avg250_trade_amt)
-        data["pre_avg365_trade_amt_ratio"] = self.cal_percent_round_2(trade_amt - pre_avg365_trade_amt, pre_avg365_trade_amt)
+        data["pre_avg1_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg1_trade_amt)
+        data["pre_avg3_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg3_trade_amt)
+        data["pre_avg5_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg5_trade_amt)
+        data["pre_avg10_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg10_trade_amt)
+        data["pre_avg20_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg20_trade_amt)
+        data["pre_avg30_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg30_trade_amt)
+        data["pre_avg60_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg60_trade_amt)
+        data["pre_avg90_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg90_trade_amt)
+        data["pre_avg120_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg120_trade_amt)
+        data["pre_avg250_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg250_trade_amt)
+        data["pre_avg365_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(trade_amt, pre_avg365_trade_amt)
 
         pre_avg1_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1))
         pre_avg3_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3))
@@ -1443,17 +1448,17 @@ class TushareBase:
         pre_avg365_trade_net_amt = abs(self.get_avg_trade_net_amt_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365))
         abs_trade_net_amt = abs(trade_net_amt)
 
-        data["pre_avg1_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg1_trade_net_amt, pre_avg1_trade_net_amt)
-        data["pre_avg3_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg3_trade_net_amt, pre_avg3_trade_net_amt)
-        data["pre_avg5_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg5_trade_net_amt, pre_avg5_trade_net_amt)
-        data["pre_avg10_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg10_trade_net_amt, pre_avg10_trade_net_amt)
-        data["pre_avg20_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg20_trade_net_amt, pre_avg20_trade_net_amt)
-        data["pre_avg30_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg30_trade_net_amt, pre_avg30_trade_net_amt)
-        data["pre_avg60_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg60_trade_net_amt, pre_avg60_trade_net_amt)
-        data["pre_avg90_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg90_trade_net_amt, pre_avg90_trade_net_amt)
-        data["pre_avg120_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg120_trade_net_amt, pre_avg120_trade_net_amt)
-        data["pre_avg250_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg250_trade_net_amt, pre_avg250_trade_net_amt)
-        data["pre_avg365_trade_net_amt_ratio"] = self.cal_percent_round_2(abs_trade_net_amt - pre_avg365_trade_net_amt, pre_avg365_trade_net_amt)
+        data["pre_avg1_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg1_trade_net_amt)
+        data["pre_avg3_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg3_trade_net_amt)
+        data["pre_avg5_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg5_trade_net_amt)
+        data["pre_avg10_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg10_trade_net_amt)
+        data["pre_avg20_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg20_trade_net_amt)
+        data["pre_avg30_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg30_trade_net_amt)
+        data["pre_avg60_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg60_trade_net_amt)
+        data["pre_avg90_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg90_trade_net_amt)
+        data["pre_avg120_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg120_trade_net_amt)
+        data["pre_avg250_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg250_trade_net_amt)
+        data["pre_avg365_trade_net_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_trade_net_amt, pre_avg365_trade_net_amt)
 
         pre_avg1_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
         pre_avg3_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
@@ -1467,17 +1472,17 @@ class TushareBase:
         pre_avg250_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
         pre_avg365_trade_volume = self.get_avg_trade_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
 
-        data["pre_avg1_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg1_trade_volume, pre_avg1_trade_volume)
-        data["pre_avg3_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg3_trade_volume, pre_avg3_trade_volume)
-        data["pre_avg5_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg5_trade_volume, pre_avg5_trade_volume)
-        data["pre_avg10_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg10_trade_volume, pre_avg10_trade_volume)
-        data["pre_avg20_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg20_trade_volume, pre_avg20_trade_volume)
-        data["pre_avg30_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg30_trade_volume, pre_avg30_trade_volume)
-        data["pre_avg60_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg60_trade_volume, pre_avg60_trade_volume)
-        data["pre_avg90_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg90_trade_volume, pre_avg90_trade_volume)
-        data["pre_avg120_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg120_trade_volume, pre_avg120_trade_volume)
-        data["pre_avg250_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg250_trade_volume, pre_avg250_trade_volume)
-        data["pre_avg365_trade_volume_ratio"] = self.cal_percent_round_2(trade_volume - pre_avg365_trade_volume, pre_avg365_trade_volume)
+        data["pre_avg1_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg1_trade_volume)
+        data["pre_avg3_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg3_trade_volume)
+        data["pre_avg5_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg5_trade_volume)
+        data["pre_avg10_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg10_trade_volume)
+        data["pre_avg20_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg20_trade_volume)
+        data["pre_avg30_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg30_trade_volume)
+        data["pre_avg60_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg60_trade_volume)
+        data["pre_avg90_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg90_trade_volume)
+        data["pre_avg120_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg120_trade_volume)
+        data["pre_avg250_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg250_trade_volume)
+        data["pre_avg365_trade_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_volume, pre_avg365_trade_volume)
 
         pre_avg1_trade_count = self.get_avg_trade_count_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
         pre_avg3_trade_count = self.get_avg_trade_count_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
@@ -1491,17 +1496,17 @@ class TushareBase:
         pre_avg250_trade_count = self.get_avg_trade_count_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
         pre_avg365_trade_count = self.get_avg_trade_count_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
 
-        data["pre_avg1_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg1_trade_count, pre_avg1_trade_count)
-        data["pre_avg3_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg3_trade_count, pre_avg3_trade_count)
-        data["pre_avg5_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg5_trade_count, pre_avg5_trade_count)
-        data["pre_avg10_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg10_trade_count, pre_avg10_trade_count)
-        data["pre_avg20_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg20_trade_count, pre_avg20_trade_count)
-        data["pre_avg30_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg30_trade_count, pre_avg30_trade_count)
-        data["pre_avg60_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg60_trade_count, pre_avg60_trade_count)
-        data["pre_avg90_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg90_trade_count, pre_avg90_trade_count)
-        data["pre_avg120_trade_count_ratio"] =self.cal_percent_round_2(trade_count - pre_avg120_trade_count, pre_avg120_trade_count)
-        data["pre_avg250_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg250_trade_count, pre_avg250_trade_count)
-        data["pre_avg365_trade_count_ratio"] = self.cal_percent_round_2(trade_count - pre_avg365_trade_count, pre_avg365_trade_count)
+        data["pre_avg1_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg1_trade_count)
+        data["pre_avg3_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg3_trade_count)
+        data["pre_avg5_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg5_trade_count)
+        data["pre_avg10_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg10_trade_count)
+        data["pre_avg20_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg20_trade_count)
+        data["pre_avg30_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg30_trade_count)
+        data["pre_avg60_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg60_trade_count)
+        data["pre_avg90_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg90_trade_count)
+        data["pre_avg120_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg120_trade_count)
+        data["pre_avg250_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg250_trade_count)
+        data["pre_avg365_trade_count_ratio"] = self.cal_percent_round_2_not_zero(trade_count, pre_avg365_trade_count)
 
         pre_avg1_trade_per_avg_volume = self.get_avg_trade_per_avg_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
         pre_avg3_trade_per_avg_volume = self.get_avg_trade_per_avg_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 3)
@@ -1515,17 +1520,17 @@ class TushareBase:
         pre_avg250_trade_per_avg_volume = self.get_avg_trade_per_avg_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 250)
         pre_avg365_trade_per_avg_volume = self.get_avg_trade_per_avg_volume_from_sunso_stock_day_trade_statistic_core(stock_code, date, 365)
 
-        data["pre_avg1_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg1_trade_per_avg_volume,  pre_avg1_trade_per_avg_volume)
-        data["pre_avg3_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg3_trade_per_avg_volume, pre_avg3_trade_per_avg_volume)
-        data["pre_avg5_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg5_trade_per_avg_volume, pre_avg5_trade_per_avg_volume)
-        data["pre_avg10_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg10_trade_per_avg_volume, pre_avg10_trade_per_avg_volume)
-        data["pre_avg20_trade_per_avg_volume_ratio"] =  self.cal_percent_round_2(trade_per_avg_volume - pre_avg20_trade_per_avg_volume, pre_avg20_trade_per_avg_volume)
-        data["pre_avg30_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg30_trade_per_avg_volume, pre_avg30_trade_per_avg_volume)
-        data["pre_avg60_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg60_trade_per_avg_volume, pre_avg60_trade_per_avg_volume)
-        data["pre_avg90_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg90_trade_per_avg_volume, pre_avg90_trade_per_avg_volume)
-        data["pre_avg120_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg120_trade_per_avg_volume, pre_avg120_trade_per_avg_volume)
-        data["pre_avg250_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg250_trade_per_avg_volume, pre_avg250_trade_per_avg_volume)
-        data["pre_avg365_trade_per_avg_volume_ratio"] = self.cal_percent_round_2(trade_per_avg_volume - pre_avg365_trade_per_avg_volume, pre_avg365_trade_per_avg_volume)
+        data["pre_avg1_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume,  pre_avg1_trade_per_avg_volume)
+        data["pre_avg3_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg3_trade_per_avg_volume)
+        data["pre_avg5_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg5_trade_per_avg_volume)
+        data["pre_avg10_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg10_trade_per_avg_volume)
+        data["pre_avg20_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg20_trade_per_avg_volume)
+        data["pre_avg30_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg30_trade_per_avg_volume)
+        data["pre_avg60_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg60_trade_per_avg_volume)
+        data["pre_avg90_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg90_trade_per_avg_volume)
+        data["pre_avg120_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg120_trade_per_avg_volume)
+        data["pre_avg250_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg250_trade_per_avg_volume)
+        data["pre_avg365_trade_per_avg_volume_ratio"] = self.cal_percent_round_2_not_zero(trade_per_avg_volume, pre_avg365_trade_per_avg_volume)
 
         dragon_tiger_today = self.get_stock_dragon_tiger_today_data(stock_code, date)
         dragon_tiger_organ_today = self.get_stock_dragon_tiger_organ_today_data(stock_code, date)
@@ -1685,9 +1690,9 @@ class TushareBase:
         data["large_above_day1_bs_diff_trade_amt"] = large_above_bs_diff_trade_amt
         data["large_above_day3_bs_diff_trade_amt"] = large_above_day3_bs_diff_trade_amt
         data["large_above_day5_bs_diff_trade_amt"] = large_above_day5_bs_diff_trade_amt
-        data["large_above_day1_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_bs_diff_trade_amt - pre_large_above_bs_diff_trade_amt, pre_large_above_bs_diff_trade_amt)
-        data["large_above_day3_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_day3_bs_diff_trade_amt - pre_large_above_day3_bs_diff_trade_amt, pre_large_above_day3_bs_diff_trade_amt)
-        data["large_above_day5_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2(abs_large_above_day5_bs_diff_trade_amt - pre_large_above_day5_bs_diff_trade_amt, pre_large_above_day5_bs_diff_trade_amt)
+        data["large_above_day1_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_large_above_bs_diff_trade_amt, pre_large_above_bs_diff_trade_amt)
+        data["large_above_day3_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_large_above_day3_bs_diff_trade_amt, pre_large_above_day3_bs_diff_trade_amt)
+        data["large_above_day5_bs_diff_trade_amt_ratio"] = self.cal_percent_round_2_not_zero(abs_large_above_day5_bs_diff_trade_amt, pre_large_above_day5_bs_diff_trade_amt)
 
         return data
 
@@ -1790,6 +1795,13 @@ class TushareBase:
             return 0
 
         return round((first_value/second_value)*100, 2)
+
+    # 计算百分比，并进行四舍五入保留2为小数
+    def cal_percent_round_2_not_zero(self, first_value, second_value):
+        if first_value == 0 or second_value == 0:
+            return 0
+
+        return round(((first_value - second_value)/second_value)*100, 2)
 
     # 两个数相除并保留两个小数点
     def cal_division_round_2(self, first_value, second_value):

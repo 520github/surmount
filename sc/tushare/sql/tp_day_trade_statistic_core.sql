@@ -1,6 +1,8 @@
 insert into t_sunso_stock_day_trade_statistic_core_data(
     code,
     name,
+    industry,
+    area,
     open_amt,
     close_amt,
     low_amt,
@@ -182,6 +184,8 @@ insert into t_sunso_stock_day_trade_statistic_core_data(
 value(
     '{{code}}',
     '{{name}}',
+    '{{industry}}',
+    '{{area}}',
     {{open_amt}},
     {{close_amt}},
     {{low_amt}},
