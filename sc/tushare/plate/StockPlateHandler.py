@@ -21,10 +21,12 @@ class StockPlateHandler(object):
         self.stock_plate_stock_day_data.update_stock_plate_stock(plate_data)
 
         self.stock_plate_day_data.init_stock_plate_day_data(plate_data)
-        self.stock_plate_day_data.update_plate_total_up_down_ratio(plate_data)
+        self.stock_plate_day_data.update_stock_plate(plate_data)
 
     def run_stock_plate(self):
         data_list = self.stock_plate_day_data.get_stock_plate_data_list()
+        if data_list is None:
+            return
         for plate_data in data_list:
             plate_data["trade_date"] = self.trade_date
             self.handle_one_stock_plate(plate_data)

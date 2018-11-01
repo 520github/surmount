@@ -1805,8 +1805,10 @@ class TushareBase:
 
     # 两个数相除并保留两个小数点
     def cal_division_round_2(self, first_value, second_value):
-        if first_value == 0 or second_value == 0:
+        if first_value == 0:
             return 0
+        if second_value == 0:
+            return 100
         return round((first_value / second_value), 2)
 
     def get_next_date_str(self, date):

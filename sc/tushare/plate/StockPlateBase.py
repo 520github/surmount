@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+from __future__ import division
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../../common'))
@@ -32,4 +33,12 @@ class StockPlateBase(DbHandler, object):
 
     def get_tempalte_path(self):
         return "./sql/"
+
+    # 两个数相除并保留两个小数点
+    def cal_division_round_2(self, first_value, second_value):
+        if first_value == 0:
+            return 0
+        if second_value == 0:
+            return 100
+        return round((first_value / second_value), 2)
 

@@ -10,8 +10,8 @@ class StockPlateStockDayData(StockPlateBase, object):
 
     def init_stock_plate_stock_data(self, plate_data):
         key = plate_data["sql_template_key"]
-        now_date = self.get_now_ymd_str()
-        plate_data["join_date"] = now_date
+        # now_date = self.get_now_ymd_str()
+        plate_data["join_date"] = plate_data["trade_date"]
         sql = self.get_sql_by_template(key, plate_data)
         try:
             self.insert_sql(sql)
@@ -29,8 +29,11 @@ class StockPlateStockDayData(StockPlateBase, object):
         data_list = self.get_stock_plate_stock_by_plate(plate_data)
         for data in data_list:
             plate_data["code"] = data["code"]
-            plate_data["total_up_down_ratio"] = self.get_plate_stock_total_up_down_ratio(plate_data)
-            plate_data["total_count"] = self.get_plate_stock_total_count(plate_data)
+            total_up_down_ratio = self.get_plate_stock_total_up_down_ratio(plate_data)
+            plate_data["total_up_down_ratio"] = total_up_down_ratio
+            total_count = self.get_plate_stock_total_count(plate_data)
+            plate_data["total_count"] = total_count
+            plate_data["avg_up_down_ratio"] = round(total_up_down_ratio/total_count,2)
             sql = self.get_sql_by_template("update_stock_plate_stock.sql", plate_data)
             self.update_sql(sql)
 

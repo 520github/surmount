@@ -8,6 +8,9 @@ CREATE TABLE `t_sunso_stock_plate` (
   `plate_start_date` date  NOT NULL COMMENT '板块开始日期',
   `plate_end_date` date  NOT NULL COMMENT '板块结束日期',
   `total_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '板块总计涨跌幅',
+  `total_count` int NOT NULL DEFAULT 0 COMMENT '总次数',
+  `total_up_top5_stock_name` varchar(512) NOT NULL DEFAULT '' COMMENT '上涨前5的股票名称',
+  `total_down_top5_stock_name` varchar(512) NOT NULL DEFAULT '' COMMENT '下跌前5的股票名称',
   `sql_template_key` varchar(1024) NOT NULL default '' COMMENT '获取板块数据的对应sql模版key',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
@@ -22,10 +25,11 @@ values
 ('short_term_3_day_overfall', '短期3天超跌', '短期3天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-29', 'plate_type_short_term_3_day_overfall_sql.sql'),
 ('short_term_5_day_overfall', '短期5天超跌', '短期5天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-29', 'plate_type_short_term_5_day_overfall_sql.sql'),
 ('day_up_limit', '当日涨停', '当日涨停股票,涨幅达10%', '2018-10-31', '2019-10-29', 'plate_type_day_up_limit_sql.sql'),
+('zq_plate', '证券板块', '所有证券行业的股票', '2018-10-26', '2019-10-29', 'plate_type_zq_plate_sql.sql'),
 ;
 
-insert into t_sunso_stock_plate(`key`, name, remark, start_date, end_date)
-value('stock_repurchase', '股份回购', '国家重新修改的股份回购政策方案后，出现的股份回购潮流', '2018-10-29', '2018-10-29');
+insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
+value('stock_repurchase', '股份回购', '国家重新修改的股份回购政策方案后，出现的股份回购潮流', '2018-10-29', '2018-10-29', 'plate_type_stock_repurchase_sql.sql');
 
 drop table t_sunso_stock_plate_day_data;
 CREATE TABLE `t_sunso_stock_plate_day_data` (
@@ -39,7 +43,10 @@ CREATE TABLE `t_sunso_stock_plate_day_data` (
   `down_limit_count` bigint NOT NULL DEFAULT -1  COMMENT '当日跌停数(一旦出现跌停情况，整个板块就需要关注方向的转变)',
   `up_count` bigint NOT NULL DEFAULT -1  COMMENT '当日上涨个数',
   `down_count` bigint NOT NULL DEFAULT -1  COMMENT '当日下跌个数',
+  `up_down_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '上涨股票数/下跌股票数',
   `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '当日板块资金净流入情况',
+  `up_top5_stock_name` varchar(512) NOT NULL DEFAULT '' COMMENT '上涨前5的股票名称',
+  `down_top5_stock_name` varchar(512) NOT NULL DEFAULT '' COMMENT '下跌前5的股票名称',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日板块说明',
   `trade_date` date  NOT NULL COMMENT '交易日期',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -63,7 +70,8 @@ CREATE TABLE `t_sunso_stock_plate_stock` (
   `join_date` date  NOT NULL COMMENT '股票加入板块日期',
   `level_type` varchar(64) NOT NULL DEFAULT 'follower' COMMENT '股票级别类型:tap龙头,mid中军,follower跟随者',
   `total_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '总计涨跌幅',
-  `total_count` int NOT NULL DEFAULT -1 COMMENT '总次数',
+  `total_count` int NOT NULL DEFAULT 0 COMMENT '总次数',
+  `avg_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '平均涨跌幅',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -120,7 +128,8 @@ values
 ('股份回购', '2018-10-29', '600986', '科达股份', '上市公司发布回购最新进展', '2018-10-29'),
 ('股份回购', '2018-10-29', '600280', '中央商场', '上市公司发布回购最新进展', '2018-10-29'),
 ('股份回购', '2018-10-29', '601388', '怡球资源', '上市公司发布回购最新进展', '2018-10-29'),
-('股份回购', '2018-10-29', '603808', '歌力思', '上市公司发布回购最新进展', '2018-10-29')
+('股份回购', '2018-10-29', '603808', '歌力思', '上市公司发布回购最新进展', '2018-10-29'),
+('股份回购', '2018-10-29', '400492', '山鼎设计', '上市公司发布回购最新进展', '2018-10-29'),
 ;
 
 drop table t_sunso_stock_plate_stock_day_data;
@@ -136,6 +145,9 @@ CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
   `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(万)',
   `continue_up_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续涨停次数',
   `continue_down_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续跌停次数',
+  `continue_up_down_days` bigint NOT NULL DEFAULT -1  COMMENT '已连续涨跌的次数',
+  `contiune_up_down_percent` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '已连续涨跌的幅度比例',
+  `join_days` bigint NOT NULL DEFAULT -1  COMMENT '加入之后的第几天',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日股票说明',
   `trade_date` date  NOT NULL COMMENT '股票交易日期',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
