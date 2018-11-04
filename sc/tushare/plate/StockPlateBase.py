@@ -42,3 +42,20 @@ class StockPlateBase(DbHandler, object):
             return 100
         return round((first_value / second_value), 2)
 
+    # 计算百分比，并进行四舍五入保留2为小数
+    def cal_percent_round_2(self, first_value, second_value):
+        if first_value == 0:
+            return 0
+        if second_value == 0:
+            return 100
+
+        return round((first_value / second_value) * 100, 2)
+
+    # 计算百分比，并进行四舍五入保留2为小数
+    def cal_percent_round_2_not_zero(self, first_value, second_value):
+        if first_value == 0:
+            return 0
+        if second_value == 0:
+            return 100
+
+        return round(((first_value - second_value) / second_value) * 100, 2)
