@@ -28,6 +28,23 @@ CREATE TABLE `t_tushare_stock_basic` (
   UNIQUE KEY `unique_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+drop table t_tushare_stock_today_tick_trade_data;
+CREATE TABLE `t_tushare_stock_today_tick_trade_data` (
+  `index` bigint(20) DEFAULT NULL,
+  `time` varchar(64) NOT NULL DEFAULT '' COMMENT '交易时间',
+  `price` decimal(8,3) NOT NULL DEFAULT -1 COMMENT '交易价格(元)',
+  `pchange` varchar(64) NOT NULL DEFAULT '' COMMENT '涨跌幅',
+  `change` decimal(8,3) NOT NULL DEFAULT -1 COMMENT '价格变动(元)',
+  `volume` bigint(20) NOT NULL DEFAULT -1 COMMENT '交易手数',
+  `amount` bigint(20) NOT NULL DEFAULT -1 COMMENT '交易金额(元)',
+  `type` varchar(32) NOT NULL DEFAULT '' COMMENT '交易类型',
+  `date` date DEFAULT NULL COMMENT '交易日期',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  KEY `ix_t_tushare_stock_today_tick_trade_data_index` (`index`),
+  KEY `index_code_date` (`code`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 drop table `t_tushare_stock_newly_quotes_data` ;
 CREATE TABLE `t_tushare_stock_newly_quotes_data` (
   `index` bigint(20) DEFAULT NULL,

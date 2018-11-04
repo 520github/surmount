@@ -452,6 +452,7 @@ create unique index unique_code_tradeDate on t_sunso_stock_basic(code, trade_dat
 drop table `t_sunso_stock_day_trade_statistic_core_data`;
 CREATE TABLE `t_sunso_stock_day_trade_statistic_core_data` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `trade_date` date NOT NULL COMMENT '交易日期',
   `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
   `industry` varchar(128) NOT NULL DEFAULT '' COMMENT '所属行业',
@@ -659,12 +660,319 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_core_data` (
   `super_inside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日内盘超大单累计交易资金/当日超级大单累计金额%',
   `super_outside_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日外盘超大单累计交易资金/当日超级大单累计金额%',
 
-  `trade_date` date NOT NULL COMMENT '交易日期',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_core_data(code, trade_date);
+
+
+drop table `t_sunso_stock_day_trade_statistic_volume_data`;
+CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `trade_date` date NOT NULL COMMENT '交易日期',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `industry` varchar(128) NOT NULL DEFAULT '' COMMENT '所属行业',
+  `area` varchar(128) NOT NULL DEFAULT '' COMMENT '所属地区',
+  `close_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '收盘价(元)',
+  `avg_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '平均价(元)',
+  `close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `trade_count` bigint NOT NULL DEFAULT -1  COMMENT '交易次数',
+
+  `large_above_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上累计交易资金/当日交易金额%',
+  `super_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单累计交易资金/当日交易金额%',
+  `large_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单累计交易资金/当日交易金额%',
+  `medium_before_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分累计交易资金/总交易金额%',
+  `medium_after_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分累计交易资金/总交易金额%',
+  `small_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单累计交易资金/总交易金额%',
+
+  `sum_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日总买单金额/当日交易金额%',
+  `large_above_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买单累计交易资金/当日交易金额%',
+  `super_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单买单累计交易资金/当日交易金额%',
+  `large_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单买单累计交易资金/当日交易金额%',
+  `medium_before_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单累计交易资金/总交易金额%',
+  `medium_after_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单累计交易资金/总交易金额%',
+  `small_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买单累计交易资金/总交易金额%',
+
+  `sum_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日总卖单资金/当日交易金额%',
+  `large_above_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖单累计交易资金/当日交易金额%',
+  `super_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单累计交易资金/当日交易金额%',
+  `large_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单卖单累计交易资金/当日交易金额%',
+  `medium_before_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单累计交易资金/总交易金额%',
+  `medium_after_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单累计交易资金/总交易金额%',
+  `small_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖单累计交易资金/总交易金额%',
+
+  `large_above_day1_bs_diff_trade_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘和卖盘之间的差额(元)',
+  `large_above_day3_bs_diff_trade_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '近3日大单及以上买盘和卖盘之间的差额(元)',
+  `large_above_day5_bs_diff_trade_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '近5日大单及以上买盘和卖盘之间的差额(元)',
+  `large_above_day1_bs_diff_trade_amt_total_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日差额/当日交易金额',
+  `large_above_day3_bs_diff_trade_amt_total_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日3日差额/当日交易金额',
+  `large_above_day5_bs_diff_trade_amt_total_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日5日差额/当日交易金额',
+  `large_above_day1_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日差额-昨日差额/昨日差额%',
+  `large_above_day3_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日3日差额-昨日3日差额/昨日3日差额%',
+  `large_above_day5_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日5日差额-昨日5日差额/昨日5日差额%',
+
+  `large_above_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的平均交易价格',
+  `super_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单的平均交易价格',
+  `large_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单的平均交易价格',
+  `medium_before_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分的平均交易价格',
+  `medium_after_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分的平均交易价格',
+  `small_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单的平均交易价格',
+
+  `large_above_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的平均交易价格-当日收盘价/当日收盘价%',
+  `super_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单的平均交易价格-当日收盘价/当日收盘价%',
+  `large_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_before_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_after_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分的平均交易价格-当日收盘价/当日收盘价%',
+  `small_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单的平均交易价格-当日收盘价/当日收盘价%',
+
+  `large_above_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘的平均交易价格',
+  `super_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单买盘的平均交易价格',
+  `large_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单买盘的平均交易价格',
+  `medium_before_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分买盘的平均交易价格',
+  `medium_after_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分买盘的平均交易价格',
+  `small_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买盘的平均交易价格',
+
+  `large_above_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `super_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `large_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大买盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_before_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_after_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `small_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买盘的平均交易价格-当日收盘价/当日收盘价%',
+
+  `large_above_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘的平均交易价格',
+  `super_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单卖盘的平均交易价格',
+  `large_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单卖盘的平均交易价格',
+  `medium_before_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖盘的平均交易价格',
+  `medium_after_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖盘的平均交易价格',
+  `small_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖盘的平均交易价格',
+
+  `large_above_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `super_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `large_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大卖盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_before_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `medium_after_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `small_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖盘的平均交易价格-当日收盘价/当日收盘价%',
+
+
+  `pre3_large_above_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上的平均交易价格',
+  `pre3_super_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单的平均交易价格',
+  `pre3_large_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单的平均交易价格',
+  `pre3_medium_before_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分的平均交易价格',
+  `pre3_medium_after_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分的平均交易价格',
+  `pre3_small_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单的平均交易价格',
+
+  `pre3_large_above_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上的平均交易价格-当日收盘价/前3日收盘价%',
+  `pre3_super_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_large_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_before_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_after_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_small_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单的平均交易价格-当日收盘价/当日收盘价%',
+
+  `pre3_large_above_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上买盘的平均交易价格',
+  `pre3_super_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单买盘的平均交易价格',
+  `pre3_large_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单买盘的平均交易价格',
+  `pre3_medium_before_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分买盘的平均交易价格',
+  `pre3_medium_after_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分买盘的平均交易价格',
+  `pre3_small_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单买盘的平均交易价格',
+
+  `pre3_large_above_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_super_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_large_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大买盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_before_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_after_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_small_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单买盘的平均交易价格-当日收盘价/当日收盘价%',
+
+  `pre3_large_above_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上卖盘的平均交易价格',
+  `pre3_super_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单卖盘的平均交易价格',
+  `pre3_large_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单卖盘的平均交易价格',
+  `pre3_medium_before_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分卖盘的平均交易价格',
+  `pre3_medium_after_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分卖盘的平均交易价格',
+  `pre3_small_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单卖盘的平均交易价格',
+
+  `pre3_large_above_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大单及以上卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_super_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日超级大单卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_large_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日大卖盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_before_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单前部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_medium_after_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日中单后部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre3_small_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日小单卖盘的平均交易价格-当日收盘价/当日交易次数%',
+
+
+  `pre5_large_above_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上的平均交易价格',
+  `pre5_super_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单的平均交易价格',
+  `pre5_large_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单的平均交易价格',
+  `pre5_medium_before_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分的平均交易价格',
+  `pre5_medium_after_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分的平均交易价格',
+  `pre5_small_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单的平均交易价格',
+
+  `pre5_large_above_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_super_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_large_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_before_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_after_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_small_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单的平均交易价格-当日收盘价/当日收盘价%',
+
+  `pre5_large_above_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上买盘的平均交易价格',
+  `pre5_super_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单买盘的平均交易价格',
+  `pre5_large_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单买盘的平均交易价格',
+  `pre5_medium_before_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分买盘的平均交易价格',
+  `pre5_medium_after_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分买盘的平均交易价格',
+  `pre5_small_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单买盘的平均交易价格',
+
+  `pre5_large_above_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_super_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_large_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大买盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_before_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_after_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分买盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_small_buy_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单买盘的平均交易价格-当日收盘价/当日收盘价%',
+
+  `pre5_large_above_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上卖盘的平均交易价格',
+  `pre5_super_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单卖盘的平均交易价格',
+  `pre5_large_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单卖盘的平均交易价格',
+  `pre5_medium_before_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分卖盘的平均交易价格',
+  `pre5_medium_after_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分卖盘的平均交易价格',
+  `pre5_small_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单卖盘的平均交易价格',
+
+  `pre5_large_above_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大单及以上卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_super_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日超级大单卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_large_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日大卖盘单的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_before_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单前部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_medium_after_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分卖盘的平均交易价格-当日收盘价/当日收盘价%',
+  `pre5_small_sell_avg_trade_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单卖盘的平均交易价格-当日收盘价/当日收盘价%',
+
+  `large_above_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上的交易次数',
+  `super_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单的交易次数',
+  `large_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单的交易次数',
+  `medium_before_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分的交易次数',
+  `medium_after_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分的交易次数',
+  `small_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日小单的交易次数',
+
+  `large_above_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的交易次数/当日交易次数%',
+  `super_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单的交易次数/当日交易次数%',
+  `large_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单的交易次数/当日交易次数%',
+  `medium_before_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分的交易次数/当日交易次数%',
+  `medium_after_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分的交易次数/当日交易次数%',
+  `small_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单的交易次数/当日交易次数%',
+
+  `large_above_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘的交易次数',
+  `super_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买盘的交易次数',
+  `large_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买盘的交易次数',
+  `medium_before_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买盘的交易次数',
+  `medium_after_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买盘的交易次数',
+  `small_buy_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买盘的交易次数',
+
+  `large_above_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘的交易次数/当日交易次数%',
+  `super_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单买盘的交易次数/当日交易次数%',
+  `large_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大买盘单的交易次数/当日交易次数%',
+  `medium_before_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分买盘的交易次数/当日交易次数%',
+  `medium_after_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分买盘的交易次数/当日交易次数%',
+  `small_buy_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买盘的交易次数/当日交易次数%',
+
+  `large_above_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘的交易次数',
+  `super_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖盘的交易次数',
+  `large_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖盘的交易次数',
+  `medium_before_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖盘的交易次数',
+  `medium_after_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖盘的交易次数',
+  `small_sell_trade_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖盘的交易次数',
+
+  `large_above_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘的交易次数/当日交易次数%',
+  `super_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单卖盘的交易次数/当日交易次数%',
+  `large_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大卖盘单的交易次数/当日交易次数%',
+  `medium_before_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖盘的交易次数/当日交易次数%',
+  `medium_after_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖盘的交易次数/当日交易次数%',
+  `small_sell_trade_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖盘的交易次数/当日交易次数%',
+
+
+  `super_time9_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单9点的交易次数',
+  `super_time10_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单10点的交易次数',
+  `super_time11_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单11点的交易次数',
+  `super_time13_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单13点的交易次数',
+  `super_time14_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单14点的交易次数',
+  `super_time15_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买单15点的交易次数',
+
+  `super_time9_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单9点的交易次数',
+  `super_time10_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单10点的交易次数',
+  `super_time11_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单11点的交易次数',
+  `super_time13_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单13点的交易次数',
+  `super_time14_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单14点的交易次数',
+  `super_time15_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖单15点的交易次数',
+
+
+  `large_time9_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单9点的交易次数',
+  `large_time10_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单10点的交易次数',
+  `large_time11_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单11点的交易次数',
+  `large_time13_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单13点的交易次数',
+  `large_time14_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单14点的交易次数',
+  `large_time15_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日大单买单15点的交易次数',
+
+  `large_time9_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单9点的交易次数',
+  `large_time10_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单10点的交易次数',
+  `large_time11_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单11点的交易次数',
+  `large_time13_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单13点的交易次数',
+  `large_time14_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单14点的交易次数',
+  `large_time15_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日大单卖单15点的交易次数',
+
+
+  `medium_before_time9_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单9点的交易次数',
+  `medium_before_time10_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单10点的交易次数',
+  `medium_before_time11_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单11点的交易次数',
+  `medium_before_time13_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单13点的交易次数',
+  `medium_before_time14_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单14点的交易次数',
+  `medium_before_time15_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单15点的交易次数',
+
+  `medium_before_time9_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单9点的交易次数',
+  `medium_before_time10_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单10点的交易次数',
+  `medium_before_time11_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单11点的交易次数',
+  `medium_before_time13_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单13点的交易次数',
+  `medium_before_time14_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单14点的交易次数',
+  `medium_before_time15_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单15点的交易次数',
+
+
+  `medium_after_time9_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单9点的交易次数',
+  `medium_after_time10_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单10点的交易次数',
+  `medium_after_time11_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单11点的交易次数',
+  `medium_after_time13_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单13点的交易次数',
+  `medium_after_time14_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单14点的交易次数',
+  `medium_after_time15_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单15点的交易次数',
+
+  `medium_after_time9_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单9点的交易次数',
+  `medium_after_time10_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单10点的交易次数',
+  `medium_after_time11_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单11点的交易次数',
+  `medium_after_time13_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单13点的交易次数',
+  `medium_after_time14_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单14点的交易次数',
+  `medium_after_time15_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单15点的交易次数',
+
+
+  `small_time9_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单9点的交易次数',
+  `small_time10_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单10点的交易次数',
+  `small_time11_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单11点的交易次数',
+  `small_time13_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单13点的交易次数',
+  `small_time14_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单14点的交易次数',
+  `small_time15_buy_count` int NOT NULL DEFAULT -1 COMMENT '当日小单买单15点的交易次数',
+
+  `small_time9_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单9点的交易次数',
+  `small_time10_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单10点的交易次数',
+  `small_time11_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单11点的交易次数',
+  `small_time13_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单13点的交易次数',
+  `small_time14_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单14点的交易次数',
+  `small_time15_sell_count` int NOT NULL DEFAULT -1 COMMENT '当日小单卖单15点的交易次数',
+
+  `super_buy_times` varchar(512) NOT NULL DEFAULT '' COMMENT '超级大单买盘时间点',
+  `super_sell_times` varchar(512) NOT NULL DEFAULT '' COMMENT '超级大单卖盘时间点',
+  `large_buy_times` varchar(512) NOT NULL DEFAULT '' COMMENT '大单买盘时间点',
+  `large_sell_times` varchar(512) NOT NULL DEFAULT '' COMMENT '大单卖盘时间点',
+  `medium_after_buy_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单后部分买盘时间点',
+  `medium_after_sell_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单后部分卖盘时间点',
+  `medium_before_buy_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单前部分买盘时间点',
+  `medium_before_sell_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单前部分卖盘时间点',
+
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_volume_data(code, trade_date);
+
 
 
 drop table t_sunso_stock_day_trade_statistic_data;

@@ -32,6 +32,7 @@ class TushareBase:
     t_sunso_stock_all_quotes_data = "t_sunso_stock_all_quotes_data"
     t_sunso_stock_day_trade_statistic_data = "t_sunso_stock_day_trade_statistic_data"
     t_sunso_stock_day_trade_statistic_core_data = "t_sunso_stock_day_trade_statistic_core_data"
+    t_sunso_stock_day_trade_statistic_volume_data = "t_sunso_stock_day_trade_statistic_volume_data"
     t_tushare_stock_today_tick_trade_data = "t_tushare_stock_today_tick_trade_data"
     t_tushare_stock_hist_tick_trade_data = "t_tushare_stock_hist_tick_trade_data"
     t_tushare_stock_newly_quotes_data = "t_tushare_stock_newly_quotes_data"
@@ -52,6 +53,10 @@ class TushareBase:
     super_volume = " > 5000 "
     # 大单及超大单
     large_above = " > 1001 "
+    # 中单前部分
+    volume_medium_before = "between 200 and 700 "
+    # 中单后部分
+    volume_medium_after = "between 701 and 1000 "
     # 早盘前部分时间
     time_early_before = " between '09:30:00' and '10:00:00' "
     # 早盘后部分时间
@@ -60,6 +65,12 @@ class TushareBase:
     time_noon_before = " between '13:00:00' and '14:30:00' "
     # 午盘后部分时间
     time_noon_after = " between '14:30:01' and '14:59:00' "
+    time_9 = " like '09:%' "
+    time_10 = " like '10:%' "
+    time_11 = " like '11:%' "
+    time_13 = " like '13:%' "
+    time_14 = " like '14:%' "
+    time_15 = " like '15:%' "
     # 降序
     desc = "desc"
     # 升序
@@ -756,11 +767,21 @@ class TushareBase:
         return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
             stock_code, self.func_sum, "volume", date, volume_condition, None, trade_type)
 
+    # 根据相关条件获取全体的成交次数统计
+    def get_all_day_trade_count(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, None, trade_type)
+
+    # 根据相关条件获取全体的成交次数统计
+    def get_fixed_time_trade_count(self, stock_code, date, volume_condition, trade_type, times):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_count, "*", date, volume_condition, times, trade_type)
+
     # 根据相关条件获取全体的交易平均价
     def get_all_day_avg_trade_price(self, stock_code, date, volume_condition, trade_type):
         amt = self.get_all_day_trade_amt(stock_code, date, volume_condition, trade_type)
         volume = self.get_all_day_trade_volume(stock_code, date, volume_condition, trade_type)
-        return Decimal(self.cal_division_round_2(amt, volume*100))
+        return Decimal(str(self.cal_division_round_2(amt, volume*100)))
 
     # 获取早盘前部分的成交量统计
     def get_early_before_trade_volume(self, stock_code, date, volume_condition, trade_type):
@@ -881,22 +902,29 @@ class TushareBase:
 
     # 获取大单交易类型时间分布
     def get_max_trade_distribution_time(self, stock_code, date):
-        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.max_volume)
+        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.max_volume, None)
 
     # 获取超级大单交易类型时间分布
     def get_super_trade_distribution_time(self, stock_code, date):
-        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.super_volume)
+        return self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.super_volume, None)
 
     # 获取某种交易类型的交易时间分布情况
-    def get_stock_trade_distribution_time_by_trade_type(self, stock_code, date, volume_condition):
+    def get_stock_trade_distribution_time_by_trade_type(self, stock_code, date, volume_condition, trade_type=None):
+        sql_select = "select * from " + self.t_tushare_stock_today_tick_trade_data + " " \
+                     "where code='" + stock_code + "' and date='" + date + "' and volume " + volume_condition + " "
+        if trade_type is not None:
+            sql_select = sql_select + " and type='" + trade_type + "'"
+
         sql = "select group_concat(time) as c from (" + " " \
-              "select * from " + self.t_tushare_stock_today_tick_trade_data + " " \
-              "where code='" + stock_code + "' and date='" + date + "' and volume " + volume_condition + " " \
+              " " + sql_select + " "\
               " order by time asc ) as t"
         distribution_time = self.count_sql(sql)
         if distribution_time is None:
             distribution_time = ""
-        return self.encode(distribution_time)
+        distribution_time = self.encode(distribution_time)
+        if len(distribution_time) > 512:
+            distribution_time = distribution_time[0:512]
+        return distribution_time
 
     # 获取股票连续涨跌相关数据
     def get_stock_continue_up_down_data(self, data):
@@ -951,10 +979,15 @@ class TushareBase:
               " order by trade_date asc limit 1 "
         data = self.select_one_sql(sql)
         if data is None:
-            sql = "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
-                  "where code='" + stock_code + "' and trade_date<'" + date + "' " \
-                  "order by trade_date asc limit 1 "
-            data = self.select_one_sql(sql)
+            sql = "select count(*) as c from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+                  "where code='" + stock_code + "' and trade_date<'" + date + "' and close_pre_close_diff_amt_ratio " \
+                   "" + up_down_type + " 0 "
+            count_value = self.count_sql_default_zero(sql)
+            if count_value <= 0:
+                sql = "select * from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
+                      "where code='" + stock_code + "' and trade_date<'" + date + "' " \
+                      "order by trade_date asc limit 1 "
+                data = self.select_one_sql(sql)
         return data
 
     # 根据交易日获取股票连续涨跌的次数
@@ -1042,13 +1075,25 @@ class TushareBase:
               " order by (bamount+samount) desc) as t "
         return self.count_sql_default_zero(sql)
 
-    def insert_into_about_sunso_stock_day_trade_statistic_data(self, data):
-        self.insert_into_t_sunso_stock_day_trade_statistic_core_data(data)
-
     def insert_into_t_sunso_stock_day_trade_statistic_core_data(self, data):
-        sql = self.sql_handler.get_t_sunso_stock_day_trade_statistic_core_data_insert_sql(
-            self.get_one_stock_statistic_core_data(data))
+        if self.is_exist_data(self.t_sunso_stock_day_trade_statistic_core_data, data):
+            return
+        sql = self.sql_handler.get_t_sunso_stock_day_trade_statistic_core_data_insert_sql(data)
         self.insert_sql(sql)
+
+    def insert_into_t_sunso_stock_day_trade_statistic_volume_data(self, data):
+        if self.is_exist_data(self.t_sunso_stock_day_trade_statistic_volume_data, data):
+            return
+        sql = self.sql_handler.get_t_sunso_stock_day_trade_statistic_volume_data_insert_sql(data)
+        self.insert_sql(sql)
+
+    def is_exist_data(self, table_name, data):
+        sql = "select count(*) as c from " + table_name + " " \
+              "where code='" + data["code"] + "' and trade_date='" + data["trade_date"] + "'"
+        count_value = self.count_sql_default_zero(sql)
+        if count_value > 0:
+            return True
+        return False
 
     def get_sum_amount_from_newly_quotes_data_hist_by_pre_two_date(self, data):
         data["limit"] = 2
@@ -1620,18 +1665,18 @@ class TushareBase:
         data["outside_dish_sum_amt_ratio"] = self.cal_percent_round_2(outside_dish_sum_amt, sum_trade_amt)
         data["midside_dish_sum_amt_ratio"] = self.cal_percent_round_2(midside_dish_sum_amt, sum_trade_amt)
 
-        small_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, None)
-        small_avg_buy_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, self.outside_dish)
-        small_avg_sell_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, self.inside_dish)
+        small_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.min_volume, None)
+        small_avg_buy_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.min_volume, self.outside_dish)
+        small_avg_sell_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.min_volume, self.inside_dish)
         large_above_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, None)
         large_above_avg_buy_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, self.outside_dish)
         large_above_avg_sell_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, self.inside_dish)
-        data["small_avg_trade_price_ratio"] = self.cal_percent_round_2(small_avg_trade_price - close_amt, close_amt)
-        data["small_avg_buy_trade_price_ratio"] = self.cal_percent_round_2(small_avg_buy_trade_price - close_amt, close_amt)
-        data["small_avg_sell_trade_price_ratio"] = self.cal_percent_round_2(small_avg_sell_trade_price - close_amt, close_amt)
-        data["large_above_avg_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_trade_price - close_amt, close_amt)
-        data["large_above_avg_buy_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_buy_trade_price - close_amt, close_amt)
-        data["large_above_avg_sell_trade_price_ratio"] = self.cal_percent_round_2(large_above_avg_sell_trade_price - close_amt, close_amt)
+        data["small_avg_trade_price_ratio"] = self.cal_percent_round_2_not_zero(small_avg_trade_price, close_amt)
+        data["small_avg_buy_trade_price_ratio"] = self.cal_percent_round_2_not_zero(small_avg_buy_trade_price, close_amt)
+        data["small_avg_sell_trade_price_ratio"] = self.cal_percent_round_2_not_zero(small_avg_sell_trade_price, close_amt)
+        data["large_above_avg_trade_price_ratio"] = self.cal_percent_round_2_not_zero(large_above_avg_trade_price, close_amt)
+        data["large_above_avg_buy_trade_price_ratio"] = self.cal_percent_round_2_not_zero(large_above_avg_buy_trade_price, close_amt)
+        data["large_above_avg_sell_trade_price_ratio"] = self.cal_percent_round_2_not_zero(large_above_avg_sell_trade_price, close_amt)
 
         small_inside_sum_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, self.inside_dish)
         small_outside_sum_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, self.outside_dish)
@@ -1766,7 +1811,7 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-10-31"
+        return "2018-11-02"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)

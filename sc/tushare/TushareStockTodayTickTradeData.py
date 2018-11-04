@@ -5,14 +5,25 @@
 import datetime
 from decimal import Decimal
 from TushareBase import TushareBase
+from SunsoDayTradeStatisticVolumeData import SunsoDayTradeStatisticVolumeData
 import tushare as ts
 
 
 class TushareStockTodayTickTradeData(TushareBase, object):
+
+    sunso_day_trade_statistic_volume_data = None
+
     def __init__(self):
         super(TushareStockTodayTickTradeData, self).__init__()
         self.table_name = "t_tushare_stock_today_tick_trade_data"
+        TushareStockTodayTickTradeData.sunso_day_trade_statistic_volume_data = SunsoDayTradeStatisticVolumeData()
         print("stock today tick trade data")
+
+    def insert_into_about_sunso_stock_day_trade_statistic_data(self, data):
+        data = self.get_one_stock_statistic_core_data(data)
+        self.insert_into_t_sunso_stock_day_trade_statistic_core_data(data)
+        data = TushareStockTodayTickTradeData.sunso_day_trade_statistic_volume_data.init_day_trade_statistic_volume_data(data)
+        self.insert_into_t_sunso_stock_day_trade_statistic_volume_data(data)
 
     def get_one_stock_date_tick_trade_data(self, stock_code=None, date=None):
         if date is None:
@@ -958,7 +969,7 @@ class TushareStockTodayTickTradeData(TushareBase, object):
     def get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(self, date):
         sql = "select distinct * from " + self.t_tushare_stock_newly_quotes_data_hist + " " \
               "where code not in (select code from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
-              "where trade_date='" + date + "') and date='" + date + "' and trade > 0" \
+              "where trade_date='" + date + "') and date='" + date + "' and trade > 0 " \
               # " and code in ('000622')"
         return self.select_sql(sql)
 

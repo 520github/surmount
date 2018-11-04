@@ -18,6 +18,11 @@ class BaseSqlHandler(object):
             "tp_day_trade_statistic_core.sql", data)
 
     @staticmethod
+    def get_t_sunso_stock_day_trade_statistic_volume_data_insert_sql(data):
+        return BaseSqlHandler.get_insert_sql_by_tp_file(
+            "tp_day_trade_statistic_volume.sql", data)
+
+    @staticmethod
     def tp_select_column_from_newly_quotes_data_hist_by_pre_date(data):
         return BaseSqlHandler.get_insert_sql_by_tp_file(
             "tp_select_column_from_newly_quotes_data_hist_by_pre_date.sql", data)
