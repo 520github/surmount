@@ -23,6 +23,8 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
     medium_before_sell_avg_trade_price = "medium_before_sell_avg_trade_price"
     medium_after_sell_avg_trade_price = "medium_after_sell_avg_trade_price"
     small_sell_avg_trade_price = "small_sell_avg_trade_price"
+    all_buy_avg_trade_price = "all_buy_avg_trade_price"
+    all_sell_avg_trade_price = "all_sell_avg_trade_price"
 
     def __init__(self):
         super(SunsoDayTradeStatisticVolumeData, self).__init__()
@@ -74,11 +76,24 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         data["large_above_day3_bs_diff_trade_amt_rise_ratio"] = data["large_above_day3_bs_diff_trade_amt_ratio"]
         data["large_above_day5_bs_diff_trade_amt_rise_ratio"] = data["large_above_day5_bs_diff_trade_amt_ratio"]
 
+        all_buy_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, None, self.outside_dish)
+        all_sell_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, None, self.inside_dish)
+        pre3_all_buy_avg_trade_price = self.get_column_avg_trade_price(stock_code, date, self.all_buy_avg_trade_price, 3)
+        pre3_all_sell_avg_trade_price = self.get_column_avg_trade_price(stock_code, date, self.all_sell_avg_trade_price, 3)
+        pre5_all_buy_avg_trade_price = self.get_column_avg_trade_price(stock_code, date, self.all_buy_avg_trade_price, 5)
+        pre5_all_sell_avg_trade_price = self.get_column_avg_trade_price(stock_code, date, self.all_sell_avg_trade_price, 5)
+        data["all_buy_avg_trade_price"] = all_buy_avg_trade_price
+        data["all_sell_avg_trade_price"] = all_sell_avg_trade_price
+        data["pre3_all_buy_avg_trade_price"] = pre3_all_buy_avg_trade_price
+        data["pre3_all_sell_avg_trade_price"] = pre3_all_sell_avg_trade_price
+        data["pre5_all_buy_avg_trade_price"] = pre5_all_buy_avg_trade_price
+        data["pre5_all_sell_avg_trade_price"] = pre5_all_sell_avg_trade_price
+
         large_above_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.large_above, None)
         super_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.super_volume, None)
         large_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.max_volume, None)
         medium_before_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.volume_medium_before, None)
-        medium_after_avg_trade_price =  self.get_all_day_avg_trade_price(stock_code, date, self.volume_medium_after, None)
+        medium_after_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.volume_medium_after, None)
         small_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, self.mid_volume, None)
 
         data["large_above_avg_trade_price"] = large_above_avg_trade_price

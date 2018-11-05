@@ -35,7 +35,7 @@ class StockPlateStockDayData(StockPlateBase, object):
             plate_data["total_up_down_ratio"] = total_up_down_ratio
             total_count = self.get_plate_stock_total_count(plate_data)
             plate_data["total_count"] = total_count
-            plate_data["avg_up_down_ratio"] = round(total_up_down_ratio/total_count,2)
+            plate_data["avg_up_down_ratio"] = self.cal_division_round_2(total_up_down_ratio, total_count)
 
             large_above_total_bs_trade_amt = self.get_plate_stock_total_bs_trade_amt(plate_data)
             plate_data["large_above_total_bs_trade_amt"] = large_above_total_bs_trade_amt
