@@ -965,9 +965,9 @@ class TushareBase:
         newly_close_amt = newly_quotes_data["trade"]
 
         trade_date = self.get_date_str(up_down_data["trade_date"])
-        close_amt = up_down_data["close_amt"]
+        pre_close_amt = up_down_data["pre_close_amt"]
         result_data["continue_up_down_days"] = self.get_stock_continue_up_down_count_by_trade_date(stock_code, trade_date, date) + 1
-        result_data["contiune_up_down_percent"] = self.cal_percent_round_2(newly_close_amt - close_amt, close_amt)
+        result_data["contiune_up_down_percent"] = self.cal_percent_round_2(newly_close_amt - pre_close_amt, pre_close_amt)
         return result_data
 
     def get_stock_continue_up_down_data_by_up_down_type(self, stock_code, date, up_down_type):
@@ -1811,7 +1811,7 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-11-02"
+        return "2018-11-07"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)

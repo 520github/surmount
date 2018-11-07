@@ -1,15 +1,19 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+import sys
+import os
 from StockPlateDayData import StockPlateDayData
 from StockPlateStockDayData import StockPlateStockDayData
+sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../../common'))
+from DateHandler import DateHandler
 
 
 class StockPlateHandler(object):
 
     stock_plate_day_data = None
     stock_plate_stock_day_data = None
-    trade_date = "2018-11-02"
+    trade_date = "2018-11-07"
 
     def __init__(self):
         StockPlateHandler.stock_plate_day_data = StockPlateDayData()
@@ -28,6 +32,11 @@ class StockPlateHandler(object):
         if data_list is None:
             return
         for plate_data in data_list:
+            plate_start_date = DateHandler.get_date_str(plate_data["plate_start_date"])
+            if DateHandler.compare_greater_two_date_str(plate_start_date, self.trade_date):
+                print("plate_start_date [" + plate_start_date + "] is greater than trade_data [" + self.trade_date + "]")
+                continue
+
             plate_data["trade_date"] = self.trade_date
             self.handle_one_stock_plate(plate_data)
 

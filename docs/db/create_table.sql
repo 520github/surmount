@@ -1,3 +1,24 @@
+drop table `t_sunso_stock_main_concept_classified`;
+CREATE TABLE `t_sunso_stock_main_concept_classified` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `concept_name` varchar(128) NOT NULL DEFAULT '' COMMENT '概念名称',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `industry` varchar(128) NOT NULL DEFAULT '' COMMENT '所属行业',
+  `area` varchar(128) NOT NULL DEFAULT '' COMMENT '所属地区',
+  `totals_stock_amt` decimal(20,6) NOT NULL DEFAULT -1 COMMENT  '总市值(万)',
+  `join_date` date  NOT NULL COMMENT '股票加入日期',
+  `is_core_stock` tinyint NOT NULL DEFAULT 0 COMMENT '是否概念中的核心股票',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '股票概念说明',
+  `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票主要概念分类表';
+create unique index unique_conceptName_code on t_sunso_stock_main_concept_classified(concept_name, code);
+
+
 drop table `t_sunso_stock_plate`;
 
 CREATE TABLE `t_sunso_stock_plate` (
@@ -22,6 +43,7 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('unicorn', '创投板块', '由上海科创板引发的创投板块投资', '2018-11-05', '2019-11-25', 'plate_type_unicorn_sql.sql'),
 ('super_large_buy_amt', '超级大额资金净流入', '当日大额净流入资金超过5千万，大额资金占20%以上', '2018-10-26', '2019-10-26', 'plate_type_super_large_buy_amt_sql.sql'),
 ('large_buy_amt_and_overfall', '大额资金净流入,同时短期内跌幅较大', '短期3或5天内跌幅超过10%,同时当日大额净流入资金超过1千万，大额资金占20%以上', '2018-10-26', '2019-10-26', 'plate_type_large_buy_amt_and_overfall_sql.sql'),
 ('short_term_3_day_overfall', '短期3天超跌', '短期3天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-29', 'plate_type_short_term_3_day_overfall_sql.sql'),
@@ -83,7 +105,7 @@ CREATE TABLE `t_sunso_stock_plate_stock` (
   `last_pre3_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '最近一次前3日的涨跌幅',
   `last_pre5_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '最近一次前5日的涨跌幅',
   `last_circulation_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '最近流通市值(万)',
-  `large_above_total_bs_trade_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '总计大额净流入金额(元)',
+  `large_above_total_bs_trade_amt` decimal(18,6)  NOT NULL DEFAULT -1 COMMENT '总计大额净流入金额(元)',
   `large_above_total_bs_trade_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '总计大额净流入金额(元)/当日交易金额',
   `large_above_total_bs_trade_last_circulatio_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '总计大额净流入金额(元)/最近流通市值(万)',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
@@ -156,10 +178,43 @@ CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
   `industry` varchar(128) NOT NULL DEFAULT '' COMMENT '所属行业',
   `area` varchar(128) NOT NULL DEFAULT '' COMMENT '所属地区',
+
+  `continue_up_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续涨停次数',
+  `up_limit_type` tinyint NOT NULL DEFAULT -1  COMMENT '涨停类型 0:未涨停, 10:其它涨停, 20:快速涨停封单,30:一字板',
+  `first_limit_up_time` varchar(64) DEFAULT NULL COMMENT '第一次涨停时间',
+  `circulation_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '流通市值(亿)',
+  `turnover_rate` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '换手率',
+  `close_amt` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日收盘价(元)',
   `up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '股票当日涨幅幅',
+  `continue_up_down_days` bigint NOT NULL DEFAULT -1  COMMENT '已连续涨跌的次数',
+  `contiune_up_down_percent` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '已连续涨跌的幅度比例',
   `pre3_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '股票前3日涨幅幅',
   `pre5_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '股票前5日涨幅幅',
-  `close_amt` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日收盘价(元)',
+  `pre30_close_price_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前30日收盘价-当日收盘价/前30日收盘价的百分比%',
+  `pre90_close_price_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前90日收盘价-当日收盘价/前90日收盘价的百分比%',
+  `pre120_close_price_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前120日收盘价-当日收盘价/前120日收盘价的百分比%',
+  `pre250_close_price_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前250日收盘价-当日收盘价/前250日收盘价的百分比%',
+
+  `trade_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '成交金额(亿)，,直接从当前行情获取数据' ,
+  `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(亿)',
+  `large_above_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上累计交易资金/当日交易金额%',
+  `large_above_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买单累计交易资金/当日交易金额%',
+  `large_above_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖单累计交易资金/当日交易金额%',
+  `medium_after_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分买单累计交易资金/总交易金额%',
+  `medium_after_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖单累计交易资金/总交易金额%',
+  `medium_before_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分买单累计交易资金/总交易金额%',
+  `medium_before_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖单累计交易资金/总交易金额%',
+  `small_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单买单累计交易资金/总交易金额%',
+  `small_sell_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日小单卖单累计交易资金/总交易金额%',
+  `large_above_bs_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买票累计交易资金/当日大单及以上卖盘累计交易资金',
+  `large_above_day1_bs_trade_amt` decimal(18,6)  NOT NULL DEFAULT -1 COMMENT '当天大额净流入金额(亿)',
+  `large_above_day1_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '当天大额净流入金额(元)/当日交易金额',
+  `large_above_day3_bs_trade_amt` decimal(18,6)  NOT NULL DEFAULT -1 COMMENT '近3日大额净流入金额(亿)',
+  `large_above_day3_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近3日大额净流入金额(元)/当日交易金额',
+  `large_above_day5_bs_trade_amt` decimal(18,6)  NOT NULL DEFAULT -1 COMMENT '近5日大额净流入金额(亿)',
+  `large_above_day5_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近5日大额净流入金额(元)/当日交易金额',
+
+  `continue_down_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续跌停次数',
 
   `avg_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日平均价格(元)',
   `all_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日买盘的平均交易价格',
@@ -190,22 +245,6 @@ CREATE TABLE `t_sunso_stock_plate_stock_day_data` (
   `pre5_medium_after_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日中单后部分买盘的平均交易价格',
   `pre5_small_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日小单买盘的平均交易价格',
 
-  `trade_amt` decimal(18,0) NOT NULL DEFAULT -1 COMMENT '成交金额(元)，,直接从当前行情获取数据' ,
-  `net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '股票当日净入金额(万)',
-  `circulation_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '流通市值(万)',
-  `continue_up_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续涨停次数',
-  `continue_down_limit_days` bigint NOT NULL DEFAULT -1  COMMENT '连续跌停次数',
-  `continue_up_down_days` bigint NOT NULL DEFAULT -1  COMMENT '已连续涨跌的次数',
-  `contiune_up_down_percent` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '已连续涨跌的幅度比例',
-  `large_above_sum_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上累计交易资金/当日交易金额%',
-  `large_above_buy_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买票累计交易资金/当日交易金额%',
-  `large_above_bs_trade_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买票累计交易资金/当日大单及以上卖盘累计交易资金',
-  `large_above_day1_bs_trade_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '当天大额净流入金额(元)',
-  `large_above_day1_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '当天大额净流入金额(元)/当日交易金额',
-  `large_above_day3_bs_trade_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近3日大额净流入金额(元)',
-  `large_above_day3_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近3日大额净流入金额(元)/当日交易金额',
-  `large_above_day5_bs_trade_amt` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近5日大额净流入金额(元)',
-  `large_above_day5_bs_trade_amt_ratio` decimal(12,2)  NOT NULL DEFAULT -1 COMMENT '近5日大额净流入金额(元)/当日交易金额',
   `join_days` bigint NOT NULL DEFAULT -1  COMMENT '加入之后的第几天',
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '当日股票说明',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
