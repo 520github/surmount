@@ -807,6 +807,21 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   `large_above_day3_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日3日差额-昨日3日差额/昨日3日差额%',
   `large_above_day5_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日5日差额-昨日5日差额/昨日5日差额%',
 
+  `sum_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '当日交易金额(亿)',
+  `large_above_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单上买入金额(亿)',
+  `super_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '超级大单买入金额(亿)',
+  `large_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单买入金额(亿)',
+  `medium_after_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单后买入金额(亿)',
+  `medium_before_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单前买入金额(亿)',
+  `small_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '小单买入金额(亿)',
+
+  `large_above_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单上卖出金额(亿)',
+  `super_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '超级大单卖出金额(亿)',
+  `large_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单卖出金额(亿)',
+  `medium_after_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单后卖出金额(亿)',
+  `medium_before_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单前卖出金额(亿)',
+  `small_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '小单卖出金额(亿)',
+
   `close_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '收盘价(元)',
   `avg_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '平均价(元)',
   `close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
