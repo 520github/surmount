@@ -808,6 +808,14 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   `large_above_day5_bs_diff_trade_amt_rise_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日5日差额-昨日5日差额/昨日5日差额%',
 
   `sum_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '当日交易金额(亿)',
+
+  `large_above_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单上金额(亿)',
+  `super_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '超级大单金额(亿)',
+  `large_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单金额(亿)',
+  `medium_after_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单后金额(亿)',
+  `medium_before_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单前金额(亿)',
+  `small_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '小单金额(亿)',
+
   `large_above_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单上买入金额(亿)',
   `super_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '超级大单买入金额(亿)',
   `large_buy_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '大单买入金额(亿)',
@@ -822,6 +830,28 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   `medium_before_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '中单前卖出金额(亿)',
   `small_sell_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '小单卖出金额(亿)',
 
+
+  `large_above_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上的交易量(手)',
+  `super_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日超级大单的交易量(手)',
+  `large_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单的交易量(手)',
+  `medium_before_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分的交易量(手)',
+  `medium_after_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分的交易量(手)',
+  `small_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日小单的交易量(手)',
+
+  `large_above_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上买盘的交易量(手)',
+  `super_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日超级大单买盘的交易量(手)',
+  `large_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单买盘的交易量(手)',
+  `medium_before_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分买盘的交易量(手)',
+  `medium_after_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分买盘的交易量(手)',
+  `small_buy_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日小单买盘的交易量(手)',
+
+  `large_above_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单及以上卖盘的交易量(手)',
+  `super_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日超级大单卖盘的交易量(手)',
+  `large_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日大单卖盘的交易量(手)',
+  `medium_before_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单前部分卖盘的交易量(手)',
+  `medium_after_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日中单后部分卖盘的交易量(手)',
+  `small_sell_trade_volume` int NOT NULL DEFAULT -1 COMMENT '当日小单卖盘的交易量(手)',
+
   `close_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '收盘价(元)',
   `avg_amt` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '平均价(元)',
   `close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
@@ -831,6 +861,10 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   `pre3_all_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日卖盘的平均交易价格',
   `pre5_all_buy_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日买盘的平均交易价格',
   `pre5_all_sell_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日卖盘的平均交易价格',
+  `large_above_low_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的最低交易价格',
+  `large_above_high_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的最高交易价格',
+  `large_above_buy_low_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买单最低交易价格',
+  `large_above_buy_high_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上买单最高交易价格',
 
   `large_above_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日大单及以上的平均交易价格',
   `super_avg_trade_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日超级大单的平均交易价格',

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+from __future__ import division
+from decimal import Decimal
 from TushareBase import TushareBase
 
 
@@ -68,6 +70,19 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         small_sell_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, self.inside_dish)
 
         data["sum_trade_amt"] = self.get_hundred_million_amt(sum_trade_amt)
+        large_above_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.large_above, None)
+        super_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.super_volume, None)
+        large_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.max_volume, None)
+        medium_after_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.volume_medium_after, None)
+        medium_before_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.volume_medium_before, None)
+        small_trade_amt = self.get_all_day_trade_amt(stock_code, date, self.min_volume, None)
+        data["large_above_trade_amt"] = self.get_hundred_million_amt(large_above_trade_amt)
+        data["super_trade_amt"] = self.get_hundred_million_amt(super_trade_amt)
+        data["large_trade_amt"] = self.get_hundred_million_amt(large_trade_amt)
+        data["medium_after_trade_amt"] = self.get_hundred_million_amt(medium_after_trade_amt)
+        data["medium_before_trade_amt"] = self.get_hundred_million_amt(medium_before_trade_amt)
+        data["small_trade_amt"] = self.get_hundred_million_amt(small_trade_amt)
+
         data["large_above_buy_trade_amt"] = self.get_hundred_million_amt(super_buy_trade_amt + large_buy_trade_amt)
         data["super_buy_trade_amt"] = self.get_hundred_million_amt(super_buy_trade_amt)
         data["large_buy_trade_amt"] = self.get_hundred_million_amt(large_buy_trade_amt)
@@ -92,6 +107,16 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         data["large_above_day1_bs_diff_trade_amt_rise_ratio"] = round(data["large_above_day1_bs_diff_trade_amt_ratio"], 2)
         data["large_above_day3_bs_diff_trade_amt_rise_ratio"] = round(data["large_above_day3_bs_diff_trade_amt_ratio"], 2)
         data["large_above_day5_bs_diff_trade_amt_rise_ratio"] = round(data["large_above_day5_bs_diff_trade_amt_ratio"], 2)
+
+        large_above_low_trade_price = self.get_all_day_min_trade_price(stock_code, date, self.large_above, None)
+        large_above_buy_low_trade_price = self.get_all_day_min_trade_price(stock_code, date, self.large_above, self.outside_dish)
+        large_above_high_trade_price = self.get_all_day_max_trade_price(stock_code, date, self.large_above, None)
+        large_above_buy_high_trade_price = self.get_all_day_max_trade_price(stock_code, date, self.large_above, self.outside_dish)
+
+        data["large_above_low_trade_price"] = large_above_low_trade_price
+        data["large_above_high_trade_price"] = large_above_high_trade_price
+        data["large_above_buy_low_trade_price"] = large_above_buy_low_trade_price
+        data["large_above_buy_high_trade_price"] = large_above_buy_high_trade_price
 
         all_buy_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, None, self.outside_dish)
         all_sell_avg_trade_price = self.get_all_day_avg_trade_price(stock_code, date, None, self.inside_dish)
@@ -299,6 +324,47 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         data["pre5_small_sell_avg_trade_price_ratio"] = self.cal_percent_round_2_not_zero(pre5_small_sell_avg_trade_price, close_amt)
 
         ########
+
+        large_above_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.large_above, None)
+        super_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.super_volume, None)
+        large_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.max_volume, None)
+        medium_before_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_before, None)
+        medium_after_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_after, None)
+        small_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.min_volume, None)
+        data["large_above_trade_volume"] = large_above_trade_volume
+        data["super_trade_volume"] = super_trade_volume
+        data["large_trade_volume"] = large_trade_volume
+        data["medium_before_trade_volume"] = medium_before_trade_volume
+        data["medium_after_trade_volume"] = medium_after_trade_volume
+        data["small_trade_volume"] = small_trade_volume
+
+        large_above_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.large_above, self.outside_dish)
+        super_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.super_volume, self.outside_dish)
+        large_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.max_volume, self.outside_dish)
+        medium_before_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_before, self.outside_dish)
+        medium_after_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_after, self.outside_dish)
+        small_buy_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.min_volume, self.outside_dish)
+        data["large_above_buy_trade_volume"] = large_above_buy_trade_volume
+        data["super_buy_trade_volume"] = super_buy_trade_volume
+        data["large_buy_trade_volume"] = large_buy_trade_volume
+        data["medium_before_buy_trade_volume"] = medium_before_buy_trade_volume
+        data["medium_after_buy_trade_volume"] = medium_after_buy_trade_volume
+        data["small_buy_trade_volume"] = small_buy_trade_volume
+
+        large_above_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.large_above, self.inside_dish)
+        super_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.super_volume, self.inside_dish)
+        large_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.max_volume, self.inside_dish)
+        medium_before_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_before, self.inside_dish)
+        medium_after_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.volume_medium_after, self.inside_dish)
+        small_sell_trade_volume = self.get_all_day_trade_volume(stock_code, date, self.min_volume, self.inside_dish)
+        data["large_above_sell_trade_volume"] = large_above_sell_trade_volume
+        data["super_sell_trade_volume"] = super_sell_trade_volume
+        data["large_sell_trade_volume"] = large_sell_trade_volume
+        data["medium_before_sell_trade_volume"] = medium_before_sell_trade_volume
+        data["medium_after_sell_trade_volume"] = medium_after_sell_trade_volume
+        data["small_sell_trade_volume"] = small_sell_trade_volume
+
+        ##########
 
         large_above_trade_count = self.get_all_day_trade_count(stock_code, date, self.large_above, None)
         super_trade_count = self.get_all_day_trade_count(stock_code, date, self.super_volume, None)
@@ -526,10 +592,10 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
 
         return data
 
-    def get_column_avg_trade_price(self,stock_code, date, column_name, days):
+    def get_column_avg_trade_price(self, stock_code, date, column_name, days):
         sql = "select avg(" + column_name + ") as c from " + self.table_name + " " \
               "where code='" + stock_code + "' and trade_date<'" + date + "' order by trade_date desc limit " + str(days)
-        return round(self.count_sql_default_zero(sql),2)
+        return Decimal(str(round(self.count_sql_default_zero(sql), 2)))
 
     def get_hundred_million_amt(self, amt):
         return round(amt/100000000, 6)

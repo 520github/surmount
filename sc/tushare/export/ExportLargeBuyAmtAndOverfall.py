@@ -18,7 +18,9 @@ class ExportLargeBuyAmtAndOverfall(ExportBase, object):
         sql = "select code from t_sunso_stock_plate_stock " \
               "where plate_name='大额资金净流入和短期内跌幅较大' and plate_start_date='2018-10-26' " \
               # "and code in ('600128','002054','600235','600462','600689','600783','002328')"
-        return self.get_stock_list_by_sql(sql)
+        data_list = self.get_stock_list_by_sql(sql)
+        # data_list.append("603386")
+        return data_list
 
 
 if __name__ == "__main__":

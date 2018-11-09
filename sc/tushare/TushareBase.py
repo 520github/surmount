@@ -783,6 +783,16 @@ class TushareBase:
         volume = self.get_all_day_trade_volume(stock_code, date, volume_condition, trade_type)
         return Decimal(str(self.cal_division_round_2(amt, volume*100)))
 
+    # 根据相关条件获取全体的交易最小价
+    def get_all_day_min_trade_price(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_min, "price", date, volume_condition, None, trade_type)
+
+    # 根据相关条件获取全体的交易最大价
+    def get_all_day_max_trade_price(self, stock_code, date, volume_condition, trade_type):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_max, "price", date, volume_condition, None, trade_type)
+
     # 获取早盘前部分的成交量统计
     def get_early_before_trade_volume(self, stock_code, date, volume_condition, trade_type):
         return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
@@ -1811,7 +1821,7 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-11-08"
+        return "2018-11-09"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)
