@@ -43,7 +43,6 @@ class SortHandler(object):
         return False
 
 
-
 if __name__ == "__main__":
     dict_data = [{"dd":"dd","aa":"aa"},{"dd":"dd","aa":"aa"}]
     print(dict_data)
