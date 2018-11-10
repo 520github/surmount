@@ -43,6 +43,7 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('turnover_rate_change_more', '换手率变大', '当日换手率较前3日平均值大3倍以上,成交金额大于1千万,大额资金占比45%以上', '2018-11-07', '2019-11-27', ''),
 ('unicorn', '创投板块', '由上海科创板引发的创投板块投资', '2018-11-05', '2019-11-25', 'plate_type_unicorn_sql.sql'),
 ('super_large_buy_amt', '超级大额资金净流入', '当日大额净流入资金超过5千万，大额资金占20%以上', '2018-10-26', '2019-10-26', 'plate_type_super_large_buy_amt_sql.sql'),
 ('large_buy_amt_and_overfall', '大额资金净流入,同时短期内跌幅较大', '短期3或5天内跌幅超过10%,同时当日大额净流入资金超过1千万，大额资金占20%以上', '2018-10-26', '2019-10-26', 'plate_type_large_buy_amt_and_overfall_sql.sql'),

@@ -34,7 +34,7 @@ class TushareStockTodayDataHandler(object):
         data_list = self.get_handle_stock_data_list()
         if data_list is None or len(data_list) < 1:
             print("date " + self.latest_work_day + " not found newly_quotes_data handle to day_trade_statistic_data")
-            time.sleep(60)
+            time.sleep(1)
             return
 
         for data in data_list:

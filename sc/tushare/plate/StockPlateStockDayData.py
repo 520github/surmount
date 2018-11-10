@@ -10,6 +10,8 @@ class StockPlateStockDayData(StockPlateBase, object):
 
     def init_stock_plate_stock_data(self, plate_data):
         key = plate_data["sql_template_key"]
+        if key is None or len(key) < 1:
+            return
         # now_date = self.get_now_ymd_str()
         plate_data["join_date"] = plate_data["trade_date"]
         sql = self.get_sql_by_template(key, plate_data)
