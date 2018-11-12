@@ -16,9 +16,11 @@ class ExportBase(DbHandler, ExcelHandler, object):
     excel_file_path_name = None
     sheet_name = None
     is_alone_file = False
+    keywords = None
 
     def __init__(self):
         super(ExportBase, self).__init__()
+        self.sql_template_key = self.keywords + ".sql"
         print("ExportBase init ")
 
     def export_stock_list_to_excel(self):
@@ -70,6 +72,7 @@ class ExportBase(DbHandler, ExcelHandler, object):
 
     def get_sql_by_template(self, template_key, data):
         sql = TemplateHandler.get_template_content_by_key(template_key, self.get_tempalte_path(), data)
+        # print(sql)
         return sql
 
     def get_tempalte_path(self):
