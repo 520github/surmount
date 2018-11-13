@@ -1,3 +1,121 @@
+drop table `t_tushare_stock_performance_report`;
+
+CREATE TABLE `t_tushare_stock_performance_report` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `eps` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '每股收益',
+  `eps_yoy` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '每股收益同比(%)',
+  `bvps` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '每股净资产',
+  `roe` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '净资产收益率(%)',
+  `epcf` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '每股现金流量(元)',
+  `net_profits` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '净利润(万元)',
+  `profits_yoy` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '净利润同比(%)',
+  `distrib` varchar(512) NOT NULL DEFAULT '' COMMENT '分配方案',
+  `report_date` varchar(32) NOT NULL DEFAULT ''  COMMENT '发布日期',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_performance_report_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop TABLE `t_tushare_stock_abitity_profit`;
+CREATE TABLE `t_tushare_stock_abitity_profit` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `roe` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净资产收益率(%)',
+  `net_profit_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利率(%)',
+  `gross_profit_rate` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '毛利率(%)',
+  `net_profits` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利润(万元)',
+  `eps` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股收益',
+  `business_income` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '营业收入(百万元)',
+  `bips` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股主营业务收入(元)',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_abitity_profit_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+drop table `t_tushare_stock_ability_operation`;
+CREATE TABLE `t_tushare_stock_ability_operation` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `arturnover` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '应收账款周转率(次)',
+  `arturndays` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '应收账款周转天数(天)',
+  `inventory_turnover` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '存货周转率(次)',
+  `inventory_days` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '存货周转天数(天)',
+  `currentasset_turnover` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动资产周转率(次)',
+  `currentasset_days` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动资产周转天数(天)',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_ability_operation_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+drop table `t_tushare_stock_ability_growth`;
+CREATE TABLE `t_tushare_stock_ability_growth` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `mbrg` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '主营业务收入增长率(%)',
+  `nprg` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利润增长率(%)',
+  `nav` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净资产增长率',
+  `targ` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '总资产增长率',
+  `epsg` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股收益增长率',
+  `seg` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '股东权益增长率',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_ability_growth_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+drop table t_tushare_stock_ability_debt_pay;
+CREATE TABLE `t_tushare_stock_ability_debt_pay` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `currentratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动比率',
+  `quickratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '速动比率',
+  `cashratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '现金比率',
+  `icratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '利息支付倍数',
+  `sheqratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '股东权益比率',
+  `adratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '股东权益增长率',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_ability_debt_pay_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+drop table `t_tushare_stock_ability_cash_flow`;
+CREATE TABLE `t_tushare_stock_ability_cash_flow` (
+  `index` bigint(20) NOT NULL DEFAULT -1,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `cf_sales` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量对销售收入比率',
+  `rateofreturn` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '资产的经营现金流量回报率',
+  `cf_nm` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量与净利润的比率',
+  `cf_liabilities` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量对负债比率',
+  `cashflowratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '现金流量比率',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `date` date NOT NULL COMMENT '处理日期',
+  KEY `ix_t_tushare_stock_ability_cash_flow_index` (`index`),
+  UNIQUE KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 drop table `t_tushare_stock_basic`;
 
 CREATE TABLE `t_tushare_stock_basic` (

@@ -18,6 +18,7 @@ class DbHandler(object):
             'charset': 'utf8'}
 
         DbHandler.db_execute = LightMysql(dbconfig)
+        print("DbHandler init ")
 
     def count_sql(self, sql):
         data = DbHandler.db_execute.select(sql)

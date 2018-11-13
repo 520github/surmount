@@ -968,9 +968,9 @@ class TushareStockTodayTickTradeData(TushareBase, object):
     # 从当日行情历史表中获取需要处理的股票数据
     def get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(self, date):
         sql = "select distinct * from " + self.t_tushare_stock_newly_quotes_data_hist + " " \
-              "where code not in (select code from " + self.t_sunso_stock_day_trade_statistic_volume_data + " " \
+              "where code not in (select code from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
               "where trade_date='" + date + "') and date='" + date + "' and trade > 0 " \
-              " and code in ('600122')"
+              # " and code in ('600122')"
         return self.select_sql(sql)
 
     # t_tushare_stock_newly_quotes_data 获取某股票N日内平均的交易数量

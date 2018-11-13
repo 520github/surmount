@@ -1,3 +1,61 @@
+
+
+drop table `t_sunso_stock_foundation_index`;
+CREATE TABLE `t_sunso_stock_foundation_index` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `earnings_per_share` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股收益(元)',
+  `net_asset_per_share` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股净资产(元)',
+  `cash_flow_per_share` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股现金流量(元)',
+  `main_business_per_share` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股主营业务收入(元)',
+  `net_profits` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利润(万元)',
+  `business_income` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '营业收入(百万元)',
+
+  `net_asset_return_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净资产收益率(%)',
+  `net_profit_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利率(%)',
+  `gross_profit_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '毛利率(%)',
+  `rise_main_business_income_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '主营业务收入增长率(%)',
+  `rise_net_profit_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利润增长率(%)',
+  `rise_net_asset_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '资产增长率%',
+  `rise_total_asset_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '总资产增长率%',
+  `rise_eps_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股收益增长率%',
+  `rise_stockholder_equity_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '股东权益增长率%',
+  `earnings_per_share_yy_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '每股收益同比(%)',
+  `profits_yy_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '净利润同比(%)',
+
+  `receivable_turnover_frequency` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '应收账款周转率(次)',
+  `receivable_turnover_days` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '应收账款周转天数(天)',
+  `inventory_turnover_frequency` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '存货周转率(次)',
+  `inventory_days` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '存货周转天数(天)',
+  `current_asset_turnover_frequency` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动资产周转率(次)',
+  `current_asset_days` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动资产周转天数(天)',
+
+  `current_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '流动比率',
+  `quick_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '速动比率',
+  `cash_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '现金比率',
+  `interest_pay_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '利息支付倍数',
+  `stockholder_equity_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '股东权益比率',
+
+  `net_cash_flow_and_sale_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量对销售收入比率',
+  `cash_flow_return_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '资产的经营现金流量回报率',
+  `net_cash_flow_and_net_profit_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量与净利润的比率',
+  `net_cash_flow_and_debt_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '经营现金净流量对负债比率',
+  `cash_flow_ratio` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '现金流量比率',
+
+  `report_date` date  NOT NULL COMMENT '发布日期',
+  `allocation_scheme` varchar(128) NOT NULL DEFAULT '' COMMENT '分配方案',
+
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票每季度基础指标表';
+create unique index unique_code_year_quarter on t_sunso_stock_foundation_index(code,`year`,`quarter`);
+
+
+
 drop table `t_sunso_stock_main_concept_classified`;
 CREATE TABLE `t_sunso_stock_main_concept_classified` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
