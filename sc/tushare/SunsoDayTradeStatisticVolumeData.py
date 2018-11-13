@@ -590,6 +590,44 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         data["medium_after_buy_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.outside_dish)
         data["medium_after_sell_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.inside_dish)
 
+        ####
+        super_time14_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_14)
+        super_time13_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_13)
+        super_time11_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_11)
+        super_time10_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_10)
+        super_time9_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_9)
+
+        data["super_time14_buy_trade_amt"] = super_time14_buy_trade_amt
+        data["super_time13_buy_trade_amt"] = super_time13_buy_trade_amt
+        data["super_time11_buy_trade_amt"] = super_time11_buy_trade_amt
+        data["super_time10_buy_trade_amt"] = super_time10_buy_trade_amt
+        data["super_time9_buy_trade_amt"] = super_time9_buy_trade_amt
+
+        super_time14_sell_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.inside_dish, self.time_14)
+        super_time13_sell_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.inside_dish, self.time_13)
+        super_time11_sell_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.inside_dish, self.time_11)
+        super_time10_sell_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.inside_dish, self.time_10)
+        super_time9_sell_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.inside_dish, self.time_9)
+        data["super_time14_sell_trade_amt"] = super_time14_sell_trade_amt
+        data["super_time13_sell_trade_amt"] = super_time13_sell_trade_amt
+        data["super_time11_sell_trade_amt"] = super_time11_sell_trade_amt
+        data["super_time10_sell_trade_amt"] = super_time10_sell_trade_amt
+        data["super_time9_sell_trade_amt"] = super_time9_sell_trade_amt
+
+        time925_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, None, None, self.time_925)
+        time925_trade_volume = self.get_fixed_time_trade_volume(stock_code, date, None, None, self.time_925)
+        time925_trade_type = self.get_fixed_time_trade_type(stock_code, date, None, None, self.time_925)
+        time1500_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, None, None, self.time_15)
+        time1500_trade_volume = self.get_fixed_time_trade_volume(stock_code, date, None, None, self.time_15)
+        time1500_trade_type = self.get_fixed_time_trade_type(stock_code, date, None, None, self.time_15)
+
+        data["time925_trade_amt"] = time925_trade_amt
+        data["time925_trade_volume"] = time925_trade_volume
+        data["time925_trade_type"] = time925_trade_type
+        data["time1500_trade_amt"] = time1500_trade_amt
+        data["time1500_trade_volume"] = time1500_trade_volume
+        data["time1500_trade_type"] = time1500_trade_type
+
         return data
 
     def get_column_avg_trade_price(self, stock_code, date, column_name, days):

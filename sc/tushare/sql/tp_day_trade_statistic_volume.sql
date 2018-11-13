@@ -295,7 +295,23 @@ insert into t_sunso_stock_day_trade_statistic_volume_data(
     medium_after_buy_times,
     medium_after_sell_times,
     medium_before_buy_times,
-    medium_before_sell_times
+    medium_before_sell_times,
+    super_time14_buy_trade_amt,
+    super_time13_buy_trade_amt,
+    super_time11_buy_trade_amt,
+    super_time10_buy_trade_amt,
+    super_time9_buy_trade_amt,
+    super_time14_sell_trade_amt,
+    super_time13_sell_trade_amt,
+    super_time11_sell_trade_amt,
+    super_time10_sell_trade_amt,
+    super_time9_sell_trade_amt,
+    time925_trade_volume,
+    time925_trade_amt,
+    time925_trade_type,
+    time1500_trade_volume,
+    time1500_trade_amt,
+    time1500_trade_type
 )
 value(
     '{{trade_date}}',
@@ -594,5 +610,21 @@ value(
     '{{medium_after_buy_times}}',
     '{{medium_after_sell_times}}',
     '{{medium_before_buy_times}}',
-    '{{medium_before_sell_times}}'
+    '{{medium_before_sell_times}}',
+    {{super_time14_buy_trade_amt}},
+    {{super_time13_buy_trade_amt}},
+    {{super_time11_buy_trade_amt}},
+    {{super_time10_buy_trade_amt}},
+    {{super_time9_buy_trade_amt}},
+    {{super_time14_sell_trade_amt}},
+    {{super_time13_sell_trade_amt}},
+    {{super_time11_sell_trade_amt}},
+    {{super_time10_sell_trade_amt}},
+    {{super_time9_sell_trade_amt}},
+    {{time925_trade_volume}},
+    {{time925_trade_amt}},
+    '{{time925_trade_type}}',
+    {{time1500_trade_volume}},
+    {{time1500_trade_amt}},
+    '{{time1500_trade_type}}'
 );

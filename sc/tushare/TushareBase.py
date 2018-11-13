@@ -65,6 +65,7 @@ class TushareBase:
     time_noon_before = " between '13:00:00' and '14:30:00' "
     # 午盘后部分时间
     time_noon_after = " between '14:30:01' and '14:59:00' "
+    time_925 = "like '09:25%' "
     time_9 = " like '09:%' "
     time_10 = " like '10:%' "
     time_11 = " like '11:%' "
@@ -80,6 +81,7 @@ class TushareBase:
     func_count = "count"
     func_sum = "sum"
     func_concat = "concat"
+    func_distinct = "distinct"
     yyyy_mm_dd_date_format = "%Y-%m-%d"
     db_engine = None
     db_execute = None
@@ -776,6 +778,21 @@ class TushareBase:
     def get_fixed_time_trade_count(self, stock_code, date, volume_condition, trade_type, times):
         return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
             stock_code, self.func_count, "*", date, volume_condition, times, trade_type)
+
+    # 根据相关条件获取全体的成交金额统计
+    def get_fixed_time_trade_amt(self, stock_code, date, volume_condition, trade_type, times):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "amount", date, volume_condition, times, trade_type)
+
+    # 根据相关条件获取全体的成交量统计
+    def get_fixed_time_trade_volume(self, stock_code, date, volume_condition, trade_type, times):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_sum, "volume", date, volume_condition, times, trade_type)
+
+    # 根据相关条件获取全体的交易类型统计
+    def get_fixed_time_trade_type(self, stock_code, date, volume_condition, trade_type, times):
+        return self.get_stock_column_func_value_by_date_time_and_volume_and_type(
+            stock_code, self.func_distinct, "type", date, volume_condition, times, trade_type)
 
     # 根据相关条件获取全体的交易平均价
     def get_all_day_avg_trade_price(self, stock_code, date, volume_condition, trade_type):
@@ -1821,7 +1838,7 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-11-12"
+        return "2018-11-13"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)

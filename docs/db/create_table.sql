@@ -1179,6 +1179,25 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   `medium_before_buy_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单前部分买盘时间点',
   `medium_before_sell_times` varchar(512) NOT NULL DEFAULT '' COMMENT '中单前部分卖盘时间点',
 
+  `super_time14_buy_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '14点超单买入交易金额(亿)',
+  `super_time13_buy_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '13点超单买入交易金额(亿)',
+  `super_time11_buy_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '11点超单买入交易金额(亿)',
+  `super_time10_buy_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '10点超单买入交易金额(亿)',
+  `super_time9_buy_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '9点超单买入交易金额(亿)',
+
+  `super_time14_sell_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '14点超单卖出交易金额(亿)',
+  `super_time13_sell_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '13点超单卖出交易金额(亿)',
+  `super_time11_sell_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '11点超单卖出交易金额(亿)',
+  `super_time10_sell_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '10点超单卖出交易金额(亿)',
+  `super_time9_sell_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '9点超单卖出交易金额(亿)',
+
+  `time925_trade_volume` int NOT NULL DEFAULT -1 COMMENT '9点25交易手数',
+  `time925_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '9点25交易金额(万)',
+  `time925_trade_type` varchar(32) NOT NULL DEFAULT '' COMMENT '9点25交易类型,buy买入,sell卖出',
+  `time1500_trade_volume` int NOT NULL DEFAULT -1 COMMENT '15点交易手数',
+  `time1500_trade_amt` decimal(12,4) NOT NULL DEFAULT -1 COMMENT '15点交易金额(万)',
+  `time1500_trade_type` varchar(32) NOT NULL DEFAULT '' COMMENT '15点交易类型,buy买入,sell卖出',
+
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)

@@ -13,7 +13,7 @@ class StockPlateHandler(object):
 
     stock_plate_day_data = None
     stock_plate_stock_day_data = None
-    trade_date = "2018-11-12"
+    trade_date = "2018-11-13"
 
     def __init__(self):
         StockPlateHandler.stock_plate_day_data = StockPlateDayData()
