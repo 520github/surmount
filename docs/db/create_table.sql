@@ -52,7 +52,7 @@ CREATE TABLE `t_sunso_stock_foundation_index` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票每季度基础指标表';
-create unique index unique_code_year_quarter on t_sunso_stock_foundation_index(code,`year`,`quarter`);
+create  index scode_year_quarter on t_sunso_stock_foundation_index(code,`year`,`quarter`);
 
 
 

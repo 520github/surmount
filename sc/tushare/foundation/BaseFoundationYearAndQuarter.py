@@ -25,6 +25,10 @@ class BaseFoundationYearAndQuarter(BaseFoundation, object):
         data["quarter"] = self.quarter
         data["date"] = self.get_now_ymd_str()
 
+    def append_year_and_quater_to_data_and_reset_index(self, data):
+        self.append_year_and_quater_to_data(data)
+        data.set_index(["code"], inplace=True)
+
     def get_data(self):
         while self.begin_year <= self.end_year:
             self.__get_data_by_year()

@@ -13,11 +13,14 @@ class ExportStockPriceReference(ExportBase, object):
         "300342": turnover_rate, "601118": turnover_rate,
         "002739": turnover_rate, "002602": turnover_rate,
         "002656": turnover_rate, "002665": turnover_rate,
+        "002147": turnover_rate, "600086": turnover_rate,
+        "300237": turnover_rate, "002369": turnover_rate,
 
         "002668": overfall, "002617": overfall,
         "600122": overfall, "600226": overfall, "603386": overfall,
 
-        "600525": large_buy, "600522": large_buy, "002195": large_buy
+        "600525": large_buy, "600522": large_buy, "002195": large_buy,
+        "600695": large_buy
 
 
     }

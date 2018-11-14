@@ -13,7 +13,7 @@ class TushareStockAbilityCashFlow(BaseFoundationYearAndQuarter, object):
 
     def get_append_data(self):
         data = ts.get_cashflow_data(self.begin_year, self.quarter)
-        self.append_year_and_quater_to_data(data)
+        self.append_year_and_quater_to_data_and_reset_index(data)
         return data
 
 

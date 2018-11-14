@@ -20,43 +20,43 @@ report_date,allocation_scheme
 )
 select
 m.code,m.name,m.year,m.quarter,
-m.eps,m.bvps,m.epcf,
-ap.bips,ap.net_profits,ap.business_income,
+m.eps,pr.bvps,pr.epcf,
+m.bips,m.net_profits,m.business_income,
 
-ap.roe,ap.net_profit_ratio,ap.gross_profit_rate,
+m.roe,m.net_profit_ratio,m.gross_profit_rate,
 ag.mbrg,ag.nprg,ag.nav,ag.targ,ag.epsg,ag.seg,
-m.eps_yoy,m.profits_yoy,
+pr.eps_yoy,pr.profits_yoy,
 
 ao.arturnover,ao.arturndays,ao.inventory_turnover,
 ao.inventory_days,ao.currentasset_turnover,ao.currentasset_days,
 
-dp.currentratio,dp.quickratio,dp.cashratio,dp.icratio,dp.sheqratio,dp.adratio,
+dp.currentratio,dp.quickratio,dp.cashratio,dp.icratio,dp.sheqratio,
 
 cf.cf_sales,cf.rateofreturn,cf.cf_nm,cf.cf_liabilities,cf.cashflowratio,
 
-m.report_date,m.distrib
+if(pr.report_date=null, null, concat(m.year,"-",pr.report_date)),pr.distrib
 
-from t_tushare_stock_performance_report m
+from (select distinct * from t_tushare_stock_abitity_profit) m
 
-left join t_tushare_stock_abitity_profit ap
-on m.code = ap.code and m.year =ap.year and m.quarter = ap.quarter
+left join (select distinct * from t_tushare_stock_performance_report) pr
+on m.code = pr.code and m.year =pr.year and m.quarter = pr.quarter
 
-left join t_tushare_stock_ability_operation ao
+left join (select distinct * from t_tushare_stock_ability_operation) ao
 on m.code = ao.code and m.year =ao.year and m.quarter = ao.quarter
 
-left join t_tushare_stock_ability_growth ag
+left join (select distinct * from t_tushare_stock_ability_growth) ag
 on m.code = ag.code and m.year =ag.year and m.quarter = ag.quarter
 
-left join t_tushare_stock_ability_debt_pay dp
+left join (select distinct * from t_tushare_stock_ability_debt_pay) dp
 on m.code = dp.code and m.year =dp.year and m.quarter = dp.quarter
 
-left join t_tushare_stock_ability_cash_flow cf
+left join (select distinct * from t_tushare_stock_ability_cash_flow) cf
 on m.code = cf.code and m.year =cf.year and m.quarter = cf.quarter
 
 where 1 > 0
 and m.year in {{year}}
 and m.quarter in {{quarter}}
-concat(m.code,m.year,m.quarter)
-not in (select concat(m.code,m.year,m.quarter) from t_sunso_stock_foundation_index)
+and concat(m.code,m.year,m.quarter)
+not in (select concat(code,year,quarter) from t_sunso_stock_foundation_index)
 ;
 

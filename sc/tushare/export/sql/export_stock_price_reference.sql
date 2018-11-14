@@ -1,7 +1,8 @@
 
 select
 '{{type_name}}' as a_类型,
-d.code as aa_代码,
+d.trade_date as aa_日期,
+d.code as ab_代码,
 d.name as b_名称,
 
 d.close_pre_close_diff_amt_ratio as ca_涨幅,
