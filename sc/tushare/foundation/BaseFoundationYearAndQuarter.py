@@ -18,15 +18,17 @@ class BaseFoundationYearAndQuarter(BaseFoundation, object):
         sql = self.get_delete_sql_by_year_and_quarter(self.begin_year, self.quarter)
         self.delete_sql(sql)
 
-    def append_year_and_quater_to_data(self, data):
+    def append_year_and_quater_to_data(self, data, date_key=None):
+        if date_key is None:
+            date_key = "date"
         if data is None:
             return data
         data["year"] = self.begin_year
         data["quarter"] = self.quarter
-        data["date"] = self.get_now_ymd_str()
+        data[date_key] = self.get_now_ymd_str()
 
-    def append_year_and_quater_to_data_and_reset_index(self, data):
-        self.append_year_and_quater_to_data(data)
+    def append_year_and_quater_to_data_and_reset_index(self, data, date_key=None):
+        self.append_year_and_quater_to_data(data, date_key)
         data.set_index(["code"], inplace=True)
 
     def get_data(self):
