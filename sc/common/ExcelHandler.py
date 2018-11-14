@@ -41,6 +41,7 @@ class ExcelHandler(object):
     def __create_sheet__(workbook, sheet_name):
         if sheet_name is None:
             sheet_name = "sheet1"
+        sheet_name = u'%s' % sheet_name
         return workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
 
     @staticmethod

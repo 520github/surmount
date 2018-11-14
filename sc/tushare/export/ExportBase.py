@@ -24,11 +24,7 @@ class ExportBase(DbHandler, ExcelHandler, object):
         print("ExportBase init ")
 
     def export_stock_list_to_excel(self):
-        if not self.is_alone_file:
-            all_excel_file = self.get_excel_file("")
-            if FileHandler.is_exist_file(all_excel_file):
-                FileHandler.remove_file(all_excel_file)
-
+        self.delete_excel_file()
         stock_list = self.get_stock_list()
         if stock_list is None or len(stock_list) < 1:
             return
@@ -38,6 +34,12 @@ class ExportBase(DbHandler, ExcelHandler, object):
             self.excel_file_path_name = self.get_excel_file(code)
             self.sheet_name = code
             self.export_db_data_to_excel_portal()
+
+    def delete_excel_file(self):
+        if not self.is_alone_file:
+            all_excel_file = self.get_excel_file("all")
+            if FileHandler.is_exist_file(all_excel_file):
+                FileHandler.remove_file(all_excel_file)
 
     def get_excel_file(self, code):
         if not self.is_alone_file:
