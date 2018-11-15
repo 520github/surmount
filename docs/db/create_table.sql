@@ -1,3 +1,68 @@
+drop table `t_sunso_stock_dragon_tiger_day_total_data`;
+
+CREATE TABLE `t_sunso_stock_dragon_tiger_day_total_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `trade_date` date  NOT NULL COMMENT '交易日期',
+  `trade_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '成交金额(亿)，,直接从当前行情获取数据' ,
+  `circulation_amt` decimal(20,8)  NOT NULL DEFAULT -1 COMMENT '流通市值(亿)',
+  `turnover_rate` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '换手率',
+  `close_amt` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日收盘价(元)',
+
+  `nearly5_day_sale_only_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构单独拥有该股票的个数',
+  `nearly5_day_sale_only_buy_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构单独买入该股票的个数',
+  `nearly5_day_sale_only_sell_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构单独卖出该股票的个数',
+  `nearly5_day_sale_top1_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构top1买入该股票的个数',
+  `nearly5_day_sale_top3_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构top3买入该股票的个数',
+  `nearly5_day_sale_only_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构单独买入该股票的名称',
+  `nearly5_day_sale_top1_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构top1买入该股票的名称',
+  `nearly5_day_sale_top3_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构top3买入该股票的名称',
+
+  `nearly5_day_sale_only_buy_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜营业机构买入金额(亿)',
+  `nearly5_day_sale_only_sell_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜营业机构卖出金额(亿)',
+
+  `nearly5_day_buy_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜买入金额(亿)',
+  `nearly5_day_sell_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜卖出金额(亿)',
+  `nearly5_day_net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜净额(亿)',
+  `nearly5_day_buy_count` int NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜买入次数',
+  `nearly5_day_sell_count` int NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜卖出次数',
+
+  `today_all_amt` decimal(18,6)  NULL DEFAULT -1 COMMENT '当日龙虎榜买入金额(亿)',
+  `today_buy_amt` decimal(18,6)  NULL DEFAULT -1 COMMENT '当日龙虎榜买入金额(亿)',
+  `today_sell_amt` decimal(18,6)  NULL DEFAULT -1 COMMENT '当日龙虎榜卖出金额(亿)',
+  `today_buy_amt_ratio` decimal(8,2)  NULL DEFAULT -1 COMMENT '当日龙虎榜买入金额占总交易比例',
+  `today_sell_amt_ratio` decimal(8,2)  NULL DEFAULT -1 COMMENT '当日龙虎榜买入金额占总交易比例',
+  `today_reason` varchar(2048)  NULL DEFAULT '' COMMENT '当日上龙虎榜原因',
+
+  `today_all_amt_mulit_str` varchar(128)  NULL DEFAULT '' COMMENT '当日龙虎榜买入金额(亿),字符串存储上榜多次情况',
+  `today_buy_amt_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日龙虎榜买入金额(亿),字符串存储上榜多次情况',
+  `today_sell_amt_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日龙虎榜卖出金额(亿),字符串存储上榜多次情况',
+  `today_buy_amt_ratio_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日龙虎榜买入金额占总交易比例,字符串存储上榜多次情况',
+  `today_sell_amt_ratio_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日龙虎榜买入金额占总交易比例,字符串存储上榜多次情况',
+  `today_reason_mulit_str` varchar(2048)  NULL DEFAULT '' COMMENT '当日上龙虎榜原因,字符串存储上榜多次情况',
+
+  `nearly5_day_organ_buy_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜机构买入金额(亿)',
+  `nearly5_day_organ_sell_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜机构卖出金额(亿)',
+  `nearly5_day_organ_net_amt` decimal(18,6) NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜机构净额(亿)',
+  `nearly5_day_organ_buy_count` int NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜机构买入次数',
+  `nearly5_day_organ_sell_count` int NOT NULL DEFAULT -1 COMMENT '近5日龙虎榜机构卖出次数',
+
+
+  `today_organ_buy_amt` decimal(18,6)  NULL DEFAULT -1 COMMENT '当日龙虎榜机构买入金额(亿)',
+  `today_organ_sell_amt` decimal(18,6)  NULL DEFAULT -1 COMMENT '当日龙虎榜机构卖出金额(亿)',
+  `today_organ_reason` varchar(512)  NULL DEFAULT '' COMMENT '当日机构上龙虎榜原因',
+
+  `today_organ_buy_amt_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日机构龙虎榜买入金额(亿),字符串存储上榜多次情况',
+  `today_organ_sell_amt_mulit_str` varchar(128)  NULL DEFAULT ''  COMMENT '当日机构龙虎榜卖出金额(亿),字符串存储上榜多次情况',
+  `today_organ_reason_mulit_str` varchar(2048)  NULL DEFAULT '' COMMENT '当日机构上龙虎榜原因,字符串存储上榜多次情况',
+
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票当日龙虎榜的统计数据';
+create unique index unique_code_tradeDate on t_sunso_stock_dragon_tiger_day_total_data(code,`trade_date`);
+
 
 
 drop table `t_sunso_stock_foundation_index`;
