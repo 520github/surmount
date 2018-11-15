@@ -15,6 +15,8 @@ class ExportStockPriceReference(ExportBase, object):
         "002656": turnover_rate, "002665": turnover_rate,
         "002147": turnover_rate, "600086": turnover_rate,
         "300237": turnover_rate, "002369": turnover_rate,
+        "600583": turnover_rate, "600115": turnover_rate,
+        "000666": turnover_rate,
 
         "002668": overfall, "002617": overfall,
         "600122": overfall, "600226": overfall, "603386": overfall,

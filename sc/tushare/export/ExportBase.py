@@ -37,9 +37,9 @@ class ExportBase(DbHandler, ExcelHandler, object):
 
     def delete_excel_file(self):
         if not self.is_alone_file:
-            all_excel_file = self.get_excel_file("all")
-            if FileHandler.is_exist_file(all_excel_file):
-                FileHandler.remove_file(all_excel_file)
+            self.excel_file_path_name = self.get_excel_file("all")
+            if FileHandler.is_exist_file(self.excel_file_path_name):
+                FileHandler.remove_file(self.excel_file_path_name)
 
     def get_excel_file(self, code):
         if not self.is_alone_file:
