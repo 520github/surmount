@@ -8,7 +8,7 @@ class AlarmTurnoverRateChangeBigMore(AlarmBase, object):
 
     def __init__(self):
         super(AlarmTurnoverRateChangeBigMore, self).__init__()
-        self.trade_date = "2018-11-15"
+        self.trade_date = "2018-11-16"
         self.limit = 5
         self.plate_name = "换手率变大"
         self.plate_start_date = "2018-11-07"
@@ -48,8 +48,3 @@ class AlarmTurnoverRateChangeBigMore(AlarmBase, object):
 if __name__ == "__main__":
     st = AlarmTurnoverRateChangeBigMore()
     data_list = st.alarm_stock_list()
-    print(len(data_list))
-    for data in data_list:
-        code = data["code"]
-        name = data["name"]
-        print(code + "," + name)

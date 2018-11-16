@@ -2,33 +2,33 @@
  '{{trade_date}}' as a_统计日期,
  {{limit}} as b_数据周期,
  t.code as code,
- t.name as ba_名称,
+ t.name as coa_名称,
  (select round((t.open_amt-cd.close_amt)/cd.close_amt*100,2) from t_sunso_stock_day_trade_statistic_core_data t
 where t.code=cd.code and t.trade_date > '{{trade_date}}'
 order by t.trade_date asc limit 1
-) as ca_第二日开盘幅度,
+) as coaa_第二日开盘幅度,
 
 (select round((t.low_amt-cd.close_amt)/cd.close_amt*100,2) from t_sunso_stock_day_trade_statistic_core_data t
 where t.code=cd.code and t.trade_date > '{{trade_date}}'
 order by t.trade_date asc limit 1
-) as cb_第二日最低幅度,
+) as cob_第二日最低幅度,
 
 (select round((t.high_amt-cd.close_amt)/cd.close_amt*100,2) from t_sunso_stock_day_trade_statistic_core_data t
 where t.code=cd.code and t.trade_date > '{{trade_date}}'
 order by t.trade_date asc limit 1
-) as cc_第二日最高幅度,
+) as coc_第二日最高幅度,
 
 (select round((t.low_amt - t.high_amt)/t.high_amt*100,2) from t_sunso_stock_day_trade_statistic_core_data t
 where t.code=cd.code and t.trade_date > '{{trade_date}}'
 order by t.trade_date asc limit 1
-) as cd_第二日低高幅度,
+) as cod_第二日低高幅度,
 
 (select round((t.close_amt-cd.close_amt)/cd.close_amt*100,2) from t_sunso_stock_day_trade_statistic_core_data t
 where t.code=cd.code and t.trade_date > '{{trade_date}}'
 order by t.trade_date asc limit 1
-) as ce_第二日收盘幅度,
- 0 as cf_今日开盘价,
- concat("=(D",cast(((@rowNum:=@rowNum+1)+1) as SIGNED INTEGER),"-",cd.close_amt,")/",cd.close_amt,"*100") as cg_开盘价涨幅,
+) as coe_第二日收盘幅度,
+ 0 as cof_今日开盘价,
+ concat("=(D",cast(((@rowNum:=@rowNum+1)+1) as SIGNED INTEGER),"-",cd.close_amt,")/",cd.close_amt,"*100") as cog_开盘价涨幅,
  -- cast(((@rowNum:=@rowNum+1)+1) as SIGNED INTEGER) as ce_序号,
  t.lh as da_平均低高幅度,
  t.open as db_平均开盘幅度,

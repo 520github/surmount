@@ -28,8 +28,16 @@ class AlarmBase(DbHandler, object):
             if self.alarm_stock_one(stock_data):
                 self.alarm_stock_data_list.append(stock_data)
 
-        self.join_to_plate()
+        # self.join_to_plate()
+        self.print_alarm_stock()
         return self.alarm_stock_data_list
+
+    def print_alarm_stock(self):
+        print(len(self.alarm_stock_data_list))
+        for data in self.alarm_stock_data_list:
+            code = data["code"]
+            name = data["name"]
+            print(code + "," + name)
 
     def join_to_plate(self):
         data = {"plate_name": self.plate_name, "plate_start_date": self.plate_start_date,
@@ -56,6 +64,12 @@ class AlarmBase(DbHandler, object):
     def get_one_stock_data_by_date(self, code, trade_date):
         data = {"code": code, "trade_date": trade_date}
         template_key = "get_one_stock_data_by_date.sql"
+        sql = self.get_sql_by_template(template_key, data)
+        return self.select_one_sql(sql)
+
+    def get_one_stock_data_by_pre_day(self, code, trade_date, limit):
+        data = {"code": code, "trade_date": trade_date, "limit": limit}
+        template_key = "get_one_stock_data_by_pre_day.sql"
         sql = self.get_sql_by_template(template_key, data)
         return self.select_one_sql(sql)
 

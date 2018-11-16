@@ -7,7 +7,7 @@ from ExportBaseSqlData import ExportBaseSqlData
 class ExportStockOpenLowCloseHigh(ExportBaseSqlData, object):
     trade_date_key = "trade_date"
     limit_key = "limit"
-    trade_date = "2018-11-15"
+    trade_date = "2018-11-16"
 
     def __init__(self):
         self.keywords = "export_stock_open_low_close_high"
