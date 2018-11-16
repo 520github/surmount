@@ -6,16 +6,26 @@ from ExportBase import ExportBase
 
 class ExportRandomStockData(ExportBase, object):
     stock_list = [
-        "000622",
-        "603389",
-        "002360",
-        "002680",
-        "002445",
-        "002477"
+        # "000622",
+        # "603389",
+        # "002360",
+        # "002680",
+        # "002445",
+        # "002477",
+        "600082",
+        "600053",
+        "000892",
+        "603366",
+        "002676",
+        "600796",
+        "300126",
+        "002871",
+        "600695"
     ]
 
     def __init__(self):
-        self.keywords = "export_stock_price_analysis_data"
+        # self.keywords = "export_stock_price_analysis_data"
+        self.keywords = "export_stock_watch_data"
         super(ExportRandomStockData, self).__init__()
         print("ExportRandomStockData init ")
 
