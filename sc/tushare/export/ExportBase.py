@@ -54,6 +54,9 @@ class ExportBase(DbHandler, ExcelHandler, object):
 
     def get_stock_list_by_sql(self, sql):
         data_list = self.select_data_list(sql)
+        return self.get_stocks_by_data_list(data_list)
+
+    def get_stocks_by_data_list(self, data_list):
         if data_list is None or len(data_list) < 1:
             return None
         stock_list = []
@@ -61,13 +64,23 @@ class ExportBase(DbHandler, ExcelHandler, object):
             stock_list.append(data["code"])
         return stock_list
 
+    def get_stocks_in_str_by_data_list(self, data_list):
+        if data_list is None or len(data_list) < 1:
+            return None
+        stocks = "("
+        for data in data_list:
+            stocks = stocks + "'" + data["ac_code"] + "',"
+        stocks = stocks + "'')"
+        return stocks
+
     def export_db_data_to_excel_portal(self):
-        self.export_db_data_to_excel(self.sql_template_key, self.sql_data, self.excel_file_path_name)
+        return self.export_db_data_to_excel(self.sql_template_key, self.sql_data, self.excel_file_path_name)
 
     def export_db_data_to_excel(self, sql_template_key, sql_data, excel_file_path_name):
         sql = self.get_sql_by_template(sql_template_key, sql_data)
         data_list = self.select_data_list(sql)
         self.export_data_to_excel_copy(data_list, excel_file_path_name, self.sheet_name)
+        return data_list
 
     def select_data_list(self, sql):
         return self.select_list_sql(sql)
