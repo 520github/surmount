@@ -1768,7 +1768,6 @@ class TushareBase:
 
         return data
 
-
     def get_now_ymd(self):
         return time.strftime("%Y-%m-%d", time.localtime())
 
@@ -1838,7 +1837,8 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return "2018-11-16"
+        return self.get_now_ymd()
+        #return "2018-11-16"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)
@@ -1916,7 +1916,7 @@ class TushareBase:
         return date.strftime("%Y-%m-%d")
 
 
-test = TushareBase()
+# test = TushareBase()
 # value = test.cal_percent_round_2(766, 877)
 # test.get_one_stock_basic("603997")
 # value = test.get_date_str_list("2018-09-28", "2018-10-13")

@@ -22,5 +22,5 @@ class TushareStockConceptCategory(TushareBase, object):
         self.data_to_db_append(self.get_all_stock_concept_category_data(), self.table_name)
 
 
-industry = TushareStockConceptCategory()
-industry.get_all_stock_concept_category_data_to_db()
+# industry = TushareStockConceptCategory()
+# industry.get_all_stock_concept_category_data_to_db()

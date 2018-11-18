@@ -17,7 +17,7 @@ class AlarmLowPriceRise(AlarmBase, object):
     def get_stock_data_list(self):
         sql = "select * from t_sunso_stock_day_trade_statistic_core_data " \
               "where trade_date='" + self.trade_date + "' " \
-              "and open_amt > 0 and pre5_close_price_ratio >=5 "
+              "and open_amt > 0 and pre5_close_price_ratio between 5 and 15 "
         return self.select_data_list(sql)
 
     def alarm_stock_one(self, stock_data):
@@ -28,6 +28,10 @@ class AlarmLowPriceRise(AlarmBase, object):
 
         pre5_close_price_ratio = pre_stock_data_one["pre5_close_price_ratio"]
         if pre5_close_price_ratio > -10:
+            return False
+
+        pre10_close_price_ratio = pre_stock_data_one["pre10_close_price_ratio"]
+        if pre10_close_price_ratio > -20:
             return False
 
         return True

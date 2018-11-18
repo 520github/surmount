@@ -24,9 +24,10 @@ class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
         print("not thing doing")
 
     def get_handle_stock_data_list(self):
-        TushareStockTodayHistDataHandler.date = self.get_next_date_str(TushareStockTodayHistDataHandler.date)
-        return self.tushare_stock_today_tick_trade_data.get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(
+        data_list = self.tushare_stock_today_tick_trade_data.get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(
             TushareStockTodayHistDataHandler.date)
+        TushareStockTodayHistDataHandler.date = self.get_next_date_str(TushareStockTodayHistDataHandler.date)
+        return data_list
 
     def get_next_date_str(self, date):
         return self.tushare_stock_today_tick_trade_data.get_next_date_str(date)

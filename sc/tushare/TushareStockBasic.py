@@ -53,6 +53,6 @@ class TushareStockBasic(TushareBase, object):
         sql = "delete from " + self.t_sunso_stock_basic + " where trade_date='" + self.get_latest_work_day() + "'"
         self.delete_sql(sql)
 
-basic = TushareStockBasic()
+# basic = TushareStockBasic()
 # basic.insert_sunso_stock_basic_from_tushare_stock_basic()
 # basic.update_sunso_stock_basic()

@@ -191,7 +191,7 @@ class TushareStockHistQuotesData(TushareBase, object):
         return "code,date,open,high,close as trade,low,volume,p_change as changepercent,ma5,ma10,ma20,v_ma5,v_ma10,v_ma20"
 
 
-newly = TushareStockHistQuotesData()
+# newly = TushareStockHistQuotesData()
 # newly.get_one_stock_hist_quotes_data("603895")
 # data_list = newly.get_stock_hist_quotes_data_list_by_less_trade_date_limit("603895", "2018-10-12", 30)
 # newly.save_data_list_to_sunso_stock_all_quotes_data(data_list)

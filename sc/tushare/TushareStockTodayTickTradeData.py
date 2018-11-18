@@ -1040,7 +1040,7 @@ class TushareStockTodayTickTradeData(TushareBase, object):
 
 
 # print(ts.trade_cal())
-today_tick = TushareStockTodayTickTradeData()
+# today_tick = TushareStockTodayTickTradeData()
 # value = today_tick.get_close_price_from_sunso_stock_day_trade_statistic_by_date_and_limit("603978", "2018-10-19", 1)
 # print(value)
 # print(float(value))

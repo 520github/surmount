@@ -13,7 +13,7 @@ from TushareStockAbilityCashFlow import TushareStockAbilityCashFlow
 
 class TushareStockLoadFoundationIndex(BaseFoundation, object):
 
-    is_delete_before_insert = True
+    is_delete_before_insert = False
     year = "(2018)"
     quarter = "(1,2,3)"
 
@@ -26,8 +26,8 @@ class TushareStockLoadFoundationIndex(BaseFoundation, object):
         print("TushareStockLoadFoundationIndex init...")
 
     def init_foundation_about_data(self):
-        # pr = TushareStockPerformanceReport()
-        # pr.get_data()
+        pr = TushareStockPerformanceReport()
+        pr.get_data()
 
         ap = TushareStockAbilityProfit()
         ap.get_data()
@@ -45,7 +45,7 @@ class TushareStockLoadFoundationIndex(BaseFoundation, object):
         acf.get_data()
 
     def load_foundation_index(self):
-        # self.init_foundation_about_data()
+        self.init_foundation_about_data()
 
         if self.is_delete_before_insert:
             self.delete_foundation_index()

@@ -37,7 +37,7 @@ class TushareStockDragonTigerTotalData(TushareBase, object):
             return True
         return False
 
-stock_top = TushareStockDragonTigerTotalData()
+# stock_top = TushareStockDragonTigerTotalData()
 # stock_top.get_tushare_stock_dragon_tiger_total_data_to_db(5)
 # stock_top.get_tushare_stock_dragon_tiger_total_data_to_db(10)
 # stock_top.get_tushare_stock_dragon_tiger_total_data_to_db(30)

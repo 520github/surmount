@@ -5,6 +5,7 @@ t.area as ad_地区,t.industry as ae_地区,
 t.pre3_close_price_ratio as af_前3价格幅度,
 t.pre5_close_price_ratio as af_前5价格幅度,
 t.close_pre_close_diff_amt_ratio as b_涨幅,
+
 t.open_pre_close_diff_amt_ratio as ba_开盘幅度,
 t.low_pre_close_diff_amt_ratio as baa_最低幅度,
 t.high_pre_close_diff_amt_ratio as bab_最高幅度,
@@ -27,7 +28,8 @@ v.medium_before_buy_trade_amt as zg_中单前买入金额,v.small_buy_trade_amt 
 v.large_above_sell_trade_amt as zi_大单上卖出金额,v.super_sell_trade_amt as zj_超级大单卖出金额,
 v.large_sell_trade_amt as zk_大单卖出金额,v.medium_after_sell_trade_amt as zl_中单后卖出金额,
 v.medium_before_sell_trade_amt as zm_中单前卖出金额,v.small_sell_trade_amt as zn_小单卖出金额
-from t_sunso_stock_day_trade_statistic_core_data t left join t_sunso_stock_day_trade_statistic_volume_data v
+from t_sunso_stock_day_trade_statistic_core_data t
+left join t_sunso_stock_day_trade_statistic_volume_data v
 on t.code = v.code and t.trade_date = v.trade_date
 where 1 > 0
 -- and t.code = '600122'

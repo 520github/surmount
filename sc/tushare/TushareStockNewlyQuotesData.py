@@ -200,7 +200,7 @@ class TushareStockNewlyQuotesData(TushareBase, object):
         return False
 
 
-newly = TushareStockNewlyQuotesData()
+# newly = TushareStockNewlyQuotesData()
 # newly.insert_stock_newly_quotes_data_to_sunso_stock_all_quotes_data()
 # newly.get_all_stock_newly_quotes_data_to_db()
 # newly.copy_all_stock_newly_quotes_data_to_sunso()

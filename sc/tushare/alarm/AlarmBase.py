@@ -28,7 +28,7 @@ class AlarmBase(DbHandler, object):
             if self.alarm_stock_one(stock_data):
                 self.alarm_stock_data_list.append(stock_data)
 
-        # self.join_to_plate()
+        self.join_to_plate()
         self.print_alarm_stock()
         return self.alarm_stock_data_list
 
@@ -90,7 +90,7 @@ class AlarmBase(DbHandler, object):
         return self.get_column_value_by_trade_statistic_volume_data(data)
 
     def get_column_value_by_trade_statistic_volume_data(self, data):
-        template_key = "get_column_value_by_trade_statistic_volume_data.sql"
+        template_key = "insert_t_sunso_stock_day_trade_statistic_range_avg_data.sql"
         return self.get_column_value_by_template(template_key, data)
 
     def get_column_value_by_trade_statistic_core_data(self, data):
@@ -125,4 +125,5 @@ class AlarmBase(DbHandler, object):
         return sql
 
     def get_tempalte_path(self):
-        return "./sql/"
+        path = os.path.abspath(os.path.dirname(__file__))
+        return path + "/sql/"

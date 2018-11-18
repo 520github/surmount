@@ -45,4 +45,5 @@ class BaseFoundation(DbHandler, DbEngineHandler, object):
         return sql
 
     def get_tempalte_path(self):
-        return "./sql/"
+        path = os.path.abspath(os.path.dirname(__file__))
+        return path + "/sql/"

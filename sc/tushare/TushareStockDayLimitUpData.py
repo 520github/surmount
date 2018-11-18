@@ -45,5 +45,5 @@ class TushareStockDayLimitUpData(TushareBase, object):
         self.insert_sql(sql)
 
 
-limit = TushareStockDayLimitUpData()
-limit.save_stock_day_limit_up_from_newly()
+# limit = TushareStockDayLimitUpData()
+# limit.save_stock_day_limit_up_from_newly()

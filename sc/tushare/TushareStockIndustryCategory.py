@@ -19,5 +19,5 @@ class TushareStockIndustryCategory(TushareBase, object):
         self.data_to_db_append(self.get_all_stock_industry_category_data(), "t_tushare_stock_industry_category")
 
 
-industry = TushareStockIndustryCategory()
-industry.get_all_stock_industry_category_data_to_db()
+# industry = TushareStockIndustryCategory()
+# industry.get_all_stock_industry_category_data_to_db()

@@ -93,6 +93,7 @@ class TushareStockDataHandler(object):
             self.days5_data)
 
 
-handler = TushareStockDataHandler()
-# handler.clear_today_basic_data()
-handler.init_today_basic_data()
+if __name__ == "__main__":
+    handler = TushareStockDataHandler()
+    # handler.clear_today_basic_data()
+    handler.init_today_basic_data()

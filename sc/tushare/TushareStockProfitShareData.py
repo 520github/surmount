@@ -20,5 +20,5 @@ class TushareStockProfitShareData(TushareBase, object):
         self.data_to_db_append(self.get_stock_profit_share_data(year), self.table_name)
 
 
-profit = TushareStockProfitShareData()
-profit.get_stock_profit_share_data_to_db(2018)
+# profit = TushareStockProfitShareData()
+# profit.get_stock_profit_share_data_to_db(2018)

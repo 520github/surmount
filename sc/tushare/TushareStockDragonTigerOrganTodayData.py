@@ -34,5 +34,5 @@ class TushareStockDragonTigerOrganTodayData(TushareBase, object):
         return False
 
 
-organ = TushareStockDragonTigerOrganTodayData()
+# organ = TushareStockDragonTigerOrganTodayData()
 # organ.get_dragon_tiger_organ_today_data_to_db()

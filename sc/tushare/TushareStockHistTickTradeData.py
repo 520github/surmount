@@ -49,6 +49,6 @@ class TushareStockHistTickTradeData(TushareBase, object):
 # print(ts.trade_cal())
 
 
-hist_tick = TushareStockHistTickTradeData()
+# hist_tick = TushareStockHistTickTradeData()
 # hist_tick.get_all_stock_hist_tick_trade_data_to_db()
-hist_tick.get_one_stock_hist_tick_trade_data_to_db("600518", "2018-10-16")
+# hist_tick.get_one_stock_hist_tick_trade_data_to_db("600518", "2018-10-16")

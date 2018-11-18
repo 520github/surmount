@@ -19,6 +19,6 @@ class TushareStockBigOrderData(TushareBase, object):
         self.data_to_db_append(self.get_one_stock_big_order_data(stock_code, date), "t_tushare_stocke_big_order_data")
 
 
-big_order = TushareStockBigOrderData()
+# big_order = TushareStockBigOrderData()
 # big_order.get_one_stock_big_order_data("002113", "2018-09-28")
-big_order.get_one_stock_big_order_data_to_db("002113", "2018-09-26")
+# big_order.get_one_stock_big_order_data_to_db("002113", "2018-09-26")

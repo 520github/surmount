@@ -39,7 +39,7 @@ class TushareStockRealtimeTickTradeData(TushareBase, object):
         self.delete_sql(sql)
 
 
-realtime = TushareStockRealtimeTickTradeData()
+# realtime = TushareStockRealtimeTickTradeData()
 # realtime.get_all_realtime_quotes_to_db()
 # realtime.delete_one_stock_realtime_quotes_by_date("000001")
-realtime.get_realtime_quotes_to_db("000001")
+# realtime.get_realtime_quotes_to_db("000001")

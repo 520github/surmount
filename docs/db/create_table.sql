@@ -1,3 +1,63 @@
+drop table `t_sunso_stock_day_trade_statistic_range_avg_data`;
+
+CREATE TABLE `t_sunso_stock_day_trade_statistic_range_avg_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `trade_date` date  NOT NULL COMMENT '交易日期',
+  `close_amt` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日收盘价(元)',
+
+  `close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日最低价-昨天收盘价)/昨日收盘价%',
+  `high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(今日最高价-昨天收盘价)/昨日收盘价%',
+  `low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre2_avg_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日平均的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre2_avg_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日平均的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre2_avg_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日平均的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre2_avg_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日平均的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre2_avg_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前2日平均的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre2_plus_count_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日幅度为正的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre2_plus_count_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日幅度为正的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre2_plus_count_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日幅度为正的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre2_plus_count_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前2日幅度为正的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre2_plus_count_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前2日幅度为正的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre3_avg_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日平均的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre3_avg_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日平均的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre3_avg_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日平均的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre3_avg_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日平均的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre3_avg_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前3日平均的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre3_plus_count_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日幅度为正的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre3_plus_count_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日幅度为正的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre3_plus_count_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日幅度为正的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre3_plus_count_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日幅度为正的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre3_plus_count_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前3日幅度为正的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre5_avg_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日平均的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre5_avg_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日平均的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre5_avg_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日平均的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre5_avg_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日平均的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre5_avg_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前5日平均的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `pre5_plus_count_close_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的涨跌幅%,今日收盘价-昨日收盘价/昨日收盘价',
+  `pre5_plus_count_open_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的(今日开盘价-昨天收盘价)/昨日收盘价%',
+  `pre5_plus_count_low_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的(今日最低价-昨天收盘价)/昨日收盘价%',
+  `pre5_plus_count_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的(今日最高价-昨天收盘价)/昨日收盘价%',
+  `pre5_plus_count_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
+
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票幅度平均值统计数据';
+create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_range_avg_data(code,`trade_date`);
+
+
+
+
 drop table `t_sunso_stock_dragon_tiger_day_total_data`;
 
 CREATE TABLE `t_sunso_stock_dragon_tiger_day_total_data` (
@@ -166,6 +226,8 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('before_down_after_up', '先下跌再上涨', '当日距前5日涨5～10%,前5日的前5日和前10日,跌幅在15%以上', '2018-11-16', '2019-11-16', ''),
+('up_limit_down_up_limt', '涨停下涨停', '开盘涨停之后下拉收盘又涨停', '2018-11-16', '2019-11-16', 'plate_type_up_limit_down_up_limt_sql.sql'),
 ('turnover_rate_change_more', '换手率变大', '当日换手率较前3日平均值大3倍以上,成交金额大于1千万,大额资金占比45%以上', '2018-11-07', '2019-11-27', ''),
 ('unicorn', '创投板块', '由上海科创板引发的创投板块投资', '2018-11-05', '2019-11-25', 'plate_type_unicorn_sql.sql'),
 ('super_large_buy_amt', '超级大额资金净流入', '当日大额净流入资金超过5千万，大额资金占20%以上', '2018-10-26', '2019-10-26', 'plate_type_super_large_buy_amt_sql.sql'),

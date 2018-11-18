@@ -1,6 +1,7 @@
 select
 t.turnover_rate,
-t.pre5_close_price_ratio
+t.pre5_close_price_ratio,
+t.pre10_close_price_ratio
 from (
     select c.* from t_sunso_stock_day_trade_statistic_core_data c
     left join t_sunso_stock_day_trade_statistic_volume_data v

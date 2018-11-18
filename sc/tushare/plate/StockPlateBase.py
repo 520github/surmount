@@ -32,7 +32,8 @@ class StockPlateBase(DbHandler, object):
         return DateHandler.get_now_ymd_str()
 
     def get_tempalte_path(self):
-        return "./sql/"
+        path = os.path.abspath(os.path.dirname(__file__))
+        return path + "/sql/"
 
     # 两个数相除并保留两个小数点
     def cal_division_round_2(self, first_value, second_value):
