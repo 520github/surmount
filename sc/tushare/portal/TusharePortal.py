@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../plate'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../foundation'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../statistic'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../batch'))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../export'))
 
 from TushareStockDataHandler import TushareStockDataHandler
 from TushareStockTodayHistDataHandler import TushareStockTodayHistDataHandler
@@ -16,6 +17,8 @@ from StatisticRangeAvgData import StatisticRangeAvgData
 from AlarmLowPriceRise import AlarmLowPriceRise
 from AlarmTurnoverRateChangeBigMore import AlarmTurnoverRateChangeBigMore
 from StockPlateHandler import StockPlateHandler
+from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
+from ExportPlateStockList import ExportPlateStockList
 
 
 class TusharePortal(object):
@@ -71,6 +74,14 @@ class TusharePortal(object):
 
         index.load_foundation_index()
 
+    def step7_export_data(self):
+        blah = ExportAlarmSameDayBeforeLowAfterHigh()
+        blah.trade_date = self.trade_date
+        blah.export_sql_data_to_excel()
+
+        high = ExportPlateStockList()
+        high.export_sql_data_list_to_excel("plate_name")
+
 
 if __name__ == "__main__":
     portal = TusharePortal()
@@ -78,3 +89,4 @@ if __name__ == "__main__":
     # portal.step4_alarm_data()
     # portal.step5_plate_data()
     # portal.step6_load_foundation_index_data()
+    portal.step7_export_data()

@@ -91,7 +91,8 @@ class ExportBase(DbHandler, ExcelHandler, object):
         return sql
 
     def get_tempalte_path(self):
-        return "./sql/"
+        path = os.path.abspath(os.path.dirname(__file__))
+        return path + "/sql/"
 
     def get_excel_file_path_name(self, keywords, code):
         return self.get_excel_file_path() + keywords + "_" + code + ".xls"
