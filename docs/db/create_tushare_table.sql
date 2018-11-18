@@ -1,3 +1,22 @@
+drop table t_tushare_stock_fund_holding;
+
+CREATE TABLE `t_tushare_stock_fund_holding` (
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
+  `date` date NOT NULL COMMENT '报告日期',
+  `nums` int NOT NULL DEFAULT -1 COMMENT '基金家数',
+  `nlast` int NOT NULL DEFAULT -1 COMMENT '与上期相比（增加或减少）',
+  `count` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '基金持股数（万股）',
+  `clast` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '与上期相比',
+  `amount` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '基金持股市值',
+  `ratio` decimal(12,4) NOT NULL  DEFAULT -1 COMMENT '占流通盘比率',
+  `year` int NOT NULL DEFAULT -1 COMMENT '年份',
+  `quarter` int NOT NULL DEFAULT -1 COMMENT '季度',
+  `handle_date` date NOT NULL COMMENT '处理日期',
+  KEY `unique_code_year_quarter` (`code`,`year`,`quarter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 DROP TABLE `t_tushare_stock_limited_sale_reopen`;
 
 CREATE TABLE `t_tushare_stock_limited_sale_reopen` (

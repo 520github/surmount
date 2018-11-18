@@ -11,7 +11,7 @@ class TushareStockFundHolding(BaseFoundationYearAndQuarter, object):
         self.table_name = "t_tushare_stock_fund_holding"
         self.begin_year = 2018
         self.end_year = 2018
-        self.quarters = [1, 2, 3, 4]
+        self.quarters = [3]
         print("TushareStockFundHolding init...")
 
     def get_append_data(self):
