@@ -5,7 +5,7 @@ where 1 > 0
 and trade_date='{{trade_date}}'
 and close_amt > 0
 and up_limit_type=20
-and low_high_diff_amt_ratio > 5
+-- and low_high_diff_amt_ratio > 5
 and pre1_avg_turnover_rate_ratio > 1
 and open_pre_close_diff_amt_ratio = close_pre_close_diff_amt_ratio
 ;

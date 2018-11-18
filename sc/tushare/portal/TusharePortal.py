@@ -77,4 +77,4 @@ if __name__ == "__main__":
     # portal.step3_statistic_range_avg_data()
     # portal.step4_alarm_data()
     # portal.step5_plate_data()
-    portal.step6_load_foundation_index_data()
+    # portal.step6_load_foundation_index_data()

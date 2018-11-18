@@ -43,7 +43,8 @@ v.small_buy_avg_trade_price as x_小单买单平均价,
 t.code as y_代码,t.industry as za_行业,
 t.turnover_rate as zb_换手率
 
-from t_sunso_stock_day_trade_statistic_core_data t left join t_sunso_stock_day_trade_statistic_volume_data v
+from t_sunso_stock_day_trade_statistic_core_data t
+left join t_sunso_stock_day_trade_statistic_volume_data v
 on t.code = v.code and t.trade_date = v.trade_date
 where 1 > 0
 -- and t.code = '600122'
