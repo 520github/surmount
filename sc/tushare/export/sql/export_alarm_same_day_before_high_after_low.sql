@@ -37,10 +37,10 @@ where 1>0
 and  cd.trade_date='{{trade_date}}'
 and cd.low_high_diff_amt_ratio > 10  -- 高低幅度超过10
 and cd.down_limit_type<=0   -- 非跌停
-and cd.open_pre_close_diff_amt_ratio between -7 and -1  -- 开盘价
+and cd.open_pre_close_diff_amt_ratio between 1 and 7  -- 开盘价
 and cd.open_pre_close_diff_amt_ratio > cd.low_pre_close_diff_amt_ratio  -- 开盘价大于最低价
-and cd.close_pre_close_diff_amt_ratio > 0 -- 收盘价大于0
-and abs(cd.low_pre_close_diff_amt_ratio ) - abs(cd.open_pre_close_diff_amt_ratio ) >1 -- 开盘价高于收盘价1个点以上
+and cd.close_pre_close_diff_amt_ratio < 0 -- 收盘价大于0
+-- and abs(cd.low_pre_close_diff_amt_ratio ) - abs(cd.open_pre_close_diff_amt_ratio ) >1 -- 开盘价高于收盘价1个点以上
 
 order by cd.open_pre_close_diff_amt_ratio asc
 

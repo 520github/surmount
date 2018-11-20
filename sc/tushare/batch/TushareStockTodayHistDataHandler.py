@@ -11,7 +11,7 @@ from TushareStockTodayDataHandler import TushareStockTodayDataHandler
 
 
 class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
-    date = "2018-11-15"
+    date = "2018-11-19"
 
     def __init__(self):
         super(TushareStockTodayHistDataHandler,self).__init__()
@@ -25,8 +25,8 @@ class TushareStockTodayHistDataHandler(TushareStockTodayDataHandler, object):
 
     def get_handle_stock_data_list(self):
         data_list = self.tushare_stock_today_tick_trade_data.get_newly_quotes_hist_stocks_not_in_sunso_stock_day_trade_statistic_data(
-            TushareStockTodayHistDataHandler.date)
-        TushareStockTodayHistDataHandler.date = self.get_next_date_str(TushareStockTodayHistDataHandler.date)
+            self.date)
+        self.date = self.get_next_date_str(self.date)
         return data_list
 
     def get_next_date_str(self, date):

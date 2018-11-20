@@ -19,10 +19,11 @@ from AlarmTurnoverRateChangeBigMore import AlarmTurnoverRateChangeBigMore
 from StockPlateHandler import StockPlateHandler
 from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
 from ExportPlateStockList import ExportPlateStockList
+from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalData
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-16"
+    trade_date = "2018-11-19"
 
     def __init__(self):
         print("TusharePortal init")
@@ -37,13 +38,20 @@ class TusharePortal(object):
     # 处理当天数据
     def step2_load_today_data(self):
         today_hist_data_handler = TushareStockTodayHistDataHandler()
+        print("date1-->" + today_hist_data_handler.date)
         today_hist_data_handler.date = self.trade_date
+        print("date2-->" + today_hist_data_handler.date)
         today_hist_data_handler.run_tushare_stock_today_data_handle()
 
     # 统计相关幅度的平均数据
     def step3_statistic_range_avg_data(self):
         range = StatisticRangeAvgData()
         range.load_statistic_data()
+
+    # 处理当日龙虎榜数据
+    def step33_dragon_tiger_day_total_data(self):
+        dragon_tiger = TushareStockDragonTigerDayTotalData()
+        dragon_tiger.load_dragon_tiger_day_total_data()
 
     # 执行相关预警操作
     def step4_alarm_data(self):
@@ -85,7 +93,10 @@ class TusharePortal(object):
 
 if __name__ == "__main__":
     portal = TusharePortal()
+    # portal.step1_get_today_data()
+    # portal.step2_load_today_data()
     # portal.step3_statistic_range_avg_data()
+    # portal.step33_dragon_tiger_day_total_data()
     # portal.step4_alarm_data()
     # portal.step5_plate_data()
     # portal.step6_load_foundation_index_data()
