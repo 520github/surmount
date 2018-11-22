@@ -75,7 +75,9 @@ CREATE TABLE `t_sunso_stock_dragon_tiger_day_total_data` (
   `nearly5_day_sale_only_sell_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构单独卖出该股票的个数',
   `nearly5_day_sale_top1_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构top1买入该股票的个数',
   `nearly5_day_sale_top3_count` int NOT NULL DEFAULT -1 COMMENT '近5日营业机构top3买入该股票的个数',
-  `nearly5_day_sale_only_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构单独买入该股票的名称',
+  `nearly5_day_sale_only_names` varchar(2000) NOT NULL DEFAULT '' COMMENT '近5日营业机构单独拥有该股票的名称',
+  `nearly5_day_sale_only_buy_names` varchar(1500) NOT NULL DEFAULT '' COMMENT '近5日营业机构单独买入该股票的名称',
+  `nearly5_day_sale_only_sell_names` varchar(1500) NOT NULL DEFAULT '' COMMENT '近5日营业机构单独卖出该股票的名称',
   `nearly5_day_sale_top1_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构top1买入该股票的名称',
   `nearly5_day_sale_top3_names` varchar(4000) NOT NULL DEFAULT '' COMMENT '近5日营业机构top3买入该股票的名称',
 
@@ -226,6 +228,7 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('yesterday_up_limit_today_up_down', '昨日涨停今日先涨后跌', '昨日涨停今日先涨后跌,开盘价在0到5点之间,收盘小于0,量能比昨日大1.2倍以上,开盘价与最高价之间不超过5个点', '2018-11-22', '2019-11-22', ''),
 ('before_down_after_up', '先下跌再上涨', '当日距前5日涨5～10%,前5日的前5日和前10日,跌幅在15%以上', '2018-11-16', '2019-11-16', ''),
 ('up_limit_down_up_limt', '涨停下涨停', '开盘涨停之后下拉收盘又涨停', '2018-11-16', '2019-11-16', 'plate_type_up_limit_down_up_limt_sql.sql'),
 ('turnover_rate_change_more', '换手率变大', '当日换手率较前3日平均值大3倍以上,成交金额大于1千万,大额资金占比45%以上', '2018-11-07', '2019-11-27', ''),

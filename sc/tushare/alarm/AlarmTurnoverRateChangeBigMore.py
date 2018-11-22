@@ -12,6 +12,7 @@ class AlarmTurnoverRateChangeBigMore(AlarmBase, object):
         self.limit = 5
         self.plate_name = "换手率变大"
         self.plate_start_date = "2018-11-07"
+        self.alarm_stock_data_list = []
         print("AlarmTurnoverRateChangeBigMore init")
 
     def alarm_stock_one(self, stock_data):

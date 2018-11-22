@@ -16,6 +16,7 @@ from BaseFoundationYearAndQuarter import BaseFoundationYearAndQuarter
 from StatisticRangeAvgData import StatisticRangeAvgData
 from AlarmLowPriceRise import AlarmLowPriceRise
 from AlarmTurnoverRateChangeBigMore import AlarmTurnoverRateChangeBigMore
+from AlarmTodayFirstUpAfterDownAndYesterdayUpLimit import AlarmTodayFirstUpAfterDownAndYesterdayUpLimit
 from StockPlateHandler import StockPlateHandler
 from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
 from ExportPlateStockList import ExportPlateStockList
@@ -23,7 +24,7 @@ from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalD
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-19"
+    trade_date = "2018-11-22"
 
     def __init__(self):
         print("TusharePortal init")
@@ -62,6 +63,9 @@ class TusharePortal(object):
         atrc= AlarmTurnoverRateChangeBigMore()
         atrc.trade_date = self.trade_date
         atrc.alarm_stock_list()
+
+        ty = AlarmTodayFirstUpAfterDownAndYesterdayUpLimit()
+        ty.alarm_stock_list()
 
     # 处理板块相关数据
     def step5_plate_data(self):

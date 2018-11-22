@@ -12,6 +12,7 @@ class AlarmLowPriceRise(AlarmBase, object):
         self.limit = 5
         self.plate_name = "先下跌再上涨"
         self.plate_start_date = "2018-11-16"
+        self.alarm_stock_data_list = []
         print("AlarmLowPriceRise init")
 
     def get_stock_data_list(self):

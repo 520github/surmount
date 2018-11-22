@@ -10,6 +10,7 @@ class AlarmSmallVolumeHighAndTurnoverRateHigh(AlarmBase, object):
         super(AlarmSmallVolumeHighAndTurnoverRateHigh, self).__init__()
         self.trade_date = "2018-11-07"
         self.limit = 5
+        self.alarm_stock_data_list = []
         print("AlarmSmallVolumeHighAndTurnoverRateHigh init")
 
     def alarm_stock_one(self, stock_data):

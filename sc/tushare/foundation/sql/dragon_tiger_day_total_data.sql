@@ -2,7 +2,9 @@ insert into t_sunso_stock_dragon_tiger_day_total_data(
     code,name,trade_date,trade_amt,circulation_amt,turnover_rate,close_amt,
     nearly5_day_sale_only_count,nearly5_day_sale_only_buy_count,nearly5_day_sale_only_sell_count,
     nearly5_day_sale_top1_count,nearly5_day_sale_top3_count,
-    nearly5_day_sale_top1_names,nearly5_day_sale_top3_names,nearly5_day_sale_only_names,
+
+    nearly5_day_sale_only_names,nearly5_day_sale_only_buy_names,nearly5_day_sale_only_sell_names,
+    nearly5_day_sale_top1_names,nearly5_day_sale_top3_names,
 
     nearly5_day_sale_only_buy_amt,nearly5_day_sale_only_sell_amt,
 
@@ -31,6 +33,8 @@ sc.turnover_rate,sc.close_amt,
 (select count(*) from t_tushare_stock_dragon_tiger_sale_total_data d where  d.date = nt.date and d.top3 like concat('',nt.name,'%')),
 nt.c,
 (select group_concat(broker order by bamount desc) from t_tushare_stock_dragon_tiger_sale_total_data d where  d.date = nt.date and d.top3 = nt.name ),
+(select group_concat(broker order by bamount desc) from t_tushare_stock_dragon_tiger_sale_total_data d where  d.date = nt.date and d.top3 = nt.name and d.scount<1),
+(select group_concat(broker order by bamount desc) from t_tushare_stock_dragon_tiger_sale_total_data d where  d.date = nt.date and d.top3 = nt.name and d.bcount<1),
 (select group_concat(broker order by bamount desc) from t_tushare_stock_dragon_tiger_sale_total_data d where  d.date = nt.date and d.top3 like concat('',nt.name,'%') ),
 nt.broker,
 
