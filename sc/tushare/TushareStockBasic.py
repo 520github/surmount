@@ -38,7 +38,8 @@ class TushareStockBasic(TushareBase, object):
     def update_sunso_stock_basic(self):
         sql = "update " + self.t_sunso_stock_basic + " t1 set totals_stock_amt = " \
               "(select mktcap from " + self.t_tushare_stock_newly_quotes_data + " t2 " \
-              "where t1.code = t2.code and t2.date='" + self.get_latest_work_day() + "' limit 1)"
+              "where t1.code = t2.code and t2.date='" + self.get_latest_work_day() + "' limit 1) " \
+              "where t1.trade_date='" + self.get_latest_work_day() + "' "
         self.update_sql(sql)
 
     def is_exist_sunso_stock_basic_by_date(self):

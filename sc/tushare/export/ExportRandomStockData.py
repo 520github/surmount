@@ -13,6 +13,7 @@ class ExportRandomStockData(ExportBase, object):
         # "002445",
         # "002477",
         #
+        "002054",
         "000058",
         "603180",
         "600461",

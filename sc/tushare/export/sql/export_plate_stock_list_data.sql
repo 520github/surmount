@@ -3,6 +3,13 @@ s.name as a_名称,
 s.code as b_代码,
 s.industry as c_行业,
 s.area as d_地区,
+round(cd.trade_amt/100000000,2) as db_交易金额,
+cd.turnover_rate as df_换手率,
+cd.close_pre_close_diff_amt_ratio as ea_收盘幅度,
+cd.open_pre_close_diff_amt_ratio as eb_开盘价幅度,
+cd.high_pre_close_diff_amt_ratio as ec_最高价幅度,
+cd.pre1_avg_turnover_rate_ratio as ed_比昨日换手率,
+cd.close_amt as ef_收盘价,
 s.join_date as f_加入时间,
 s.total_count as g_加入天数,
 s.total_up_down_ratio as ga_加入之后总上涨幅度,
@@ -24,6 +31,8 @@ dtd.nearly5_day_sell_amt as ht_近5日龙虎榜卖出金额
 from t_sunso_stock_plate_stock s
 left join t_sunso_stock_dragon_tiger_day_total_data dtd
 on s.code = dtd.code and s.join_date = dtd.trade_date
+left join t_sunso_stock_day_trade_statistic_core_data cd
+on s.code = cd.code  and s.join_date = cd.trade_date
 where 1> 0
 and s.plate_name = '{{plate_name}}'
 and s.plate_start_date = '{{plate_start_date}}'

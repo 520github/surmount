@@ -585,10 +585,14 @@ class SunsoDayTradeStatisticVolumeData(TushareBase, object):
         data["super_sell_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.super_volume, self.inside_dish)
         data["large_buy_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.max_volume, self.outside_dish)
         data["large_sell_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.max_volume, self.inside_dish)
-        data["medium_before_buy_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_before, self.outside_dish)
-        data["medium_before_sell_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_before, self.inside_dish)
-        data["medium_after_buy_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.outside_dish)
-        data["medium_after_sell_times"] = self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.inside_dish)
+        data["medium_before_buy_times"] = ''
+            # self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_before, self.outside_dish)
+        data["medium_before_sell_times"] = ''
+            # self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_before, self.inside_dish)
+        data["medium_after_buy_times"] = ''
+            # self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.outside_dish)
+        data["medium_after_sell_times"] = ''
+            # self.get_stock_trade_distribution_time_by_trade_type(stock_code, date, self.volume_medium_after, self.inside_dish)
 
         ####
         super_time14_buy_trade_amt = self.get_fixed_time_trade_amt(stock_code, date, self.super_volume, self.outside_dish, self.time_14)

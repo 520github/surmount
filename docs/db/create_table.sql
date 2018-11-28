@@ -1,3 +1,136 @@
+drop table t_sunso_stock_day_industry_statistic_core_data;
+
+CREATE TABLE `t_sunso_stock_day_industry_statistic_core_data` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `industry` varchar(128) NOT NULL DEFAULT '' COMMENT '行业名称',
+  `trade_date` date  NOT NULL COMMENT '交易日期',
+
+  `totals_stock_amt` decimal(20,6) NOT NULL DEFAULT '-1.000000' COMMENT '板块总市值(亿)',
+  `circulation_stock_amt` decimal(20,6) NOT NULL DEFAULT '-1.000000' COMMENT '板块总流通市值(亿)',
+  `totals_stock_volume` decimal(12,3) NOT NULL DEFAULT '-1.000' COMMENT '板块总股本(亿)',
+  `circulation_stock_volume` decimal(12,3) NOT NULL DEFAULT '-1.000' COMMENT '板块流通股本(亿)',
+
+  `trade_volume` decimal(18,6) NOT NULL DEFAULT '-1' COMMENT '板块总成交量(亿)',
+  `trade_amt` decimal(18,6) NOT NULL DEFAULT '-1' COMMENT '板块总成交金额(亿)',
+  `trade_count` bigint(20) NOT NULL DEFAULT '-1' COMMENT '板块总交易次数(次)',
+  `avg_trade_per_volume` decimal(12,2) NOT NULL DEFAULT '-1' COMMENT '平均每次交易的手数',
+  `stock_num` bigint(20) NOT NULL DEFAULT '-1' COMMENT '板块股票个数',
+  `avg_close_price` decimal(8,2) NOT NULL DEFAULT '-1' COMMENT '收盘平均价格(元)',
+
+  `sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '当日板块总涨跌幅%',
+  `avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块平均涨跌幅%',
+  `up_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块上涨平均涨跌幅%',
+  `down_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日板块下跌平均涨跌幅%',
+
+  `sum_up_limit_count` bigint(20) NOT NULL DEFAULT '-1' COMMENT '当日板块总涨停数',
+  `sum_down_limit_count` bigint(20) NOT NULL DEFAULT '-1' COMMENT '当日板块总跌停数',
+  `up_down_limit_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '涨停数和跌停数的比例',
+  `sum_up_count` bigint(20) NOT NULL DEFAULT '-1' COMMENT '当日板块总上涨数',
+  `sum_down_count` bigint(20) NOT NULL DEFAULT '-1' COMMENT '当日板块总下跌数',
+  `up_down_count_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '上涨和下跌数的比例',
+
+  `up_top1_name` varchar(32) NOT NULL DEFAULT '' COMMENT '涨幅前1股票',
+  `up_top2_name` varchar(32) NOT NULL DEFAULT '' COMMENT '涨幅前2股票',
+  `up_top3_name` varchar(32) NOT NULL DEFAULT '' COMMENT '涨幅前3股票',
+
+  `down_top1_name` varchar(32) NOT NULL DEFAULT '' COMMENT '跌幅前1股票',
+  `down_top2_name` varchar(32) NOT NULL DEFAULT '' COMMENT '跌幅前2股票',
+  `down_top3_name` varchar(32) NOT NULL DEFAULT '' COMMENT '跌幅前3股票',
+
+  `pre1_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第1日板块总市值)/前第1日板块总市值',
+  `pre1_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第1日板块流通市值)/前第1日板块流通市值',
+  `pre1_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第1日板块总股本数)/前第1日板块总股本数',
+  `pre1_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第1日板块流通股本数)/前第1日板块流通股本数',
+
+  `pre3_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第3日板块总市值)/前第3日板块总市值',
+  `pre3_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第3日板块流通市值)/前第3日板块流通市值',
+  `pre3_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第3日板块总股本数)/前第3日板块总股本数',
+  `pre3_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第3日板块流通股本数)/前第3日板块流通股本数',
+  `pre3_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前3日板块总涨跌幅%',
+  `pre3_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前3日板块平均涨跌幅%',
+  `pre3_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前3日平均交易金额(亿)',
+  `pre3_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前3日平均交易量(亿)',
+  `pre3_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前3日平均交易次数(次)',
+
+  `pre5_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第5日板块总市值)/前第5日板块总市值',
+  `pre5_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第5日板块流通市值)/前第5日板块流通市值',
+  `pre5_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第5日板块总股本数)/前第5日板块总股本数',
+  `pre5_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第5日板块流通股本数)/前第5日板块流通股本数',
+  `pre5_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前5日板块总涨跌幅%',
+  `pre5_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日板块平均涨跌幅%',
+  `pre5_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前5日平均交易金额(亿)',
+  `pre5_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前5日平均交易量(亿)',
+  `pre5_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前5日平均交易次数(次)',
+
+  `pre10_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第10日板块总市值)/前第10日板块总市值',
+  `pre10_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第10日板块流通市值)/前第10日板块流通市值',
+  `pre10_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第10日板块总股本数)/前第10日板块总股本数',
+  `pre10_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第10日板块流通股本数)/前第10日板块流通股本数',
+  `pre10_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前10日板块总涨跌幅%',
+  `pre10_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前10日板块平均涨跌幅%',
+  `pre10_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前10日平均交易金额(亿)',
+  `pre10_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前10日平均交易量(亿)',
+  `pre10_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前10日平均交易次数(次)',
+
+  `pre20_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第20日板块总市值)/前第20日板块总市值',
+  `pre20_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第20日板块流通市值)/前第20日板块流通市值',
+  `pre20_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第20日板块总股本数)/前第20日板块总股本数',
+  `pre20_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第20日板块流通股本数)/前第20日板块流通股本数',
+  `pre20_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前20日板块总涨跌幅%',
+  `pre20_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前20日板块平均涨跌幅%',
+  `pre20_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前20日平均交易金额(亿)',
+  `pre20_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前20日平均交易量(亿)',
+  `pre20_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前20日平均交易次数(次)',
+
+  `pre30_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第30日板块总市值)/前第30日板块总市值',
+  `pre30_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第30日板块流通市值)/前第30日板块流通市值',
+  `pre30_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第30日板块总股本数)/前第30日板块总股本数',
+  `pre30_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第30日板块流通股本数)/前第30日板块流通股本数',
+  `pre30_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前30日板块总涨跌幅%',
+  `pre30_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前30日板块平均涨跌幅%',
+  `pre30_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前30日平均交易金额(亿)',
+  `pre30_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前30日平均交易量(亿)',
+  `pre30_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前30日平均交易次数(次)',
+
+  `pre60_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第60日板块总市值)/前第60日板块总市值',
+  `pre60_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第60日板块流通市值)/前第60日板块流通市值',
+  `pre60_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第60日板块总股本数)/前第60日板块总股本数',
+  `pre60_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第60日板块流通股本数)/前第60日板块流通股本数',
+  `pre60_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前60日板块总涨跌幅%',
+  `pre60_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前60日板块平均涨跌幅%',
+  `pre60_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前60日平均交易金额(亿)',
+  `pre60_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前60日平均交易量(亿)',
+  `pre60_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前60日平均交易次数(次)',
+
+  `pre90_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第90日板块总市值)/前第90日板块总市值',
+  `pre90_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第90日板块流通市值)/前第90日板块流通市值',
+  `pre90_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第90日板块总股本数)/前第90日板块总股本数',
+  `pre90_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第90日板块流通股本数)/前第90日板块流通股本数',
+  `pre90_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前90日板块总涨跌幅%',
+  `pre90_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前90日板块平均涨跌幅%',
+  `pre90_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前90日平均交易金额(亿)',
+  `pre90_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前90日平均交易量(亿)',
+  `pre90_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前90日平均交易次数(次)',
+
+  `pre120_totals_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总市值-前第120日板块总市值)/前第120日板块总市值',
+  `pre120_circulation_stock_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通市值-前第120日板块流通市值)/前第120日板块流通市值',
+  `pre120_totals_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块总股本数-前第120日板块总股本数)/前第120日板块总股本数',
+  `pre120_circulation_stock_volume_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '(当日板块流通股本数-前第120日板块流通股本数)/前第120日板块流通股本数',
+  `pre120_sum_close_price_ratio` decimal(12,2) NOT NULL DEFAULT -1 COMMENT '前120日板块总涨跌幅%',
+  `pre120_avg_close_price_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前120日板块平均涨跌幅%',
+  `pre120_avg_trade_amt` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前120日平均交易金额(亿)',
+  `pre120_avg_trade_volume` decimal(12,6) NOT NULL DEFAULT -1 COMMENT '前120日平均交易量(亿)',
+  `pre120_avg_trade_count` decimal(10,2) NOT NULL DEFAULT -1 COMMENT '前120日平均交易次数(次)',
+
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票每日行业统计数据';
+create unique index unique_industry_tradeDate on t_sunso_stock_day_industry_statistic_core_data(industry,`trade_date`);
+
+
+
+
 drop table `t_sunso_stock_day_trade_statistic_range_avg_data`;
 
 CREATE TABLE `t_sunso_stock_day_trade_statistic_range_avg_data` (

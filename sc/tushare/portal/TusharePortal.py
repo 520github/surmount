@@ -24,7 +24,7 @@ from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalD
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-22"
+    trade_date = "2018-11-27"
 
     def __init__(self):
         print("TusharePortal init")
@@ -65,6 +65,7 @@ class TusharePortal(object):
         atrc.alarm_stock_list()
 
         ty = AlarmTodayFirstUpAfterDownAndYesterdayUpLimit()
+        ty.trade_date = self.trade_date
         ty.alarm_stock_list()
 
     # 处理板块相关数据
