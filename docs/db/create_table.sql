@@ -361,6 +361,8 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('short_term_10_day_overfall', '短期10天超跌', '短期10天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-31', 'plate_type_short_term_10_day_overfall_sql.sql'),
+('short_term_20_day_overfall', '短期20天超跌', '短期20天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-31', 'plate_type_short_term_20_day_overfall_sql.sql'),
 ('yesterday_up_limit_today_up_down', '昨日涨停今日先涨后跌', '昨日涨停今日先涨后跌,开盘价在0到5点之间,收盘小于0,量能比昨日大1.2倍以上,开盘价与最高价之间不超过5个点', '2018-11-22', '2019-11-22', ''),
 ('before_down_after_up', '先下跌再上涨', '当日距前5日涨5～10%,前5日的前5日和前10日,跌幅在15%以上', '2018-11-16', '2019-11-16', ''),
 ('up_limit_down_up_limt', '涨停下涨停', '开盘涨停之后下拉收盘又涨停', '2018-11-16', '2019-11-16', 'plate_type_up_limit_down_up_limt_sql.sql'),

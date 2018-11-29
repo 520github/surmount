@@ -24,7 +24,7 @@ from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalD
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-27"
+    trade_date = "2018-11-28"
 
     def __init__(self):
         print("TusharePortal init")
