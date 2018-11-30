@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../foundation'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../statistic'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../batch'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../export'))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../industry'))
 
 from TushareStockDataHandler import TushareStockDataHandler
 from TushareStockTodayHistDataHandler import TushareStockTodayHistDataHandler
@@ -21,10 +22,11 @@ from StockPlateHandler import StockPlateHandler
 from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
 from ExportPlateStockList import ExportPlateStockList
 from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalData
+from DayIndustryStatisticCoreData import DayIndustryStatisticCoreData
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-28"
+    trade_date = "2018-11-29"
 
     def __init__(self):
         print("TusharePortal init")
@@ -53,6 +55,11 @@ class TusharePortal(object):
     def step33_dragon_tiger_day_total_data(self):
         dragon_tiger = TushareStockDragonTigerDayTotalData()
         dragon_tiger.load_dragon_tiger_day_total_data()
+
+    # 处理行业相关数据
+    def step333_day_industry_statistic_data(self):
+        dis = DayIndustryStatisticCoreData()
+        dis.handle_list_day_industry()
 
     # 执行相关预警操作
     def step4_alarm_data(self):
@@ -102,6 +109,7 @@ if __name__ == "__main__":
     # portal.step2_load_today_data()
     # portal.step3_statistic_range_avg_data()
     # portal.step33_dragon_tiger_day_total_data()
+    # portal.step333_day_industry_statistic_data()
     # portal.step4_alarm_data()
     # portal.step5_plate_data()
     # portal.step6_load_foundation_index_data()
