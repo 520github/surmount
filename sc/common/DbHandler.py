@@ -2,16 +2,20 @@
 # -*- coding: utf-8 -*-
 
 from LightMysql import LightMysql
-
+from ConfigReader import ConfigReader
 
 class DbHandler(object):
 
     db_execute = None
 
     def __init__(self):
+        self.configReader = ConfigReader().get_conf("main")
+        self.ip = self.configReader.mysql_ip
+        self.port = self.configReader.mysql_port
+        print("ip:" + self.ip + ", port:" + self.port)
         dbconfig = {
-            'host': '127.0.0.1',
-            'port': 3307,
+            'host': self.ip,
+            'port': self.port,
             'user': 'root',
             'passwd': 'root',
             'db': 'tushare',
@@ -87,3 +91,10 @@ class DbHandler(object):
     @staticmethod
     def encode(value):
         return value.encode('utf-8')
+
+
+if __name__ == "__main__":
+    sql = "select count(*) as c from t_sunso_stock_basic"
+    db = DbHandler()
+    result = db.count_sql(sql)
+    print("result-->" + str(result))

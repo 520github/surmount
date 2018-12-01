@@ -26,7 +26,7 @@ from DayIndustryStatisticCoreData import DayIndustryStatisticCoreData
 
 
 class TusharePortal(object):
-    trade_date = "2018-11-29"
+    trade_date = "2018-11-30"
 
     def __init__(self):
         print("TusharePortal init")

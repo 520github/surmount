@@ -92,8 +92,8 @@ class TushareBase:
         TushareBase.db_engine = create_engine(self.configReader.mysql_url)
 
         dbconfig = {
-            'host': '127.0.0.1',
-            'port': 3307,
+            'host': self.configReader.mysql_ip,
+            'port': self.configReader.mysql_port,
             'user': 'root',
             'passwd': 'root',
             'db': 'tushare',
