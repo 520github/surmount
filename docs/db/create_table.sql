@@ -1,5 +1,5 @@
 
-drop table `t_sunso_stock_classify_track`;
+drop table `t_sunso_stock_classify_track_basic`;
 
 CREATE TABLE `t_sunso_stock_classify_track_basic` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -9,6 +9,7 @@ CREATE TABLE `t_sunso_stock_classify_track_basic` (
 
   `stock_num` int NOT NULL DEFAULT -1 COMMENT '最近跟踪的股票数',
   `from_track_date_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '追踪日到最近日的涨幅',
+  `trade_date` date  NOT NULL COMMENT '最近交易日期',
 
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '说明',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
@@ -35,7 +36,7 @@ CREATE TABLE `t_sunso_stock_classify_track_config` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票分类跟踪配置';
-create index index_classifyType_classifyName_trackDate on t_sunso_stock_classify_track_config(classify_type,classify_name,`track_date`);
+create unique index unique_classifyType_classifyName_trackDate_rebackDay on t_sunso_stock_classify_track_config(classify_type,classify_name,`track_date`,`reback_day`);
 
 
 CREATE TABLE `t_sunso_stock_classify_track_reback_stock_data` (
@@ -65,15 +66,13 @@ CREATE TABLE `t_sunso_stock_classify_track_day_data` (
   `track_date` date  NOT NULL COMMENT '触发的分类跟踪日期',
   `trade_date` date  NOT NULL COMMENT '交易日期',
 
-  `reback_day` int NOT NULL DEFAULT -1 COMMENT '回溯天数(跟踪日往回回溯)',
-  `track_day` int NOT NULL DEFAULT -1 COMMENT '跟踪天数(跟踪日往前跟踪)',
   `track_sum_day` int NOT NULL DEFAULT -1 COMMENT '累计跟踪天数(自跟踪日起)',
 
   `from_track_date_up_down_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '追踪日到当日的涨幅',
-  `trade_volume` decimal(18,6) NOT NULL DEFAULT '-1' COMMENT '板块总成交量(亿)',
+  `trade_volume` decimal(18,6) NOT NULL DEFAULT '-1' COMMENT '当日板块总成交量(亿)',
   `sum_close_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日分类跟踪累计收盘涨幅',
   `avg_close_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '当日分类跟踪平均收盘涨幅',
-  `stock_num` int NOT NULL DEFAULT -1 COMMENT '跟踪的股票数',
+  `stock_num` int NOT NULL DEFAULT -1 COMMENT '当日跟踪的股票数',
 
   `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '说明',
   `status` varchar(32) NOT NULL DEFAULT 'normal' COMMENT '状态,正常normal，禁用disable',
@@ -82,7 +81,7 @@ CREATE TABLE `t_sunso_stock_classify_track_day_data` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票分类跟踪回溯的每日数据';
-create unique index unique_code_tradeDate on t_sunso_stock_classify_track_day_data(code,`trade_date`);
+create unique index unique_classifyType_classifyName_trackDate_tradeDate on t_sunso_stock_classify_track_day_data(classify_type, classify_name, track_date, `trade_date`);
 
 
 CREATE TABLE `t_sunso_stock_classify_track_stock_day_data` (
@@ -91,6 +90,8 @@ CREATE TABLE `t_sunso_stock_classify_track_stock_day_data` (
   `classify_name` varchar(128) NOT NULL DEFAULT '' COMMENT '分类跟踪名称',
   `track_date` date  NOT NULL COMMENT '触发的分类跟踪日期',
   `trade_date` date  NOT NULL COMMENT '交易日期',
+
+  `track_sum_day` int NOT NULL DEFAULT -1 COMMENT '累计跟踪天数(自跟踪日起)',
 
   `code` varchar(32) NOT NULL DEFAULT '' COMMENT '股票代码',
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '股票名称',
@@ -106,7 +107,7 @@ CREATE TABLE `t_sunso_stock_classify_track_stock_day_data` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票分类跟踪回溯每只股票的每日数据';
-create unique index unique_code_tradeDate on t_sunso_stock_classify_track_stock_day_data(code,`trade_date`);
+create unique index unique_classifyType_classifyName_trackDate_tradeDate_code on t_sunso_stock_classify_track_stock_day_data(classify_type,classify_name, track_date,`trade_date`, code);
 
 
 
