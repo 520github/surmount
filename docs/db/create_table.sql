@@ -240,7 +240,7 @@ CREATE TABLE `t_sunso_stock_day_industry_statistic_core_data` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票每日行业统计数据';
 create unique index unique_industry_tradeDate on t_sunso_stock_day_industry_statistic_core_data(industry,`trade_date`);
-
+create index index_tradeDate on  t_sunso_stock_day_industry_statistic_core_data(`trade_date`);
 
 
 
@@ -1199,7 +1199,7 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_core_data` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_core_data(code, trade_date);
-
+create index index_tradeData on t_sunso_stock_day_trade_statistic_core_data(trade_date);
 
 drop table `t_sunso_stock_day_trade_statistic_volume_data`;
 CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (

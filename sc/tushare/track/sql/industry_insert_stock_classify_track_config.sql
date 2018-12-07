@@ -17,7 +17,7 @@ and trade_volume > pre3_avg_trade_volume
 and trade_date='{{trade_date}}'
 and concat('industry',industry,'{{trade_date}}',5) not in (
   select concat(classify_type,classify_name,track_date,5)
-  from t_sunso_stock_classify_track_basic
+  from t_sunso_stock_classify_track_config
   where 1>0
   and classify_type='industry'
   and track_date='{{trade_date}}'

@@ -24,17 +24,21 @@ class TrackBace(DbHandler, DbEngineHandler, object):
         DbEngineHandler.__init__(self)
         print("TrackBace init")
 
-    def init_classify_track_portal(self):
+    def init_classify_track_list_portal(self):
         date_list = self.get_classify_track_data_list()
         if date_list is None:
             return
         for date in date_list:
-            self.trade_date = DateHandler.get_date_str(date["trade_date"])
-            self.init_classify_track_basic()
-            self.init_classify_track_config()
-            self.init_classify_track_reback_stock_data()
-            self.init_list_classify_track_day_data()
-            self.init_list_classify_track_stock_day_data()
+            trade_date = DateHandler.get_date_str(date["trade_date"])
+            self.init_classify_track_one_portal(trade_date)
+
+    def init_classify_track_one_portal(self, trade_date):
+        self.trade_date = trade_date
+        self.init_classify_track_basic()
+        self.init_classify_track_config()
+        self.init_classify_track_reback_stock_data()
+        self.init_list_classify_track_day_data()
+        self.init_list_classify_track_stock_day_data()
 
     def get_classify_track_data_list(self):
         sql = "select distinct trade_date from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \

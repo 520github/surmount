@@ -71,7 +71,7 @@ class IndustryTrackBase(TrackBace, object):
         return self.get_industry_column_value_by_date(data, "sum_close_price_ratio")
 
     def get_industry_avg_close_amt_ratio_value_by_date(self, data):
-        return self.get_industry_column_value_by_date(data, "avg_close_price_ratio")
+        return round(self.get_industry_column_value_by_date(data, "avg_close_price_ratio"),2)
 
     def get_industry_stock_num_value_by_date(self, data):
         return self.get_industry_column_value_by_date(data, "stock_num")
@@ -97,4 +97,4 @@ class IndustryTrackBase(TrackBace, object):
 
 if __name__ == "__main__":
     industry = IndustryTrackBase()
-    industry.init_classify_track_portal()
+    industry.init_classify_track_list_portal()
