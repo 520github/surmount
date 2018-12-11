@@ -98,3 +98,4 @@ class IndustryTrackBase(TrackBace, object):
 if __name__ == "__main__":
     industry = IndustryTrackBase()
     industry.init_classify_track_list_portal()
+    # industry.init_classify_track_one_portal("2018-12-01")

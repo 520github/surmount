@@ -9,6 +9,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../statistic'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../batch'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../export'))
 sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../industry'))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../track'))
 
 from TushareStockDataHandler import TushareStockDataHandler
 from TushareStockTodayHistDataHandler import TushareStockTodayHistDataHandler
@@ -23,6 +24,7 @@ from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfte
 from ExportPlateStockList import ExportPlateStockList
 from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalData
 from DayIndustryStatisticCoreData import DayIndustryStatisticCoreData
+from IndustryTrackBase import IndustryTrackBase
 
 
 class TusharePortal(object):
@@ -81,6 +83,10 @@ class TusharePortal(object):
         plate_handler.trade_date = self.trade_date
         plate_handler.run_stock_plate()
 
+    def step55_track_data(self):
+        industry = IndustryTrackBase()
+        industry.init_classify_track_one_portal(self.trade_date)
+
     # 执行股票基础指标相关数据，一般每个季度跑一次就可以,不需要每次都执行
     def step6_load_foundation_index_data(self):
 
@@ -112,5 +118,6 @@ if __name__ == "__main__":
     # portal.step333_day_industry_statistic_data()
     # portal.step4_alarm_data()
     # portal.step5_plate_data()
+    # portal.step55_track_data()
     # portal.step6_load_foundation_index_data()
     portal.step7_export_data()

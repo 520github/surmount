@@ -30,6 +30,7 @@ class TrackBace(DbHandler, DbEngineHandler, object):
             return
         for date in date_list:
             trade_date = DateHandler.get_date_str(date["trade_date"])
+            print("hande date-->" + trade_date)
             self.init_classify_track_one_portal(trade_date)
 
     def init_classify_track_one_portal(self, trade_date):
@@ -42,7 +43,7 @@ class TrackBace(DbHandler, DbEngineHandler, object):
 
     def get_classify_track_data_list(self):
         sql = "select distinct trade_date from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
-              "where 1 > 0 order by trade_date asc"
+              "where 1 > 0 and trade_date>='2018-11-11' order by trade_date asc"
         return self.select_list_sql(sql)
 
     def init_classify_track_basic(self):
