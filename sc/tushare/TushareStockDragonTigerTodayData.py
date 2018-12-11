@@ -32,6 +32,7 @@ class TushareStockDragonTigerTodayData(TushareBase, object):
         return False
 
 
-# top = TushareStockDragonTigerTodayData()
-# top.get_stock_dragon_tiger_today_data_to_db("2018-10-19")
+if __name__ == "__main__":
+    top = TushareStockDragonTigerTodayData()
+    top.get_stock_dragon_tiger_today_data("2018-12-10")
 # top.get_stock_dragon_tiger_today_data_to_db("2018-10-18")
