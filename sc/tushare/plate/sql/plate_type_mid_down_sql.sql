@@ -12,5 +12,4 @@ and pre10_close_price_ratio > pre30_close_price_ratio  -- 说明10日上涨幅�
 and pre30_close_price_ratio < -10
 and code not in (select code from t_sunso_stock_plate_stock
 where plate_name='{{plate_name}}' and plate_start_date='{{plate_start_date}}')
-order by large_above_day1_bs_diff_trade_amt desc
 ;

@@ -474,6 +474,8 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('before_up_after_adjust', '先上涨然后调整', '前10天连续上涨，最近几天在调整', '2018-12-04', '2019-12-04', 'plate_type_before_up_after_adjust_sql.sql'),
+('continue_down_after_up', '连续下跌然后上涨', '几天连续下跌,某天突然大幅上涨', '2018-12-04', '2019-12-04', 'plate_type_continue_down_after_up_sql.sql'),
 ('mid_up', '中继上涨', '从高处往下走,然后往上走', '2018-12-04', '2019-12-04', 'plate_type_mid_up_sql.sql'),
 ('mid_down', '中继下跌', '从高处往下走,有逐步企稳的迹象', '2018-12-04', '2019-12-04', 'plate_type_mid_down_sql.sql'),
 ('short_term_10_day_overfall', '短期10天超跌', '短期10天内跌幅超过15%,需要观察后面的方向变化情况', '2018-10-31', '2019-10-31', 'plate_type_short_term_10_day_overfall_sql.sql'),
