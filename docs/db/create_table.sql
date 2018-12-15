@@ -295,6 +295,18 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_range_avg_data` (
   `pre5_plus_count_high_pre_close_diff_amt_ratio` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的(今日最高价-昨天收盘价)/昨日收盘价%',
   `pre5_plus_count_low_high_diff_amt_ratio` decimal(8,2)  NOT NULL DEFAULT -1 COMMENT '前5日幅度为正的当日最高价与最低价之间的差值/昨日收盘价的百分比%',
 
+  `nearly5_avg_close_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '近5日平均收盘价',
+  `nearly10_avg_close_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '近10日平均收盘价',
+  `nearly20_avg_close_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '近20日平均收盘价',
+  `nearly30_avg_close_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '近30日平均收盘价',
+  `nearly60_avg_close_price` decimal(8,2) NOT NULL DEFAULT -1 COMMENT '近60日平均收盘价',
+
+  `continue_above_nearly5_avg_day` int NOT NULL DEFAULT -1 COMMENT '连续站上5日线的天数',
+  `continue_above_nearly10_avg_day` int NOT NULL DEFAULT -1 COMMENT '连续站上10日线的天数',
+  `continue_above_nearly20_avg_day` int NOT NULL DEFAULT -1 COMMENT '连续站上20日线的天数',
+  `continue_above_nearly30_avg_day` int NOT NULL DEFAULT -1 COMMENT '连续站上30日线的天数',
+  `continue_above_nearly60_avg_day` int NOT NULL DEFAULT -1 COMMENT '连续站上60日线的天数',
+
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`)
