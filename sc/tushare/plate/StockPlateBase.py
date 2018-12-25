@@ -31,6 +31,9 @@ class StockPlateBase(DbHandler, object):
     def get_now_ymd_str(self):
         return DateHandler.get_now_ymd_str()
 
+    def get_date_str(self, date):
+        return DateHandler.get_date_str(date)
+
     def get_tempalte_path(self):
         path = os.path.abspath(os.path.dirname(__file__))
         return path + "/sql/"

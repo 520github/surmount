@@ -1,5 +1,5 @@
 insert into t_sunso_stock_plate_stock(plate_name,plate_start_date,code,name,industry,area,circulation_amt,join_date)
-select '{{plate_name}}','{{plate_start_date}}',code,name,industry,area,round(circulation_amt/10000,6),'{{join_date}}'
+select '{{plate_name}}','{{plate_start_date}}',cd.code,cd.name,industry,area,round(circulation_amt/10000,6),'{{join_date}}'
 FROM
 t_sunso_stock_day_trade_statistic_core_data cd,
 tushare.t_sunso_stock_day_trade_statistic_range_avg_data ra

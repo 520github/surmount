@@ -49,6 +49,7 @@ class StatisticBase(DbHandler, DbEngineHandler, object):
             if stock_data_list is None:
                 continue
             for data in stock_data_list:
+                print("code-->" + data["code"])
                 data["trade_date"] = DateHandler.get_date_str(data["trade_date"])
                 self.handle_one_stock_data(data)
 
@@ -59,7 +60,7 @@ class StatisticBase(DbHandler, DbEngineHandler, object):
         sql = "select distinct trade_date from " \
               "" + self.t_sunso_stock_day_trade_statistic_core_data + " " \
               "where 1 > 0 " \
-              "and trade_date='2018-12-14'"
+              # "and trade_date='2018-12-14'"
         return self.select_data_list(sql)
 
     def get_stock_data_list(self):

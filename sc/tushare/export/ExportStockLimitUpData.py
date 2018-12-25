@@ -5,7 +5,7 @@ from ExportBaseSqlData import ExportBaseSqlData
 
 
 class ExportStockLimitUpData(ExportBaseSqlData, object):
-    trade_date = "2018-11-15"
+    trade_date = "2018-12-17"
 
     def __init__(self):
         # self.keywords = "export_stock_high_transfer_data"

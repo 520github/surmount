@@ -312,6 +312,7 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_range_avg_data` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='股票幅度平均值统计数据';
 create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_range_avg_data(code,`trade_date`);
+create index index_tradeDate on t_sunso_stock_day_trade_statistic_range_avg_data(trade_date);
 
 
 
@@ -486,6 +487,18 @@ create unique index unique_plateName_plateStartDate on t_sunso_stock_plate(plate
 
 insert into t_sunso_stock_plate(`key`, plate_name, remark, plate_start_date, plate_end_date, sql_template_key)
 values
+('mid_three_avg_ten_day_down', '中线10日平均价连续低', '中线10日平均价一个比一个低', '2018-12-18', '2019-12-19', 'plate_type_mid_term_three_avg_ten_day_down_sql.sql'),
+('mid_5_10_20_quick_down', '中线5-10-20快速下跌', '5日快速下跌,10、20也是下跌趋势', '2018-11-28', '2019-11-29', 'plate_type_mid_term_newly_5_10_20_quick_down.sql'),
+('mid_full_abandon_baby', '中线全弃婴', '近30天向下走势,中间K线在左右两个K线的下面', '2018-12-03', '2019-12-04', 'plate_type_mid_term_abandon_baby_sql.sql'),
+('mid_left_abandon_baby', '中线左弃婴', '近30天向下走势,中间K线在左K线的下面', '2018-12-11', '2019-12-12', 'plate_type_mid_term_left_abandon_baby_sql.sql'),
+('mid_right_abandon_baby', '中线右弃婴', '近30天向下走势,中间K线在右K线的下面', '2018-12-03', '2019-12-04', 'plate_type_mid_term_right_abandon_baby_sql.sql'),
+('mid_continue_down_shrinkage_botton', '中线连续缩量下跌', '中线连续缩量下跌,探底当天微放量', '2018-12-20', '2019-12-21', 'plate_type_mid_term_continue_down_shrinkage_botton_sql.sql'),
+('mid_one_sun_after_two_shade', '中线一阳双阴', '中幅上涨之后，后续连续2次下跌', '2018-11-05', '2019-12-06', 'plate_type_mid_term_one_up_after_two_down_sql.sql'),
+('short_quick_up_after_three_adjust', '短线快升后3调', '短期快速上升之后,进行了3天缩量调整', '2018-12-05', '2019-12-06', 'plate_type_short_term_quick_up_after_three_adjust_sql.sql'),
+('short_quick_up_after_n_day_adjust', '短线快升后n调', '短期快速上升之后,进行了N天缩量调整', '2018-12-03', '2019-12-04', 'plate_type_short_term_quick_up_after_n_day_adjust_sql.sql'),
+
+
+('short_two_shade_after_one_sun', '短线双阴一阳', '高点下走过程的一个中续,反弹幅度可能不会很大', '2018-11-05', '2019-12-06', 'plate_type_short_term_two_shade_after_sun_sql.sql'),
 ('before_up_after_adjust', '先上涨然后调整', '前10天连续上涨，最近几天在调整', '2018-12-04', '2019-12-04', 'plate_type_before_up_after_adjust_sql.sql'),
 ('continue_down_after_up', '连续下跌然后上涨', '几天连续下跌,某天突然大幅上涨', '2018-12-04', '2019-12-04', 'plate_type_continue_down_after_up_sql.sql'),
 ('mid_up', '中继上涨', '从高处往下走,然后往上走', '2018-12-04', '2019-12-04', 'plate_type_mid_up_sql.sql'),
@@ -1597,6 +1610,7 @@ CREATE TABLE `t_sunso_stock_day_trade_statistic_volume_data` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 create unique index unique_code_tradeDate on t_sunso_stock_day_trade_statistic_volume_data(code, trade_date);
+create index index_tradeDate on t_sunso_stock_day_trade_statistic_volume_data(trade_date);
 
 
 
