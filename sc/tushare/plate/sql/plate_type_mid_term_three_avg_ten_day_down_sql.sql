@@ -1,6 +1,6 @@
--- 中线连续3个10日平均收盘价，一个比一个高
-
-select cd.* from t_sunso_stock_day_trade_statistic_core_data cd,
+insert into t_sunso_stock_plate_stock(plate_name,plate_start_date,code,name,industry,area,circulation_amt,join_date)
+select '{{plate_name}}','{{plate_start_date}}',cd.code,cd.name,cd.industry,cd.area,round(cd.circulation_amt/10000,6),'{{join_date}}'
+from t_sunso_stock_day_trade_statistic_core_data cd,
 t_sunso_stock_day_trade_statistic_range_avg_data rd,
 (
 select * from t_sunso_stock_day_trade_statistic_range_avg_data

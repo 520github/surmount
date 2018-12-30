@@ -30,7 +30,7 @@ class StockPlateHandler(object):
 
     def run_stock_plate_by_date(self):
         sql = "select distinct trade_date from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
-              "where trade_date>='2018-10-31' order by trade_date asc "
+              "where trade_date>='2018-11-28' order by trade_date asc "
         date_list = DbHandler.select_list_sql(sql)
         if date_list is None:
             return

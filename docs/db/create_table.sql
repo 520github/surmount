@@ -493,11 +493,12 @@ values
 ('mid_left_abandon_baby', '中线左弃婴', '近30天向下走势,中间K线在左K线的下面', '2018-12-11', '2019-12-12', 'plate_type_mid_term_left_abandon_baby_sql.sql'),
 ('mid_right_abandon_baby', '中线右弃婴', '近30天向下走势,中间K线在右K线的下面', '2018-12-03', '2019-12-04', 'plate_type_mid_term_right_abandon_baby_sql.sql'),
 ('mid_continue_down_shrinkage_botton', '中线连续缩量下跌', '中线连续缩量下跌,探底当天微放量', '2018-12-20', '2019-12-21', 'plate_type_mid_term_continue_down_shrinkage_botton_sql.sql'),
-('mid_one_sun_after_two_shade', '中线一阳双阴', '中幅上涨之后，后续连续2次下跌', '2018-11-05', '2019-12-06', 'plate_type_mid_term_one_up_after_two_down_sql.sql'),
 ('short_quick_up_after_three_adjust', '短线快升后3调', '短期快速上升之后,进行了3天缩量调整', '2018-12-05', '2019-12-06', 'plate_type_short_term_quick_up_after_three_adjust_sql.sql'),
 ('short_quick_up_after_n_day_adjust', '短线快升后n调', '短期快速上升之后,进行了N天缩量调整', '2018-12-03', '2019-12-04', 'plate_type_short_term_quick_up_after_n_day_adjust_sql.sql'),
+('short_five_shade_sun_change', '短线5日阴阳变化', '近期下跌过程中，出现一阴双阳一阴一阳的变化情况', '2018-12-20', '2019-12-21', 'plate_type_short_term_five_shade_sun_change_sql.sql'),
+('short_up_limit_after_three_up', '涨停价上3天调整', '某天涨停，之后3天在涨停价上进行调整，可观察后续2天的情况', '2018-12-05', '2019-12-05', 'plate_type_short_term_up_limit_after_three_up_sql.sql'),
 
-
+('mid_one_sun_after_two_shade', '中线一阳双阴', '中幅上涨之后，后续连续2次下跌', '2018-11-05', '2019-12-06', 'plate_type_mid_term_one_up_after_two_down_sql.sql'),
 ('short_two_shade_after_one_sun', '短线双阴一阳', '高点下走过程的一个中续,反弹幅度可能不会很大', '2018-11-05', '2019-12-06', 'plate_type_short_term_two_shade_after_sun_sql.sql'),
 ('before_up_after_adjust', '先上涨然后调整', '前10天连续上涨，最近几天在调整', '2018-12-04', '2019-12-04', 'plate_type_before_up_after_adjust_sql.sql'),
 ('continue_down_after_up', '连续下跌然后上涨', '几天连续下跌,某天突然大幅上涨', '2018-12-04', '2019-12-04', 'plate_type_continue_down_after_up_sql.sql'),

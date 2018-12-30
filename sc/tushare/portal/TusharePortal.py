@@ -28,7 +28,7 @@ from IndustryTrackBase import IndustryTrackBase
 
 
 class TusharePortal(object):
-    trade_date = "2018-12-24"
+    trade_date = "2018-12-28"
 
     def __init__(self):
         print("TusharePortal init")

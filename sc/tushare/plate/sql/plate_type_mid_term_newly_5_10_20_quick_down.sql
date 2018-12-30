@@ -1,6 +1,6 @@
--- 中线近5日急跌，10日跌幅大于5日跌幅，20日跌幅大于10跌幅
-
-select * from t_sunso_stock_day_trade_statistic_core_data
+insert into t_sunso_stock_plate_stock(plate_name,plate_start_date,code,name,industry,area,circulation_amt,join_date)
+select '{{plate_name}}','{{plate_start_date}}',cd.code,cd.name,cd.industry,cd.area,round(cd.circulation_amt/10000,6),'{{join_date}}'
+from t_sunso_stock_day_trade_statistic_core_data cd
 where 1 >0
 -- and code='603922'
 and trade_date='{{trade_date}}'

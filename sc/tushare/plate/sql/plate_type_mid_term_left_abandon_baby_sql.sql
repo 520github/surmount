@@ -1,6 +1,6 @@
--- 中线左弃婴（中间十字星与左侧K线远离）
-
-select cd.* from t_sunso_stock_day_trade_statistic_core_data cd,
+insert into t_sunso_stock_plate_stock(plate_name,plate_start_date,code,name,industry,area,circulation_amt,join_date)
+select '{{plate_name}}','{{plate_start_date}}',cd.code,cd.name,cd.industry,cd.area,round(cd.circulation_amt/10000,6),'{{join_date}}'
+from t_sunso_stock_day_trade_statistic_core_data cd,
 (
 select * from t_sunso_stock_day_trade_statistic_core_data
 where 1 >0

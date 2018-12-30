@@ -49,7 +49,7 @@ class SqlTest(StockPlateBase, object):
 
         # self.sql_template = "plate_type_mid_term_abandon_baby_sql.sql"
 
-        self.sql_template = "plate_type_mid_term_one_up_after_two_down_sql.sql"
+
 
         #self.sql_template = "plate_type_short_term_two_shade_after_sun_sql.sql"
 
@@ -70,6 +70,12 @@ class SqlTest(StockPlateBase, object):
         self.sql_template = "plate_type_mid_term_three_avg_ten_day_down_sql.sql"
 
         # self.sql_template = "plate_type_mid_term_two_avg_ten_day_up_sql.sql"
+        self.sql_template = "plate_type_mid_term_three_sun_sql.sql"
+        self.sql_template = "plate_type_short_term_five_shade_sun_change_sql.sql"
+        self.sql_template = "plate_type_short_term_up_limit_after_three_up_sql.sql"
+        self.sql_template = "plate_type_mid_term_one_up_after_two_down_sql.sql"
+        self.sql_template = "plate_type_short_term_four_sun_one_shade_sql.sql"
+        self.sql_template = "plate_type_short_term_limit_up_after_down_sql.sql"
 
         sql = "select distinct trade_date from " + self.t_sunso_stock_day_trade_statistic_core_data + " " \
               "where 1 > 0 and trade_date<'2018-12-28' " \
