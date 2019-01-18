@@ -22,13 +22,14 @@ from AlarmTodayFirstUpAfterDownAndYesterdayUpLimit import AlarmTodayFirstUpAfter
 from StockPlateHandler import StockPlateHandler
 from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
 from ExportPlateStockList import ExportPlateStockList
+from ExportStockBeforeTwoShadeAfterOneSun import ExportStockBeforeTwoShadeAfterOneSun
 from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalData
 from DayIndustryStatisticCoreData import DayIndustryStatisticCoreData
 from IndustryTrackBase import IndustryTrackBase
 
 
 class TusharePortal(object):
-    trade_date = "2018-12-28"
+    trade_date = "2019-01-17"
 
     def __init__(self):
         print("TusharePortal init")
@@ -107,6 +108,10 @@ class TusharePortal(object):
 
         high = ExportPlateStockList()
         high.export_sql_data_list_to_excel("plate_name")
+
+        one = ExportStockBeforeTwoShadeAfterOneSun()
+        one.trade_date = self.trade_date
+        one.export_sql_data_to_excel()
 
 
 if __name__ == "__main__":
