@@ -23,13 +23,14 @@ from StockPlateHandler import StockPlateHandler
 from ExportAlarmSameDayBeforeLowAfterHigh import ExportAlarmSameDayBeforeLowAfterHigh
 from ExportPlateStockList import ExportPlateStockList
 from ExportStockBeforeTwoShadeAfterOneSun import ExportStockBeforeTwoShadeAfterOneSun
+from ExportStockNShadeNDayBigTurnover import ExportStockNShadeNDayBigTurnover
 from TushareStockDragonTigerDayTotalData import TushareStockDragonTigerDayTotalData
 from DayIndustryStatisticCoreData import DayIndustryStatisticCoreData
 from IndustryTrackBase import IndustryTrackBase
 
 
 class TusharePortal(object):
-    trade_date = "2019-01-17"
+    trade_date = "2019-01-25"
 
     def __init__(self):
         print("TusharePortal init")
@@ -113,11 +114,15 @@ class TusharePortal(object):
         one.trade_date = self.trade_date
         one.export_sql_data_to_excel()
 
+        ExportStockNShadeNDayBigTurnover.trade_date = self.trade_date
+        nshadenday = ExportStockNShadeNDayBigTurnover()
+        nshadenday.export_sql_data_list_to_excel("key")
+
 
 if __name__ == "__main__":
     portal = TusharePortal()
     # portal.step1_get_today_data()
-    # portal.step2_load_today_data()
+    portal.step2_load_today_data()
     # portal.step3_statistic_range_avg_data()
     # portal.step33_dragon_tiger_day_total_data()
     # portal.step333_day_industry_statistic_data()
@@ -125,4 +130,4 @@ if __name__ == "__main__":
     # portal.step5_plate_data()
     # portal.step55_track_data()
     # portal.step6_load_foundation_index_data()
-    portal.step7_export_data()
+    # portal.step7_export_data()
