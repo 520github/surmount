@@ -32,7 +32,8 @@ class TushareStockBasic(TushareBase, object):
               "shareholders,time_to_market,trade_date) " \
               "select code,name,industry,area,pe,pb,esp,bvps,outstanding,totals,0,totalAssets,liquidAssets,fixedAssets," \
               "reserved,reservedPerShare,undp,perundp,rev,profit,gpr,npr,holders,timeToMarket,"  \
-              "'" + self.get_latest_work_day() + "' from " + self.table_name
+              "'" + self.get_latest_work_day() + "' from " + self.table_name + " " \
+              "where date='" + self.get_latest_work_day() + "'"
         self.insert_sql(sql)
 
     def update_sunso_stock_basic(self):
