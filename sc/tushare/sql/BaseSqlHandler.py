@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import sys
+import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import pystache as tp
@@ -36,7 +37,8 @@ class BaseSqlHandler(object):
 
     @staticmethod
     def get_sql_path(name):
-        return "../sql/" + name
+        path = os.path.abspath(os.path.dirname(__file__))
+        return path + "/" + name
 
 
 # data = {"a":'hello',"b":100,"c":"yes"}

@@ -98,4 +98,5 @@ class ExportBase(DbHandler, ExcelHandler, object):
         return self.get_excel_file_path() + keywords + "_" + code + ".xls"
 
     def get_excel_file_path(self):
-        return "/Users/sunso520/Downloads/"
+        #return "/Users/sunso520/Downloads/"
+        return "G:\\surmount\\export\\"

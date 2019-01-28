@@ -122,7 +122,7 @@ class TusharePortal(object):
 if __name__ == "__main__":
     portal = TusharePortal()
     # portal.step1_get_today_data()
-    portal.step2_load_today_data()
+    # portal.step2_load_today_data()
     # portal.step3_statistic_range_avg_data()
     # portal.step33_dragon_tiger_day_total_data()
     # portal.step333_day_industry_statistic_data()
@@ -130,4 +130,4 @@ if __name__ == "__main__":
     # portal.step5_plate_data()
     # portal.step55_track_data()
     # portal.step6_load_foundation_index_data()
-    # portal.step7_export_data()
+    portal.step7_export_data()
