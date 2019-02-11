@@ -1,0 +1,38 @@
+insert into t_tushare_stock_newly_quotes_data(
+    `index`,
+    code,
+    name,
+    changepercent,
+    trade,
+    open,
+    high,
+    low,
+    settlement,
+    volume,
+    turnoverratio,
+    amount,
+    per,
+    pb,
+    mktcap,
+    nmc,
+    date
+)
+value(
+    {{index}},
+    '{{code}}',
+    '{{name}}',
+    {{changepercent}},
+    {{trade}},
+    {{open}},
+    {{high}},
+    {{low}},
+    {{settlement}},
+    {{volume}},
+    {{turnoverratio}},
+    {{amount}},
+    {{per}},
+    {{pb}},
+    {{mktcap}},
+    {{nmc}},
+    '{{date}}'
+);

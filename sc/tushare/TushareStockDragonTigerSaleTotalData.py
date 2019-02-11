@@ -14,6 +14,8 @@ class TushareStockDragonTigerSaleTotalData(TushareBase, object):
 
     def get_stock_dragon_tiger_sale_total_data(self, days):
         data_list = ts.broker_tops(days)
+        if data_list is None:
+            return data_list
         data_list["days"] = days
         data_list["date"] = self.get_latest_work_day()
         return data_list

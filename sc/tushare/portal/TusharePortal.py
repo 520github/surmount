@@ -13,6 +13,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../track'))
 
 from TushareStockDataHandler import TushareStockDataHandler
 from TushareStockTodayHistDataHandler import TushareStockTodayHistDataHandler
+from TushareStockHistDateDataHandler import TushareStockHistDateDataHandler
+from TushareStockHistQuotesToNewlyQuotesHandler import TushareStockHistQuotesToNewlyQuotesHandler
 from TushareStockLoadFoundationIndex import TushareStockLoadFoundationIndex
 from BaseFoundationYearAndQuarter import BaseFoundationYearAndQuarter
 from StatisticRangeAvgData import StatisticRangeAvgData
@@ -30,7 +32,7 @@ from IndustryTrackBase import IndustryTrackBase
 
 
 class TusharePortal(object):
-    trade_date = "2019-01-25"
+    trade_date = "2019-01-29"
 
     def __init__(self):
         print("TusharePortal init")
@@ -42,6 +44,14 @@ class TusharePortal(object):
         # handler.clear_today_basic_data()
         handler.init_today_basic_data()
 
+    # 获取历史指定日期相关的数据源
+    def step1_get_hist_data(self):
+        handler = TushareStockDataHandler()
+        handler.init_hist_basic_data()
+
+        quotes_handler = TushareStockHistQuotesToNewlyQuotesHandler()
+        quotes_handler.handle_hist_quotes_to_newly_quotes(self.trade_date)
+
     # 处理当天数据
     def step2_load_today_data(self):
         today_hist_data_handler = TushareStockTodayHistDataHandler()
@@ -49,6 +59,12 @@ class TusharePortal(object):
         today_hist_data_handler.date = self.trade_date
         print("date2-->" + today_hist_data_handler.date)
         today_hist_data_handler.run_tushare_stock_today_data_handle()
+
+    # 处理历史数据
+    def step2_load_hist_data(self):
+        hist_date_data_handler = TushareStockHistDateDataHandler()
+        hist_date_data_handler.date = self.trade_date
+        hist_date_data_handler.run_tushare_date_stock_hist_data_handle()
 
     # 统计相关幅度的平均数据
     def step3_statistic_range_avg_data(self):
@@ -122,6 +138,7 @@ class TusharePortal(object):
 if __name__ == "__main__":
     portal = TusharePortal()
     # portal.step1_get_today_data()
+    portal.step1_get_hist_data()
     # portal.step2_load_today_data()
     # portal.step3_statistic_range_avg_data()
     # portal.step33_dragon_tiger_day_total_data()
@@ -130,4 +147,4 @@ if __name__ == "__main__":
     # portal.step5_plate_data()
     # portal.step55_track_data()
     # portal.step6_load_foundation_index_data()
-    portal.step7_export_data()
+    # portal.step7_export_data()

@@ -3,7 +3,7 @@
 
 import tushare as ts
 from TushareBase import TushareBase
-
+import traceback
 
 class TushareStockDragonTigerOrganTotalData(TushareBase, object):
 
@@ -13,10 +13,17 @@ class TushareStockDragonTigerOrganTotalData(TushareBase, object):
         print("TushareStockDragonTigerOrganTotalData init")
 
     def get_tushare_stock_dragon_tiger_organ_total_data(self, days):
-        data = ts.inst_tops(days)
-        data["days"] = days
-        data["date"] = self.get_latest_work_day()
-        return data
+        try:
+            data = ts.inst_tops(days)
+            if data is None:
+                return data
+            data["days"] = days
+            data["date"] = self.get_latest_work_day()
+            return data
+        except Exception, e:
+            print e
+            print(traceback.format_exc())
+            return None
 
     def get_tushare_stock_dragon_tiger_organ_total_data_to_db(self, days):
         if not self.is_exist_dragon_tiger_organ_total_data_by_date_and_days(days):

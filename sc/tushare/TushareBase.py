@@ -1114,9 +1114,23 @@ class TushareBase:
         sql = self.sql_handler.get_t_sunso_stock_day_trade_statistic_volume_data_insert_sql(data)
         self.insert_sql(sql)
 
+    def insert_into_t_tushare_stock_newly_quotes_data(self, data):
+        if self.is_exist_data_by_date(self.t_tushare_stock_newly_quotes_data, data):
+            return
+        sql = self.sql_handler.tp_tushare_stock_newly_quotes_data(data)
+        self.insert_sql(sql)
+
     def is_exist_data(self, table_name, data):
         sql = "select count(*) as c from " + table_name + " " \
               "where code='" + data["code"] + "' and trade_date='" + data["trade_date"] + "'"
+        count_value = self.count_sql_default_zero(sql)
+        if count_value > 0:
+            return True
+        return False
+
+    def is_exist_data_by_date(self, table_name, data):
+        sql = "select count(*) as c from " + table_name + " " \
+              "where code='" + data["code"] + "' and date='" + self.get_date_str(data["date"]) + "'"
         count_value = self.count_sql_default_zero(sql)
         if count_value > 0:
             return True
@@ -1321,6 +1335,46 @@ class TushareBase:
             pre_down_limit_days = 0
         return pre_down_limit_days + 1
 
+    def get_newly_quotes_data_by_hist_quotes_data(self, data):
+        stock_code = data["code"]
+        close_amt = data["trade"]
+        change_percent = data["changepercent"]
+        settlement = Decimal(str(self.cal_division_round_2(close_amt, (1 + change_percent / 100))))
+        # 昨日收盘价
+        data["settlement"] = settlement
+
+        date = data["date"]
+        if isinstance(date, datetime.date):
+            date = self.get_date_str(date)
+        sum_trade_volume = self.get_stock_today_sum_volume(stock_code, date)
+        sum_trade_amt = self.get_stock_today_sum_amt(stock_code, date)
+        sunso_stock_baise = self.get_one_sunso_stock_basic(stock_code, date)
+
+        name_key = "name"
+        # 股票名称
+        data[name_key] = sunso_stock_baise[name_key]
+        data["index"] = sunso_stock_baise["id"]
+
+        turnover_rate = Decimal(str(self.cal_percent_round_2(
+            sum_trade_volume*100, sunso_stock_baise["circulation_stock_volume"] * self.unit_hundred_million)))
+        # 换手率
+        data["turnoverratio"] = turnover_rate
+        # 交易金额
+        data["amount"] = sum_trade_amt
+        # 市盈率
+        data["per"] = sunso_stock_baise["pe"]
+        # 市净率
+        data["pb"] = sunso_stock_baise["pb"]
+
+        # 总市值
+        data["mktcap"] = self.get_stock_amt_by_stock_volume(sunso_stock_baise["totals_stock_volume"] , close_amt)
+        # 流通市值
+        data["nmc"] = self.get_stock_amt_by_stock_volume(sunso_stock_baise["circulation_stock_volume"], close_amt)
+        return data
+
+    def get_stock_amt_by_stock_volume(self, stock_volume, close_amt):
+        return round(stock_volume * self.unit_hundred_million * close_amt / 10000, 7)
+
     # 获取某只股票统计的核心数据
     def get_one_stock_statistic_core_data(self, data):
         if data is None:
@@ -1427,8 +1481,8 @@ class TushareBase:
         if turnoverratio_key in data.keys():
             turnover_rate = data[turnoverratio_key]
         else:
-            turnover_rate = str(self.cal_percent_round_2(
-                trade_volume, sunso_stock_baise["circulation_stock_volume"]*self.unit_hundred_million))
+            turnover_rate = Decimal(str(self.cal_percent_round_2(
+                trade_volume, sunso_stock_baise["circulation_stock_volume"]*self.unit_hundred_million)))
         data["turnover_rate"] = turnover_rate
 
         pre1_avg_turnover_rate = self.get_avg_turnover_rate_from_sunso_stock_day_trade_statistic_core(stock_code, date, 1)
@@ -1772,6 +1826,9 @@ class TushareBase:
         return time.strftime("%Y-%m-%d", time.localtime())
 
     def data_to_db_append(self, data, table_name):
+        if data is None:
+            print("data_to_db input data parameter is empty")
+            return
         print(data)
         self.data_to_db(data, table_name, "append")
 
@@ -1837,8 +1894,8 @@ class TushareBase:
         time.sleep(second)
 
     def get_latest_work_day(self):
-        return self.get_now_ymd()
-        #return "2018-11-16"
+        # return self.get_now_ymd()
+        return "2019-01-29"
 
     def get_before_two_month(self):
         before_two_month = datetime.datetime.today() + datetime.timedelta(days=-60)

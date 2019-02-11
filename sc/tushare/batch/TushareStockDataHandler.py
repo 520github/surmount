@@ -56,6 +56,11 @@ class TushareStockDataHandler(object):
         self.init_dragon_tiger_data()
         print("init_today_basic_data is ok...........................")
 
+    def init_hist_basic_data(self):
+        self.init_today_stock_basic()
+        self.init_dragon_tiger_data()
+        print("init_hist_basic_data is ok...........................")
+
     def init_today_quotes_data(self):
         TushareStockDataHandler.tushare_stock_newly_quotes_data.delete_stock_newly_quotes_data_before_today()
         if TushareStockDataHandler.tushare_stock_newly_quotes_data.is_exist_today_newly_quotes_data():

@@ -40,7 +40,8 @@ class TushareStockHistDateDataHandler(object):
 
             if not self.tushare_stock_today_tick_trade_data.is_exist_today_tick_trade_data(stock_code, date):
                 self.tushare_stock_today_tick_trade_data.get_one_stock_date_tick_trade_data_to_db(stock_code, date)
-            self.tushare_stock_today_tick_trade_data.insert_to_sunso_stock_day_trade_statistic_data(hist_quotes_data)
+            # self.tushare_stock_today_tick_trade_data.insert_to_sunso_stock_day_trade_statistic_data(hist_quotes_data)
+            self.tushare_stock_today_tick_trade_data.insert_into_about_sunso_stock_day_trade_statistic_data(hist_quotes_data)
             self.tushare_stock_today_tick_trade_data.delete_today_tick_trade_data(stock_code, date)
 
     def run_tushare_date_stock_hist_data_handle(self):

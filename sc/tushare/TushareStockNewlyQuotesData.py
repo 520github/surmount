@@ -17,6 +17,10 @@ class TushareStockNewlyQuotesData(TushareBase, object):
         data["date"] = self.get_latest_work_day()
         return data
 
+    def insert_into_newly_quotes_data_from_hist_quotes_data(self, data):
+        data = self.get_newly_quotes_data_by_hist_quotes_data(data)
+        self.insert_into_t_tushare_stock_newly_quotes_data(data)
+
     def get_all_stock_newly_quotes_data_to_db(self):
         data = self.get_all_stock_newly_quotes_data()
         if self.is_none(data):

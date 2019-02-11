@@ -29,6 +29,11 @@ class BaseSqlHandler(object):
             "tp_select_column_from_newly_quotes_data_hist_by_pre_date.sql", data)
 
     @staticmethod
+    def tp_tushare_stock_newly_quotes_data(data):
+        return BaseSqlHandler.get_insert_sql_by_tp_file(
+            "tp_tushare_stock_newly_quotes_data.sql", data)
+
+    @staticmethod
     def get_insert_sql_by_tp_file(tp_file, data):
         t = open(BaseSqlHandler.get_sql_path(tp_file), "r")
         sql = tp.render(t.read(), data)
