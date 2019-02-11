@@ -8,6 +8,8 @@ from DbHandler import DbHandler
 from ExcelHandler import ExcelHandler
 from TemplateHandler import TemplateHandler
 from FileHandler import FileHandler
+from ConfigReader import ConfigReader
+from CommonHandler import CommonHandler
 
 
 class ExportBase(DbHandler, ExcelHandler, object):
@@ -17,10 +19,12 @@ class ExportBase(DbHandler, ExcelHandler, object):
     sheet_name = None
     is_alone_file = False
     keywords = None
+    configReader = None
 
     def __init__(self):
         super(ExportBase, self).__init__()
         self.sql_template_key = self.keywords + ".sql"
+        ExportBase.configReader = ConfigReader().get_conf("main")
         print("ExportBase init ")
 
     def export_stock_list_to_excel(self):
@@ -99,4 +103,7 @@ class ExportBase(DbHandler, ExcelHandler, object):
 
     def get_excel_file_path(self):
         #return "/Users/sunso520/Downloads/"
-        return "G:\\surmount\\export\\"
+        #return "G:\\surmount\\export\\"
+        if CommonHandler.is_window_platform():
+            return ExportBase.configReader.export_path_window
+        return ExportBase.configReader.export_path_linux
