@@ -33,14 +33,18 @@ class TushareStockHistQuotesToNewlyQuotesHandler(object):
         for data in data_list:
             stock_code = data["code"]
             date = data["trade_date"].strftime("%Y-%m-%d")
+            print("code:" + stock_code + ", trade_date:" + date)
             if not self.tushare_stock_hist_quotes_data.is_exist_stock_hist_quotes_data_by_date(stock_code, date):
                 self.tushare_stock_hist_quotes_data.get_one_stock_hist_quotes_data_to_db(stock_code, date, date)
 
             hist_quotes_data = self.tushare_stock_hist_quotes_data.get_one_stock_hist_quotes_data_by_date(
                 stock_code, date)
+            if hist_quotes_data is None:
+                continue
             if not self.tushare_stock_today_tick_trade_data.is_exist_today_tick_trade_data(stock_code, date):
                 self.tushare_stock_today_tick_trade_data.get_one_stock_date_tick_trade_data_to_db(stock_code, date)
             self.tushare_stock_newly_quotes_data.insert_into_newly_quotes_data_from_hist_quotes_data(hist_quotes_data)
 
+        print("handle newly_quotes_data_hist by trade_date:" + date)
         self.tushare_stock_newly_quotes_data.delete_stock_newly_quotes_data_hist(date)
         self.tushare_stock_newly_quotes_data.insert_to_stock_newly_quotes_data_hist()

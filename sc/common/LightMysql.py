@@ -64,6 +64,7 @@ class LightMysql:
         if len(params) < 1:
             params = None
         self._cursor.execute(sql, params)
+        self._connect.commit()
         if ret_type == 'all':
             if (self._dbconfig.has_key('cursorType') and self._dbconfig['cursorType'] == 'list') or ret_format == 'row':
                 return self._cursor.fetchall()

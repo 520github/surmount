@@ -170,8 +170,8 @@ class TushareStockHistQuotesData(TushareBase, object):
               "" + self.t_sunso_stock_day_trade_statistic_data + " " \
               "where trade_date='" + date + "')  " \
               " and trade_date='" + date + "' " \
-              " and code='600518' " \
               "order by trade_date asc "
+        # " and code='600518' " \
         return self.select_sql(sql)
 
     def get_one_stock_hist_quotes_data_by_date(self, stock_code, date):
